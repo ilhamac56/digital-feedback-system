@@ -118,11 +118,7 @@ def init_database():
         conn.commit()
         conn.close()
     except Exception as e:
-        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nError: `{e}`")
-        safe_config = DB_CONFIG.copy()
-        safe_config["password"] = "********"  # Sembunyikan password
-        st.info("🔧 **Info Debugging (Konfigurasi yang sedang digunakan):**")
-        st.json(safe_config)
+        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
         st.stop()
 
 
