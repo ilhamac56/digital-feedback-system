@@ -37,14 +37,35 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 # ============================================================
-# DATABASE SETUP (MySQL via Laragon)
+# DATABASE SETUP (MySQL — lokal atau cloud)
 # ============================================================
+
+def _get_secret(key: str, default: str = "") -> str:
+    """
+    Ambil konfigurasi dari environment variable terlebih dahulu,
+    lalu fallback ke st.secrets (Streamlit Cloud), lalu default.
+    """
+    # 1. Environment variable (Railway, Render, VPS, dll.)
+    val = os.environ.get(key)
+    if val:
+        return val
+
+    # 2. Streamlit secrets (Streamlit Community Cloud)
+    try:
+        if hasattr(st, "secrets") and "database" in st.secrets:
+            return str(st.secrets["database"].get(key, default))
+    except Exception:
+        pass
+
+    return default
+
+
 DB_CONFIG = {
-    "host": "127.0.0.1",
-    "port": 3306,
-    "user": "root",
-    "password": "",
-    "database": "digital_feedback_system",
+    "host": _get_secret("DB_HOST", "127.0.0.1"),
+    "port": int(_get_secret("DB_PORT", "3306")),
+    "user": _get_secret("DB_USER", "root"),
+    "password": _get_secret("DB_PASSWORD", ""),
+    "database": _get_secret("DB_NAME", "digital_feedback_system"),
     "charset": "utf8mb4",
 }
 
