@@ -96,26 +96,34 @@ def get_connection():
 
 def init_database():
     """Inisialisasi tabel guest_feedback jika belum ada."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS guest_feedback (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            tanggal DATE DEFAULT (CURDATE()),
-            nama_tamu VARCHAR(255) NOT NULL,
-            rating_bintang TINYINT NOT NULL CHECK(rating_bintang BETWEEN 1 AND 5),
-            q1_tangibles TINYINT NOT NULL CHECK(q1_tangibles BETWEEN 1 AND 5),
-            q2_reliability TINYINT NOT NULL CHECK(q2_reliability BETWEEN 1 AND 5),
-            q3_responsiveness TINYINT NOT NULL CHECK(q3_responsiveness BETWEEN 1 AND 5),
-            q4_assurance TINYINT NOT NULL CHECK(q4_assurance BETWEEN 1 AND 5),
-            q5_empathy TINYINT NOT NULL CHECK(q5_empathy BETWEEN 1 AND 5),
-            teks_ulasan TEXT,
-            dimensi_terdeteksi VARCHAR(500),
-            sentimen_akhir ENUM('Positif', 'Netral', 'Negatif')
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    """)
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS guest_feedback (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                tanggal DATE DEFAULT (CURDATE()),
+                nama_tamu VARCHAR(255) NOT NULL,
+                rating_bintang TINYINT NOT NULL CHECK(rating_bintang BETWEEN 1 AND 5),
+                q1_tangibles TINYINT NOT NULL CHECK(q1_tangibles BETWEEN 1 AND 5),
+                q2_reliability TINYINT NOT NULL CHECK(q2_reliability BETWEEN 1 AND 5),
+                q3_responsiveness TINYINT NOT NULL CHECK(q3_responsiveness BETWEEN 1 AND 5),
+                q4_assurance TINYINT NOT NULL CHECK(q4_assurance BETWEEN 1 AND 5),
+                q5_empathy TINYINT NOT NULL CHECK(q5_empathy BETWEEN 1 AND 5),
+                teks_ulasan TEXT,
+                dimensi_terdeteksi VARCHAR(500),
+                sentimen_akhir ENUM('Positif', 'Netral', 'Negatif')
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        """)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nError: `{e}`")
+        safe_config = DB_CONFIG.copy()
+        safe_config["password"] = "********"  # Sembunyikan password
+        st.info("🔧 **Info Debugging (Konfigurasi yang sedang digunakan):**")
+        st.json(safe_config)
+        st.stop()
 
 
 # ============================================================
