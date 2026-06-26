@@ -28,7 +28,3 @@ Thumbs.db
 
 # Byte-compiled
 *.pyc
-
-# Environment / Secrets (JANGAN commit!)
-.env
-.streamlit/secrets.toml

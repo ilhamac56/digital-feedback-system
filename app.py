@@ -37,13 +37,15 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 # ============================================================
-# DATABASE SETUP (MySQL — lokal atau cloud)
+# ============================================================
+# DATABASE SETUP (MySQL — lokal via Laragon / cloud via Secrets)
 # ============================================================
 
 def _get_secret(key: str, default: str = "") -> str:
     """
     Ambil konfigurasi dari environment variable terlebih dahulu,
     lalu fallback ke st.secrets (Streamlit Cloud), lalu default.
+    Default value = konfigurasi Laragon lokal.
     """
     # 1. Environment variable (Railway, Render, VPS, dll.)
     val = os.environ.get(key)
