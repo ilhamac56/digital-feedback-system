@@ -69,12 +69,28 @@ DB_CONFIG = {
     "password": _get_secret("DB_PASSWORD", ""),
     "database": _get_secret("DB_NAME", "digital_feedback_system"),
     "charset": "utf8mb4",
+    "use_pure": True,
 }
 
 
 def get_connection():
-    """Membuat koneksi ke database MySQL."""
-    conn = mysql.connector.connect(**DB_CONFIG)
+    """Membuat koneksi ke database MySQL (lokal atau cloud dengan SSL)."""
+    config = DB_CONFIG.copy()
+    host = config.get("host", "127.0.0.1")
+
+    # Aktifkan SSL jika koneksi bukan ke localhost (cloud database)
+    if host not in ("127.0.0.1", "localhost", "::1"):
+        config["ssl_disabled"] = False
+        # Coba gunakan certifi CA bundle jika tersedia
+        try:
+            import certifi
+            config["ssl_ca"] = certifi.where()
+        except ImportError:
+            # Tanpa certifi, gunakan ssl_verify_cert=False
+            config["ssl_verify_cert"] = False
+            config["ssl_verify_identity"] = False
+
+    conn = mysql.connector.connect(**config)
     return conn
 
 
