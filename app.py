@@ -307,7 +307,7 @@ def inject_css():
 
     /* ---------- Sidebar ---------- */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        background: linear-gradient(180deg, #145a32 0%, #1e8449 50%, #27ae60 100%);
     }
     section[data-testid="stSidebar"] * {
         color: #e0e0e0 !important;
@@ -336,7 +336,7 @@ def inject_css():
     .kpi-value {
         font-size: 2.2rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #1a5276, #2ecc71);
+        background: linear-gradient(135deg, #1e8449, #2ecc71);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         line-height: 1.2;
@@ -369,7 +369,7 @@ def inject_css():
     .form-header h1 {
         font-size: 1.6rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #0f2027, #2c5364);
+        background: linear-gradient(135deg, #145a32, #27ae60);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -404,8 +404,8 @@ def inject_css():
 
     /* ---------- Likert Label ---------- */
     .likert-statement {
-        background: #f8fafc;
-        border-left: 4px solid #2c5364;
+        background: #f0fdf4;
+        border-left: 4px solid #27ae60;
         padding: 12px 16px;
         border-radius: 0 10px 10px 0;
         margin-bottom: 8px;
@@ -441,7 +441,7 @@ def inject_css():
     .login-card h2 {
         font-size: 1.5rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #0f2027, #2c5364);
+        background: linear-gradient(135deg, #145a32, #27ae60);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
@@ -454,19 +454,19 @@ def inject_css():
 
     /* ---------- Upload Info Box ---------- */
     .upload-info {
-        background: #eef6ff;
-        border-left: 4px solid #3a7ca5;
+        background: #f0fdf4;
+        border-left: 4px solid #27ae60;
         padding: 14px 18px;
         border-radius: 0 10px 10px 0;
         margin-bottom: 16px;
         font-size: 0.9rem;
-        color: #1e3a5f;
+        color: #145a32;
         line-height: 1.6;
     }
 
     /* ---------- Misc Buttons ---------- */
     .stButton > button {
-        background: linear-gradient(135deg, #0f2027, #2c5364) !important;
+        background: linear-gradient(135deg, #1e8449, #27ae60) !important;
         color: white !important;
         border: none !important;
         border-radius: 12px !important;
@@ -478,14 +478,14 @@ def inject_css():
     }
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(15,32,39,0.3) !important;
+        box-shadow: 0 6px 20px rgba(39,174,96,0.35) !important;
     }
 
     /* ---------- Admin nav button (top-right) ---------- */
     .admin-nav-btn button {
         background: transparent !important;
-        color: #2c5364 !important;
-        border: 2px solid #2c5364 !important;
+        color: #1e8449 !important;
+        border: 2px solid #27ae60 !important;
         border-radius: 10px !important;
         padding: 0.35rem 1.2rem !important;
         font-weight: 600 !important;
@@ -493,7 +493,7 @@ def inject_css():
         width: auto !important;
     }
     .admin-nav-btn button:hover {
-        background: linear-gradient(135deg, #0f2027, #2c5364) !important;
+        background: linear-gradient(135deg, #1e8449, #27ae60) !important;
         color: white !important;
         transform: none !important;
         box-shadow: none !important;
@@ -901,7 +901,7 @@ def page_dashboard_monitoring():
             ]
         })
 
-        colors = ["#0f2027", "#203a43", "#2c5364", "#3a7ca5", "#5cb85c"]
+        colors = ["#145a32", "#1e8449", "#27ae60", "#2ecc71", "#82e0aa"]
         fig_bar = px.bar(
             dim_means,
             x="Dimensi",
