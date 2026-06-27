@@ -646,30 +646,25 @@ def page_guest_form():
             st.caption("Pilih angka 1 (Sangat Tidak Setuju) hingga 5 (Sangat Setuju)")
 
             likert_questions = {
-                "q1_tangibles": (
-                    "Kebersihan & Fasilitas Kamar",
-                    "Kamar, estetika bangunan, dan fasilitas fisik di resor ini sangat bersih "
-                    "dan nyaman untuk digunakan."
-                ),
                 "q2_reliability": (
-                    "Kesesuaian Layanan & Biaya",
-                    "Fasilitas dan layanan yang saya terima sejak kedatangan sudah sesuai "
-                    "dengan apa yang dijanjikan."
-                ),
-                "q3_responsiveness": (
-                    "Kecepatan & Kesigapan Staf",
-                    "Staf resor sangat cepat dan sigap dalam merespons serta melayani setiap "
-                    "permintaan saya."
+                    "Kenyamanan Kamar & Kualitas Tidur",
+                    "Kenyamanan kamar dan kualitas tidur yang saya rasakan di resor ini sangat baik dan sesuai dengan janji pelayanan/ekspektasi."
                 ),
                 "q4_assurance": (
-                    "Kenyamanan & Keamanan",
-                    "Keramahan dan kesopanan staf, serta jaminan keamanan di resor ini membuat "
-                    "saya merasa sangat nyaman."
+                    "Kesopanan, Kompetensi & Keamanan Pelayanan",
+                    "Kesopanan dan kompetensi staf, serta jaminan keamanan di resor ini membuat saya merasa sangat nyaman dan terlindungi."
+                ),
+                "q1_tangibles": (
+                    "Kebersihan & Kelengkapan Fasilitas Fisik",
+                    "Estetika bangunan, kebersihan, serta kelengkapan fasilitas fisik di resor ini sangat terawat dan berfungsi dengan baik."
                 ),
                 "q5_empathy": (
-                    "Perhatian Personal Staf",
-                    "Staf resor memberikan perhatian khusus yang ramah dan sangat memahami "
-                    "kebutuhan personal saya selama menginap."
+                    "Kepedulian & Perhatian Personal Staf",
+                    "Staf resor menunjukkan kepedulian yang tinggi dan memberikan perhatian personal untuk memahami kebutuhan saya."
+                ),
+                "q3_responsiveness": (
+                    "Kecepatan & Kesigapan Respons Staf",
+                    "Staf resor sangat cepat dan sigap dalam merespons serta melayani setiap permintaan saya."
                 ),
             }
 
@@ -933,14 +928,14 @@ def page_dashboard_monitoring():
                     unsafe_allow_html=True)
 
         dim_means = pd.DataFrame({
-            "Dimensi": ["Q1 Tangibles", "Q2 Reliability", "Q3 Responsiveness",
-                         "Q4 Assurance", "Q5 Empathy"],
+            "Dimensi": ["X1 Reliability", "X2 Assurance", "X3 Tangibles",
+                         "X4 Empathy", "X5 Responsiveness"],
             "Rata-rata": [
-                df["q1_tangibles"].mean(),
                 df["q2_reliability"].mean(),
-                df["q3_responsiveness"].mean(),
                 df["q4_assurance"].mean(),
+                df["q1_tangibles"].mean(),
                 df["q5_empathy"].mean(),
+                df["q3_responsiveness"].mean(),
             ]
         })
 
@@ -1039,11 +1034,11 @@ def page_dashboard_monitoring():
         "tanggal": "Tanggal",
         "nama_tamu": "Nama Tamu",
         "rating_bintang": "Rating Bintang",
-        "q1_tangibles": "X1 Tangibles",
-        "q2_reliability": "X2 Reliability",
-        "q3_responsiveness": "X3 Responsiveness",
-        "q4_assurance": "X4 Assurance",
-        "q5_empathy": "X5 Empathy",
+        "q2_reliability": "X1 Reliability",
+        "q4_assurance": "X2 Assurance",
+        "q1_tangibles": "X3 Tangibles",
+        "q5_empathy": "X4 Empathy",
+        "q3_responsiveness": "X5 Responsiveness",
         "dimensi_terdeteksi": "Dimensi Terdeteksi",
         "sentimen_akhir": "Sentimen",
         "teks_ulasan": "Teks Ulasan",
@@ -1058,11 +1053,11 @@ def page_dashboard_monitoring():
         column_config={
             "Tanggal": st.column_config.DateColumn(format="DD MMM YYYY"),
             "Rating Bintang": st.column_config.NumberColumn(format="%d ⭐"),
-            "X1 Tangibles": st.column_config.NumberColumn(format="%d"),
-            "X2 Reliability": st.column_config.NumberColumn(format="%d"),
-            "X3 Responsiveness": st.column_config.NumberColumn(format="%d"),
-            "X4 Assurance": st.column_config.NumberColumn(format="%d"),
-            "X5 Empathy": st.column_config.NumberColumn(format="%d"),
+            "X1 Reliability": st.column_config.NumberColumn(format="%d"),
+            "X2 Assurance": st.column_config.NumberColumn(format="%d"),
+            "X3 Tangibles": st.column_config.NumberColumn(format="%d"),
+            "X4 Empathy": st.column_config.NumberColumn(format="%d"),
+            "X5 Responsiveness": st.column_config.NumberColumn(format="%d"),
             "Sentimen": st.column_config.TextColumn(width="small"),
         },
     )
@@ -1083,12 +1078,12 @@ def page_upload_ota():
     st.markdown("""
     <div class="upload-info">
         <strong>📋 Format kolom Excel yang diharapkan:</strong><br>
-        <code>Tanggal | Nama | Rating | Q1 | Q2 | Q3 | Q4 | Q5 | Ulasan</code><br><br>
+        <code>Tanggal | Nama | Rating | X1 | X2 | X3 | X4 | X5 | Ulasan</code><br><br>
         <strong>Keterangan:</strong><br>
         • <strong>Tanggal</strong> — Format tanggal (YYYY-MM-DD atau DD/MM/YYYY)<br>
         • <strong>Nama</strong> — Nama tamu (teks)<br>
         • <strong>Rating</strong> — Rating bintang (angka 1–5)<br>
-        • <strong>Q1–Q5</strong> — Skor dimensi Tangibles, Reliability, Responsiveness, Assurance, Empathy (angka 1–5)<br>
+        • <strong>X1–X5</strong> — Skor dimensi Reliability, Assurance, Tangibles, Empathy, Responsiveness (angka 1–5)<br>
         • <strong>Ulasan</strong> — Teks ulasan tamu
     </div>
     """, unsafe_allow_html=True)
@@ -1112,14 +1107,14 @@ def page_upload_ota():
         if df_upload.shape[1] < 9:
             st.error(
                 f"❌ File harus memiliki minimal 9 kolom "
-                f"(Tanggal, Nama, Rating, Q1, Q2, Q3, Q4, Q5, Ulasan). "
+                f"(Tanggal, Nama, Rating, X1, X2, X3, X4, X5, Ulasan). "
                 f"File Anda memiliki {df_upload.shape[1]} kolom."
             )
             return
 
         # Normalisasi nama kolom — ambil 9 kolom pertama
         df_upload = df_upload.iloc[:, :9]
-        expected_cols = ["Tanggal", "Nama", "Rating", "Q1", "Q2", "Q3", "Q4", "Q5", "Ulasan"]
+        expected_cols = ["Tanggal", "Nama", "Rating", "X1", "X2", "X3", "X4", "X5", "Ulasan"]
         df_upload.columns = expected_cols
 
         # Preview data
@@ -1144,14 +1139,14 @@ def page_upload_ota():
                     rating_val = int(row["Rating"]) if pd.notna(row["Rating"]) else 3
                     rating_val = max(1, min(5, rating_val))  # Clamp 1-5
 
-                    q1 = int(row["Q1"]) if pd.notna(row["Q1"]) else 3
-                    q2 = int(row["Q2"]) if pd.notna(row["Q2"]) else 3
-                    q3 = int(row["Q3"]) if pd.notna(row["Q3"]) else 3
-                    q4 = int(row["Q4"]) if pd.notna(row["Q4"]) else 3
-                    q5 = int(row["Q5"]) if pd.notna(row["Q5"]) else 3
+                    x1 = int(row["X1"]) if pd.notna(row["X1"]) else 3
+                    x2 = int(row["X2"]) if pd.notna(row["X2"]) else 3
+                    x3 = int(row["X3"]) if pd.notna(row["X3"]) else 3
+                    x4 = int(row["X4"]) if pd.notna(row["X4"]) else 3
+                    x5 = int(row["X5"]) if pd.notna(row["X5"]) else 3
 
-                    # Clamp Q1-Q5 ke rentang 1-5
-                    q1, q2, q3, q4, q5 = [max(1, min(5, q)) for q in [q1, q2, q3, q4, q5]]
+                    # Clamp X1-X5 ke rentang 1-5
+                    x1, x2, x3, x4, x5 = [max(1, min(5, x)) for x in [x1, x2, x3, x4, x5]]
 
                     ulasan_val = str(row["Ulasan"]).strip() if pd.notna(row["Ulasan"]) else ""
 
@@ -1162,11 +1157,11 @@ def page_upload_ota():
                         "tanggal": tanggal_str,
                         "nama_tamu": nama_val,
                         "rating_bintang": rating_val,
-                        "q1_tangibles": q1,
-                        "q2_reliability": q2,
-                        "q3_responsiveness": q3,
-                        "q4_assurance": q4,
-                        "q5_empathy": q5,
+                        "q1_tangibles": x3,
+                        "q2_reliability": x1,
+                        "q3_responsiveness": x5,
+                        "q4_assurance": x2,
+                        "q5_empathy": x4,
                         "teks_ulasan": ulasan_val,
                         "dimensi_terdeteksi": dimensi,
                         "sentimen_akhir": sentimen,
