@@ -607,8 +607,8 @@ def page_guest_form():
             st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("""
-        <div style="text-align: center; margin-bottom: 1rem; color: #334155;">
-            <strong>Bantu Kami Menjadi Lebih Baik</strong><br><br>
+        <div style="text-align: center; margin-bottom: 1rem; color: #1e8449; font-size: 0.85rem; line-height: 1.5;">
+            <strong style="font-size: 1rem; color: #145a32;">Bantu Kami Menjadi Lebih Baik</strong><br><br>
             Kepuasan pengunjung adalah prioritas utama di Kampung Sumber Alam. Kami mengundang Anda untuk membagikan kesan dan pesan selama berada di resor kami. Jawaban jujur yang Anda berikan akan langsung kami jadikan acuan untuk meningkatkan standar kualitas layanan kami. Terima kasih atas partisipasi Anda.
         </div>
         """, unsafe_allow_html=True)
