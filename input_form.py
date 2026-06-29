@@ -12,7 +12,7 @@ import pandas as pd
 from datetime import date
 
 from process_nlp import analyze_feedback
-from app import inject_css, go_to, insert_feedback, insert_feedback_batch
+from core_utils import inject_css, go_to, insert_feedback, insert_feedback_batch
 
 
 # ============================================================

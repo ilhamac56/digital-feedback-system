@@ -14,7 +14,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import date, timedelta
 
-from app import load_all_feedback
+from core_utils import load_all_feedback
 
 
 # ============================================================
