@@ -606,7 +606,11 @@ def page_guest_form():
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
-        st.caption("Bantu kami meningkatkan layanan dengan feedback Anda")
+        st.markdown("""
+        **Bantu Kami Menjadi Lebih Baik**
+        
+        Kepuasan pengunjung adalah prioritas utama di Kampung Sumber Alam. Kami mengundang Anda untuk membagikan kesan dan pesan selama berada di resor kami. Jawaban jujur yang Anda berikan akan langsung kami jadikan acuan untuk meningkatkan standar kualitas layanan kami. Terima kasih atas partisipasi Anda.
+        """)
         st.divider()
 
         # --- Form (semua elemen tersusun VERTIKAL, mobile-friendly) ---
