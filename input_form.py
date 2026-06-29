@@ -101,23 +101,23 @@ def page_guest_form():
             st.caption("Pilih angka 1 (Sangat Tidak Setuju) hingga 5 (Sangat Setuju)")
 
             likert_questions = {
-                "q2_reliability": (
+                "q1_reliability": (
                     "Kenyamanan Kamar & Kualitas Tidur",
                     "Kenyamanan kamar dan kualitas tidur yang saya rasakan di resor ini sangat baik dan sesuai dengan janji pelayanan/ekspektasi."
                 ),
-                "q4_assurance": (
+                "q2_assurance": (
                     "Kesopanan, Kompetensi & Keamanan Pelayanan",
                     "Kesopanan dan kompetensi staf, serta jaminan keamanan di resor ini membuat saya merasa sangat nyaman dan terlindungi."
                 ),
-                "q1_tangibles": (
+                "q3_tangibles": (
                     "Kebersihan & Kelengkapan Fasilitas Fisik",
                     "Estetika bangunan, kebersihan, serta kelengkapan fasilitas fisik di resor ini sangat terawat dan berfungsi dengan baik."
                 ),
-                "q5_empathy": (
+                "q4_empathy": (
                     "Kepedulian & Perhatian Personal Staf",
                     "Staf resor menunjukkan kepedulian yang tinggi dan memberikan perhatian personal untuk memahami kebutuhan saya."
                 ),
-                "q3_responsiveness": (
+                "q5_responsiveness": (
                     "Kecepatan & Kesigapan Respons Staf",
                     "Staf resor sangat cepat dan sigap dalam merespons serta melayani setiap permintaan saya."
                 ),
@@ -169,11 +169,11 @@ def page_guest_form():
                 "tanggal": tanggal_menginap.isoformat(),
                 "nama_tamu": nama.strip(),
                 "rating_bintang": rating,
-                "q1_tangibles": likert_values["q1_tangibles"],
-                "q2_reliability": likert_values["q2_reliability"],
-                "q3_responsiveness": likert_values["q3_responsiveness"],
-                "q4_assurance": likert_values["q4_assurance"],
-                "q5_empathy": likert_values["q5_empathy"],
+                "q1_reliability": likert_values["q1_reliability"],
+                "q2_assurance": likert_values["q2_assurance"],
+                "q3_tangibles": likert_values["q3_tangibles"],
+                "q4_empathy": likert_values["q4_empathy"],
+                "q5_responsiveness": likert_values["q5_responsiveness"],
                 "teks_ulasan": ulasan.strip() if ulasan else "",
                 "dimensi_terdeteksi": dimensi,
                 "sentimen_akhir": sentimen,
@@ -335,11 +335,11 @@ def page_upload_ota():
                         "tanggal": tanggal_str,
                         "nama_tamu": nama_val,
                         "rating_bintang": rating_val,
-                        "q1_tangibles": x3,
-                        "q2_reliability": x1,
-                        "q3_responsiveness": x5,
-                        "q4_assurance": x2,
-                        "q5_empathy": x4,
+                        "q1_reliability": x1,
+                        "q2_assurance": x2,
+                        "q3_tangibles": x3,
+                        "q4_empathy": x4,
+                        "q5_responsiveness": x5,
                         "teks_ulasan": ulasan_val,
                         "dimensi_terdeteksi": dimensi,
                         "sentimen_akhir": sentimen,

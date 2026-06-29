@@ -159,14 +159,14 @@ def page_dashboard_monitoring():
                     unsafe_allow_html=True)
 
         dim_means = pd.DataFrame({
-            "Dimensi": ["X1 Reliability", "X2 Assurance", "X3 Tangibles",
-                         "X4 Empathy", "X5 Responsiveness"],
+            "Dimensi": ["Q1 Reliability", "Q2 Assurance", "Q3 Tangibles",
+                         "Q4 Empathy", "Q5 Responsiveness"],
             "Rata-rata": [
-                df["q2_reliability"].mean(),
-                df["q4_assurance"].mean(),
-                df["q1_tangibles"].mean(),
-                df["q5_empathy"].mean(),
-                df["q3_responsiveness"].mean(),
+                df["q1_reliability"].mean(),
+                df["q2_assurance"].mean(),
+                df["q3_tangibles"].mean(),
+                df["q4_empathy"].mean(),
+                df["q5_responsiveness"].mean(),
             ]
         })
 
@@ -265,11 +265,11 @@ def page_dashboard_monitoring():
         "tanggal": "Tanggal",
         "nama_tamu": "Nama Tamu",
         "rating_bintang": "Rating Bintang",
-        "q2_reliability": "X1 Reliability",
-        "q4_assurance": "X2 Assurance",
-        "q1_tangibles": "X3 Tangibles",
-        "q5_empathy": "X4 Empathy",
-        "q3_responsiveness": "X5 Responsiveness",
+        "q1_reliability": "Q1 Reliability",
+        "q2_assurance": "Q2 Assurance",
+        "q3_tangibles": "Q3 Tangibles",
+        "q4_empathy": "Q4 Empathy",
+        "q5_responsiveness": "Q5 Responsiveness",
         "dimensi_terdeteksi": "Dimensi Terdeteksi",
         "sentimen_akhir": "Sentimen",
         "teks_ulasan": "Teks Ulasan",

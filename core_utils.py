@@ -89,11 +89,11 @@ def init_database():
                 tanggal DATE DEFAULT (CURDATE()),
                 nama_tamu VARCHAR(255) NOT NULL,
                 rating_bintang TINYINT NOT NULL CHECK(rating_bintang BETWEEN 1 AND 5),
-                q1_tangibles TINYINT NOT NULL CHECK(q1_tangibles BETWEEN 1 AND 5),
-                q2_reliability TINYINT NOT NULL CHECK(q2_reliability BETWEEN 1 AND 5),
-                q3_responsiveness TINYINT NOT NULL CHECK(q3_responsiveness BETWEEN 1 AND 5),
-                q4_assurance TINYINT NOT NULL CHECK(q4_assurance BETWEEN 1 AND 5),
-                q5_empathy TINYINT NOT NULL CHECK(q5_empathy BETWEEN 1 AND 5),
+                q1_reliability TINYINT NOT NULL CHECK(q1_reliability BETWEEN 1 AND 5),
+                q2_assurance TINYINT NOT NULL CHECK(q2_assurance BETWEEN 1 AND 5),
+                q3_tangibles TINYINT NOT NULL CHECK(q3_tangibles BETWEEN 1 AND 5),
+                q4_empathy TINYINT NOT NULL CHECK(q4_empathy BETWEEN 1 AND 5),
+                q5_responsiveness TINYINT NOT NULL CHECK(q5_responsiveness BETWEEN 1 AND 5),
                 teks_ulasan TEXT,
                 dimensi_terdeteksi VARCHAR(500),
                 sentimen_akhir ENUM('Positif', 'Netral', 'Negatif')
@@ -118,19 +118,19 @@ def insert_feedback(data: dict) -> bool:
         cursor.execute("""
             INSERT INTO guest_feedback
             (tanggal, nama_tamu, rating_bintang,
-             q1_tangibles, q2_reliability, q3_responsiveness,
-             q4_assurance, q5_empathy, teks_ulasan,
+             q1_reliability, q2_assurance, q3_tangibles,
+             q4_empathy, q5_responsiveness, teks_ulasan,
              dimensi_terdeteksi, sentimen_akhir)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             data["tanggal"],
             data["nama_tamu"],
             data["rating_bintang"],
-            data["q1_tangibles"],
-            data["q2_reliability"],
-            data["q3_responsiveness"],
-            data["q4_assurance"],
-            data["q5_empathy"],
+            data["q1_reliability"],
+            data["q2_assurance"],
+            data["q3_tangibles"],
+            data["q4_empathy"],
+            data["q5_responsiveness"],
             data["teks_ulasan"],
             data["dimensi_terdeteksi"],
             data["sentimen_akhir"],
@@ -157,19 +157,19 @@ def insert_feedback_batch(rows: list[dict]) -> int:
                 cursor.execute("""
                     INSERT INTO guest_feedback
                     (tanggal, nama_tamu, rating_bintang,
-                     q1_tangibles, q2_reliability, q3_responsiveness,
-                     q4_assurance, q5_empathy, teks_ulasan,
+                     q1_reliability, q2_assurance, q3_tangibles,
+                     q4_empathy, q5_responsiveness, teks_ulasan,
                      dimensi_terdeteksi, sentimen_akhir)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     data["tanggal"],
                     data["nama_tamu"],
                     data["rating_bintang"],
-                    data["q1_tangibles"],
-                    data["q2_reliability"],
-                    data["q3_responsiveness"],
-                    data["q4_assurance"],
-                    data["q5_empathy"],
+                    data["q1_reliability"],
+                    data["q2_assurance"],
+                    data["q3_tangibles"],
+                    data["q4_empathy"],
+                    data["q5_responsiveness"],
                     data["teks_ulasan"],
                     data["dimensi_terdeteksi"],
                     data["sentimen_akhir"],
