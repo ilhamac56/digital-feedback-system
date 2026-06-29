@@ -129,21 +129,7 @@ def init_database():
         conn.commit()
         conn.close()
     except Exception as e:
-        # Debug info sementara — untuk troubleshoot koneksi cloud
-        debug_host = DB_CONFIG.get("host", "???")
-        debug_port = DB_CONFIG.get("port", "???")
-        debug_user = DB_CONFIG.get("user", "???")
-        debug_db = DB_CONFIG.get("database", "???")
-        st.error(
-            f"⚠️ **Gagal terhubung ke Database MySQL!**\n\n"
-            f"Detail Error: `{e}`\n\n"
-            f"**Konfigurasi yang terbaca:**\n"
-            f"- Host: `{debug_host}`\n"
-            f"- Port: `{debug_port}`\n"
-            f"- User: `{debug_user}`\n"
-            f"- Database: `{debug_db}`\n\n"
-            f"Pastikan Secrets di Streamlit Cloud sudah diisi dengan benar."
-        )
+        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
         st.stop()
 
 
