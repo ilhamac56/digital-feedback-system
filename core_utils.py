@@ -101,8 +101,8 @@ def init_database():
         """)
         conn.commit()
         conn.close()
-    except Exception as e:
-        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
+    except Exception:
+        st.error("⚠️ **Gagal terhubung ke Database MySQL!**\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
         st.stop()
 
 
