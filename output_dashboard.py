@@ -102,8 +102,8 @@ def page_dashboard_monitoring():
     )
     avg_rating = df["rating_bintang"].mean() if total_ulasan > 0 else 0
     avg_servperf = (
-        df[["q1_tangibles", "q2_reliability", "q3_responsiveness",
-            "q4_assurance", "q5_empathy"]].mean().mean()
+        df[["q1_reliability", "q2_assurance", "q3_tangibles",
+            "q4_empathy", "q5_responsiveness"]].mean().mean()
         if total_ulasan > 0 else 0
     )
 
