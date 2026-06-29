@@ -54,8 +54,19 @@ def _get_secret(key: str, default: str = "") -> str:
 
     # 2. Streamlit secrets (Streamlit Community Cloud)
     try:
-        if hasattr(st, "secrets") and "database" in st.secrets:
-            return str(st.secrets["database"].get(key, default))
+        if hasattr(st, "secrets"):
+            # Coba dari section [database] dulu
+            if "database" in st.secrets:
+                sec = st.secrets["database"]
+                if key in sec:
+                    return str(sec[key])
+                # Coba key lowercase (misal: host, port, user, dll.)
+                key_lower = key.replace("DB_", "").lower()
+                if key_lower in sec:
+                    return str(sec[key_lower])
+            # Coba langsung dari root secrets (tanpa section [database])
+            if key in st.secrets:
+                return str(st.secrets[key])
     except Exception:
         pass
 
@@ -118,7 +129,21 @@ def init_database():
         conn.commit()
         conn.close()
     except Exception as e:
-        st.error(f"⚠️ **Gagal terhubung ke Database MySQL!**\n\nDetail Error: `{e}`\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
+        # Debug info sementara — untuk troubleshoot koneksi cloud
+        debug_host = DB_CONFIG.get("host", "???")
+        debug_port = DB_CONFIG.get("port", "???")
+        debug_user = DB_CONFIG.get("user", "???")
+        debug_db = DB_CONFIG.get("database", "???")
+        st.error(
+            f"⚠️ **Gagal terhubung ke Database MySQL!**\n\n"
+            f"Detail Error: `{e}`\n\n"
+            f"**Konfigurasi yang terbaca:**\n"
+            f"- Host: `{debug_host}`\n"
+            f"- Port: `{debug_port}`\n"
+            f"- User: `{debug_user}`\n"
+            f"- Database: `{debug_db}`\n\n"
+            f"Pastikan Secrets di Streamlit Cloud sudah diisi dengan benar."
+        )
         st.stop()
 
 
