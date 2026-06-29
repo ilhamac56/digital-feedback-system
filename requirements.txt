@@ -3,3 +3,4 @@ plotly>=5.18.0
 pandas>=2.0.0
 mysql-connector-python>=9.0.0
 certifi
+openpyxl>=3.1.0
