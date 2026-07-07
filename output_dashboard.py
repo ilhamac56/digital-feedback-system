@@ -50,6 +50,13 @@ def page_dashboard_monitoring():
         st.markdown("---")
         st.markdown("### 🔍 Filter Data")
 
+        # Filter Rentang Waktu — posisi paling atas agar dropdown tidak terpotong
+        filter_terbaru = st.selectbox(
+            "Rentang Waktu",
+            ["Semua Waktu", "Hari Ini", "7 Hari Terakhir", "30 Hari Terakhir", "90 Hari Terakhir"],
+            key="filter_terbaru",
+        )
+
         # Filter Sentimen
         sentimen_options = ["Semua"] + sorted(df["sentimen_akhir"].dropna().unique().tolist())
         filter_sentimen = st.selectbox("Sentimen", sentimen_options, key="filter_sentimen")
@@ -62,13 +69,6 @@ def page_dashboard_monitoring():
                     all_dimensions.add(d.strip())
         dimensi_options = ["Semua"] + sorted(all_dimensions)
         filter_dimensi = st.selectbox("Dimensi", dimensi_options, key="filter_dimensi")
-
-        # Filter Rentang Waktu — langsung di bawah Dimensi
-        filter_terbaru = st.selectbox(
-            "Rentang Waktu",
-            ["Semua Waktu", "Hari Ini", "7 Hari Terakhir", "30 Hari Terakhir", "90 Hari Terakhir"],
-            key="filter_terbaru",
-        )
 
     # Terapkan filter
     df_filtered = df.copy()
