@@ -63,12 +63,9 @@ def page_dashboard_monitoring():
         dimensi_options = ["Semua"] + sorted(all_dimensions)
         filter_dimensi = st.selectbox("Dimensi", dimensi_options, key="filter_dimensi")
 
-        st.markdown("---")
-
-        # Filter Ulasan Terbaru (berdasarkan rentang waktu)
-        st.markdown("### 🕐 Ulasan Terbaru")
+        # Filter Rentang Waktu — langsung di bawah Dimensi
         filter_terbaru = st.selectbox(
-            "Tampilkan ulasan dari",
+            "Rentang Waktu",
             ["Semua Waktu", "Hari Ini", "7 Hari Terakhir", "30 Hari Terakhir", "90 Hari Terakhir"],
             key="filter_terbaru",
         )
@@ -83,16 +80,19 @@ def page_dashboard_monitoring():
             df_filtered["dimensi_terdeteksi"].str.contains(filter_dimensi, na=False)
         ]
 
-    # Filter berdasarkan waktu — gunakan WIB (UTC+7) agar sesuai waktu lokal Indonesia
+    # Filter berdasarkan waktu — gunakan WIB (UTC+7) dan batasi sampai hari ini
     today = pd.Timestamp(datetime.now(_WIB).date())
     if filter_terbaru == "Hari Ini":
-        df_filtered = df_filtered[df_filtered["tanggal"] >= today]
+        df_filtered = df_filtered[df_filtered["tanggal"] == today]
     elif filter_terbaru == "7 Hari Terakhir":
-        df_filtered = df_filtered[df_filtered["tanggal"] >= today - timedelta(days=7)]
+        start = today - timedelta(days=7)
+        df_filtered = df_filtered[(df_filtered["tanggal"] >= start) & (df_filtered["tanggal"] <= today)]
     elif filter_terbaru == "30 Hari Terakhir":
-        df_filtered = df_filtered[df_filtered["tanggal"] >= today - timedelta(days=30)]
+        start = today - timedelta(days=30)
+        df_filtered = df_filtered[(df_filtered["tanggal"] >= start) & (df_filtered["tanggal"] <= today)]
     elif filter_terbaru == "90 Hari Terakhir":
-        df_filtered = df_filtered[df_filtered["tanggal"] >= today - timedelta(days=90)]
+        start = today - timedelta(days=90)
+        df_filtered = df_filtered[(df_filtered["tanggal"] >= start) & (df_filtered["tanggal"] <= today)]
 
     # ----------------------------------------------------------------
     # KPI CARDS — menggunakan data yang sudah difilter
