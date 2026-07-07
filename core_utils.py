@@ -229,13 +229,6 @@ def inject_css():
         font-size: 1.05rem;
         font-weight: 500;
     }
-    /* Dropdown popup: jangan terpotong oleh sidebar */
-    div[data-baseweb="popover"] {
-        z-index: 9999 !important;
-    }
-    section[data-testid="stSidebar"] > div:first-child {
-        overflow: visible !important;
-    }
     /* Dropdown list text harus gelap agar terbaca di popup putih */
     div[data-baseweb="popover"] li,
     div[data-baseweb="popover"] [role="option"],

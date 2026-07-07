@@ -50,9 +50,9 @@ def page_dashboard_monitoring():
         st.markdown("---")
         st.markdown("### 🔍 Filter Data")
 
-        # Filter Rentang Waktu — posisi paling atas agar dropdown tidak terpotong
-        filter_terbaru = st.selectbox(
-            "Rentang Waktu",
+        # Filter Rentang Waktu — radio agar semua opsi terlihat tanpa dropdown
+        filter_terbaru = st.radio(
+            "🕐 Rentang Waktu",
             ["Semua Waktu", "Hari Ini", "7 Hari Terakhir", "30 Hari Terakhir", "90 Hari Terakhir"],
             key="filter_terbaru",
         )
