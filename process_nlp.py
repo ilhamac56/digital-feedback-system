@@ -15,32 +15,209 @@ import re
 # ============================================================
 
 DIMENSION_KEYWORDS = {
-    "Tangibles": ["kamar", "bersih", "kotor", "fasilitas", "ac", "air", "handuk", "bau", "luas"],
-    "Reliability": ["janji", "sesuai", "nilai", "harga", "pesan", "jadwal"],
-    "Responsiveness": ["cepat", "lambat", "sigap", "respon", "lama", "tunggu", "jam"],
-    "Assurance": ["aman", "nyaman", "ramah", "sopan", "ketus", "satpam"],
-    "Empathy": ["perhatian", "peduli", "bantu", "personal", "senyum"],
+    "Tangibles": [
+        # Kamar & tempat tidur
+        "kamar", "bed", "kasur", "tempat tidur", "ranjang", "bantal", "selimut", "sprei",
+        # Kebersihan
+        "bersih", "kotor", "jorok", "kumuh", "dekil", "debu", "berdebu", "noda",
+        # Fasilitas kamar
+        "fasilitas", "ac", "air", "handuk", "sabun", "sampo", "shampoo", "shower",
+        "toilet", "wc", "wastafel", "cermin", "lemari", "tv", "televisi", "wifi",
+        "internet", "remote", "kulkas", "minibar", "hairdryer", "sandal",
+        # Bangunan & area
+        "bau", "luas", "sempit", "gedung", "bangunan", "lobby", "lobi", "parkir",
+        "taman", "kolam", "pool", "renang", "restoran", "restaurant", "cafe", "kafe",
+        "mushola", "masjid", "playground", "gazebo", "balkon", "teras",
+        # Kondisi fisik
+        "terawat", "rusak", "bocor", "lecek", "kusam", "lusuh", "usang", "tua",
+        "baru", "modern", "renovasi", "cat", "dinding", "lantai", "atap", "plafon",
+        "jendela", "pintu", "kunci", "lampu", "penerangan", "gelap", "terang",
+        # Pemandangan & estetika
+        "pemandangan", "view", "indah", "asri", "hijau", "alam", "sawah", "gunung",
+        "sungai", "danau", "dekorasi", "desain", "interior", "estetik", "instagramable",
+        # Amenities
+        "hot spring", "pemandian", "spa", "sauna", "jacuzzi", "waterpark", "waterboom",
+        "playground", "outbound", "meeting room", "ruang rapat", "ballroom",
+    ],
+    "Reliability": [
+        # Kesesuaian janji
+        "janji", "sesuai", "tidak sesuai", "ekspektasi", "harapan",
+        "deskripsi", "foto", "gambar", "iklan", "promosi", "promo",
+        # Harga & nilai
+        "nilai", "harga", "tarif", "rate", "murah", "mahal", "worth", "worthit",
+        "value", "sebanding", "sepadan", "wajar", "overpriced", "terjangkau",
+        # Reservasi & booking
+        "pesan", "booking", "reservasi", "konfirmasi", "voucher", "tiket",
+        "check in", "checkin", "check out", "checkout",
+        # Jadwal & konsistensi
+        "jadwal", "waktu", "tepat", "telat", "terlambat", "on time", "konsisten",
+        "standar", "kualitas", "mutu", "jaminan", "garansi",
+        # Keandalan umum
+        "andal", "handal", "terpercaya", "profesional", "akurat",
+        "kesalahan", "salah", "keliru", "error", "sistem",
+    ],
+    "Responsiveness": [
+        # Kecepatan
+        "cepat", "lambat", "sigap", "respon", "responsif", "tanggap", "gesit", "gerak",
+        # Waktu tunggu
+        "lama", "tunggu", "antri", "antre", "jam", "menit", "menunggu", "nunggu",
+        "instan", "segera", "langsung",
+        # Pelayanan
+        "layani", "melayani", "pelayanan", "servis", "service", "layanin",
+        "room service", "housekeeping", "cleaning", "maintenance",
+        # Ketanggapan
+        "tanggap", "proaktif", "inisiatif", "spontan", "siap", "siaga",
+        "follow up", "tindak lanjut", "ditindak", "diproses",
+        # Keluhan
+        "komplain", "aduan", "lapor", "request", "permintaan", "minta",
+        "diabaikan", "diacuhkan", "cuek", "masa bodoh",
+    ],
+    "Assurance": [
+        # Keamanan
+        "aman", "keamanan", "security", "satpam", "kunci", "brankas", "safe",
+        "cctv", "pencurian", "hilang", "kehilangan",
+        # Kenyamanan
+        "nyaman", "kenyamanan", "tenang", "damai", "tenteram", "betah",
+        "rileks", "relax", "santai",
+        # Keramahan & kesopanan
+        "ramah", "sopan", "ketus", "jutek", "judes", "galak", "kasar",
+        "hormat", "menghormati", "hangat", "welcome", "sambut", "menyambut",
+        "sapa", "menyapa", "salam",
+        # Kompetensi staf
+        "kompeten", "terlatih", "berpengalaman", "ahli", "mahir",
+        "terampil", "pintar", "cerdas", "capable",
+        # Kepercayaan
+        "percaya", "terpercaya", "trust", "jujur", "transparan",
+        "kredibel", "reputasi", "bintang",
+    ],
+    "Empathy": [
+        # Perhatian personal
+        "perhatian", "peduli", "empati", "care", "caring", "pengertian",
+        "memahami", "paham", "mengerti", "sensitif",
+        # Bantuan
+        "bantu", "membantu", "dibantu", "bantuin", "tolong", "menolong",
+        "ditolong", "assist",
+        # Keramahan personal
+        "personal", "senyum", "tersenyum", "tulus", "ikhlas", "sabar",
+        "lembut", "halus", "bijak",
+        # Kebutuhan khusus
+        "spesial", "special", "khusus", "custom", "request",
+        "disabilitas", "difabel", "anak", "bayi", "lansia",
+        "alergi", "vegetarian", "vegan", "halal",
+        # Komunikasi
+        "komunikasi", "jelaskan", "informasi", "info", "arahan", "panduan",
+        "guide", "sarankan", "rekomendasi", "suggest",
+        "dengar", "mendengar", "dengarkan", "keluh",
+    ],
 }
 
 POSITIVE_KEYWORDS = [
-    "bersih", "ramah", "cepat", "nyaman", "bagus", "enak", "sigap", "sopan",
-    "puas", "memuaskan", "mantap", "indah", "asri", "sejuk", "tenang",
-    "menyenangkan", "terbaik", "recommended", "rekomen", "suka", "senang",
-    "lezat", "wangi", "terawat", "rapi", "luas", "membantu", "responsif",
-]
-NEGATIVE_KEYWORDS = [
-    "kotor", "lambat", "bau", "lama", "ketus", "buruk", "mahal", "mati", "keras",
-    "kurang", "kecewa", "mengecewakan", "jelek", "rusak", "bocor", "sempit",
-    "berisik", "ribut", "bising", "jorok", "lecek", "kusam", "lusuh",
-    "gelap", "pengap", "lembab", "apek", "payah", "parah",
-    "komplain", "keluhan", "ganggu", "terganggu", "susah", "sulit", "ribet",
-    "kumuh", "dekil", "buluk", "ancur", "hancur", "sampah",
-    "kecil", "semrawut", "berantakan", "tua", "usang",
-    "mengecewakan", "rugi", "menyesal", "protes",
-    "tidak", "tdk", "gak", "nggak",
+    # Kebersihan & kondisi
+    "bersih", "terawat", "rapi", "higienis", "steril", "wangi", "harum",
+    "mulus", "baru", "segar",
+    # Keramahan & pelayanan
+    "ramah", "sopan", "hangat", "welcome", "menyambut", "senyum",
+    "tulus", "ikhlas", "sabar", "lembut",
+    # Kecepatan & tanggap
+    "cepat", "sigap", "responsif", "tanggap", "gesit", "proaktif",
+    "inisiatif", "siap", "siaga",
+    # Kenyamanan
+    "nyaman", "tenang", "damai", "betah", "rileks", "santai",
+    "sejuk", "adem", "dingin",
+    # Kualitas
+    "bagus", "baik", "mantap", "oke", "ok", "top", "hebat", "keren",
+    "istimewa", "luar biasa", "fantastis", "sempurna", "prima",
+    "excellent", "amazing", "wonderful", "great", "good", "nice", "perfect",
+    # Pengalaman
+    "enak", "puas", "memuaskan", "senang", "suka", "bahagia", "gembira",
+    "menyenangkan", "berkesan", "memorable", "unforgettable",
+    # Estetika
+    "indah", "cantik", "asri", "hijau", "eksotis", "estetik",
+    "instagramable", "fotogenik", "menawan", "mempesona", "memukau",
+    # Makanan
+    "lezat", "enak", "nikmat", "sedap", "gurih", "segar", "fresh",
+    "variatif", "lengkap", "melimpah", "porsi besar",
+    # Rekomendasi
+    "terbaik", "recommended", "rekomen", "rekomendasi", "worth",
+    "worthit", "sepadan", "sebanding", "terjangkau", "murah",
+    # Ukuran & ruang
+    "luas", "lapang", "spacious", "besar", "megah",
+    # Bantuan
+    "membantu", "dibantu", "menolong", "helpful",
+    # Fasilitas
+    "lengkap", "komplit", "modern", "canggih", "update",
+    # Umum positif
+    "terima kasih", "makasih", "thanks", "thank you",
+    "kembali", "balik", "lagi", "repeat",
+    "aman", "terpercaya", "profesional", "kompeten",
 ]
 
-STOPWORDS_ID = {"di", "ke", "dari", "yang", "dan", "atau", "tapi"}
+NEGATIVE_KEYWORDS = [
+    # Kebersihan
+    "kotor", "jorok", "kumuh", "dekil", "buluk", "bau", "apek", "pengap",
+    "lembab", "jamur", "berjamur", "berdebu", "debu", "noda", "bernoda",
+    "sampah", "berantakan", "semrawut", "acak-acakan",
+    # Kerusakan
+    "rusak", "bocor", "pecah", "retak", "patah", "copot", "lepas",
+    "macet", "error", "mati", "jebol", "robek",
+    "ancur", "hancur", "rontok",
+    # Kondisi buruk
+    "lecek", "kusam", "lusuh", "usang", "tua", "lapuk", "karatan",
+    "gelap", "remang", "suram", "pudar", "luntur",
+    # Ukuran & ruang
+    "sempit", "kecil", "sesak", "sumpek", "penuh", "padat",
+    # Kecepatan
+    "lambat", "lama", "lemot", "molor", "telat", "terlambat",
+    # Sikap staf
+    "ketus", "jutek", "judes", "galak", "kasar", "sombong", "angkuh",
+    "cuek", "acuh", "masa bodoh", "malas", "ogah",
+    "tidak ramah", "gak ramah",
+    # Kebisingan
+    "berisik", "ribut", "bising", "gaduh", "ramai", "keras",
+    # Harga
+    "mahal", "kemahalan", "overpriced", "overprice", "rugi", "merugikan",
+    # Kekecewaan
+    "kurang", "kecewa", "mengecewakan", "menyesal", "kapok",
+    "jelek", "buruk", "payah", "parah", "ampun", "astaga",
+    "terrible", "worst", "bad", "horrible", "awful", "poor", "dirty",
+    # Keluhan & komplain
+    "komplain", "keluhan", "keluh", "protes", "aduan",
+    "ganggu", "terganggu", "mengganggu",
+    # Kesulitan
+    "susah", "sulit", "ribet", "repot", "rumit",
+    # Ketidaksesuaian
+    "tidak sesuai", "gak sesuai", "beda", "berbeda", "zonk", "bohong", "tipu", "menipu",
+    "palsu", "abal", "hoax",
+    # Negasi umum (pembobot)
+    "tidak", "tdk", "gak", "nggak", "nga", "ga", "ngga", "enggak",
+    "belum", "blm", "bukan", "jangan",
+    "tanpa", "tak", "kagak",
+    # Keamanan
+    "hilang", "kehilangan", "dicuri", "pencurian", "bahaya", "berbahaya",
+    # Makanan
+    "hambar", "basi", "tengik", "mentah", "gosong", "asin", "kecut",
+    # Kondisi umum
+    "biasa", "standar", "so so", "lumayan",
+]
+
+STOPWORDS_ID = {
+    # Kata hubung
+    "di", "ke", "dari", "yang", "dan", "atau", "tapi", "tetapi", "namun",
+    # Kata depan & partikel
+    "ini", "itu", "nya", "lah", "kah", "pun", "pula", "juga",
+    "dengan", "untuk", "pada", "oleh", "akan", "telah", "sudah",
+    "sedang", "masih", "bisa", "dapat", "harus", "perlu",
+    # Kata ganti
+    "saya", "aku", "kita", "kami", "mereka", "dia", "ia", "beliau",
+    "kamu", "anda", "kalian",
+    # Kata bantu
+    "adalah", "ialah", "yaitu", "yakni", "merupakan",
+    "ada", "saat", "ketika", "serta", "maupun", "ataupun",
+    "begitu", "jadi", "maka", "karena", "sebab", "agar", "supaya",
+    "jika", "kalau", "bila", "apabila", "walau", "meski", "walaupun",
+    "seperti", "bagai", "seolah", "selain", "hanya", "saja", "sih",
+    "dong", "deh", "kok", "kan", "banget", "sangat", "sekali",
+}
 
 
 # ============================================================
