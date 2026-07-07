@@ -11,9 +11,12 @@ Berisi halaman dashboard admin untuk menampilkan:
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 
 from core_utils import load_all_feedback
+
+# Timezone WIB (UTC+7) — agar filter tanggal sesuai waktu lokal Indonesia
+_WIB = timezone(timedelta(hours=7))
 
 
 # ============================================================
@@ -36,7 +39,9 @@ def page_dashboard_monitoring():
         return
 
     # Pastikan kolom tanggal bertipe datetime untuk filtering
+    # Normalisasi ke date-only (tanpa waktu) agar perbandingan konsisten
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
+    df["tanggal"] = df["tanggal"].dt.normalize()  # Set waktu ke 00:00:00
 
     # ----------------------------------------------------------------
     # SIDEBAR: FILTER (ditambahkan ke sidebar yang sudah ada)
@@ -78,8 +83,8 @@ def page_dashboard_monitoring():
             df_filtered["dimensi_terdeteksi"].str.contains(filter_dimensi, na=False)
         ]
 
-    # Filter berdasarkan waktu
-    today = pd.Timestamp(date.today())
+    # Filter berdasarkan waktu — gunakan WIB (UTC+7) agar sesuai waktu lokal Indonesia
+    today = pd.Timestamp(datetime.now(_WIB).date())
     if filter_terbaru == "Hari Ini":
         df_filtered = df_filtered[df_filtered["tanggal"] >= today]
     elif filter_terbaru == "7 Hari Terakhir":
@@ -90,18 +95,18 @@ def page_dashboard_monitoring():
         df_filtered = df_filtered[df_filtered["tanggal"] >= today - timedelta(days=90)]
 
     # ----------------------------------------------------------------
-    # KPI CARDS — menggunakan seluruh data (tanpa filter)
+    # KPI CARDS — menggunakan data yang sudah difilter
     # ----------------------------------------------------------------
     st.markdown('<p class="section-header">📈 Key Performance Indicators</p>', unsafe_allow_html=True)
 
-    total_ulasan = len(df)
+    total_ulasan = len(df_filtered)
     pct_negatif = (
-        (df["sentimen_akhir"] == "Negatif").sum() / total_ulasan * 100
+        (df_filtered["sentimen_akhir"] == "Negatif").sum() / total_ulasan * 100
         if total_ulasan > 0 else 0
     )
-    avg_rating = df["rating_bintang"].mean() if total_ulasan > 0 else 0
+    avg_rating = df_filtered["rating_bintang"].mean() if total_ulasan > 0 else 0
     avg_servperf = (
-        df[["q1_reliability", "q2_assurance", "q3_tangibles",
+        df_filtered[["q1_reliability", "q2_assurance", "q3_tangibles",
             "q4_empathy", "q5_responsiveness"]].mean().mean()
         if total_ulasan > 0 else 0
     )
@@ -161,11 +166,11 @@ def page_dashboard_monitoring():
             "Dimensi": ["Q1 Reliability", "Q2 Assurance", "Q3 Tangibles",
                          "Q4 Empathy", "Q5 Responsiveness"],
             "Rata-rata": [
-                df["q1_reliability"].mean(),
-                df["q2_assurance"].mean(),
-                df["q3_tangibles"].mean(),
-                df["q4_empathy"].mean(),
-                df["q5_responsiveness"].mean(),
+                df_filtered["q1_reliability"].mean(),
+                df_filtered["q2_assurance"].mean(),
+                df_filtered["q3_tangibles"].mean(),
+                df_filtered["q4_empathy"].mean(),
+                df_filtered["q5_responsiveness"].mean(),
             ]
         })
 
@@ -201,7 +206,7 @@ def page_dashboard_monitoring():
     with chart_col2:
         st.markdown('<p class="section-header">🎯 Distribusi Sentimen</p>', unsafe_allow_html=True)
 
-        sentimen_counts = df["sentimen_akhir"].value_counts().reset_index()
+        sentimen_counts = df_filtered["sentimen_akhir"].value_counts().reset_index()
         sentimen_counts.columns = ["Sentimen", "Jumlah"]
 
         color_map = {"Positif": "#2ecc71", "Netral": "#f39c12", "Negatif": "#e74c3c"}
@@ -251,13 +256,14 @@ def page_dashboard_monitoring():
     if filter_terbaru != "Semua Waktu":
         active_filters.append(f"Waktu={filter_terbaru}")
 
+    total_semua = len(df)
     if active_filters:
         st.caption(
-            f"🔎 Menampilkan {len(df_filtered)} dari {total_ulasan} ulasan "
+            f"🔎 Menampilkan {len(df_filtered)} dari {total_semua} ulasan "
             f"(Filter: {', '.join(active_filters)})"
         )
     else:
-        st.caption(f"Menampilkan seluruh {total_ulasan} ulasan")
+        st.caption(f"Menampilkan seluruh {total_semua} ulasan")
 
     # Pilih & rename kolom untuk tampilan
     display_cols = {
