@@ -435,12 +435,20 @@ def inject_css():
 
     /* ---------- Dashboard Section Card (st.container with border) ---------- */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: linear-gradient(135deg, #f8faf9 0%, #edf5f0 100%);
-        border: 1px solid #d5e8dc !important;
+        background: linear-gradient(135deg, #f0f7f2 0%, #e4f0e8 100%) !important;
+        border: 1.5px solid #c3dbc9 !important;
         border-radius: 16px !important;
-        padding: 8px !important;
-        margin: 10px 0 !important;
-        box-shadow: 0 2px 12px rgba(30, 132, 73, 0.06);
+        padding: 16px 20px !important;
+        margin: 14px 0 !important;
+        box-shadow: 0 3px 15px rgba(30, 132, 73, 0.08) !important;
+        overflow: hidden;
+    }
+    /* Inner layers harus transparan agar gradient parent terlihat */
+    [data-testid="stVerticalBlockBorderWrapper"] > div,
+    [data-testid="stVerticalBlockBorderWrapper"] > div > div,
+    [data-testid="stVerticalBlockBorderWrapper"] > div > div > div {
+        background: transparent !important;
+        background-color: transparent !important;
     }
     </style>
     """, unsafe_allow_html=True)
