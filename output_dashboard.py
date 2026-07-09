@@ -406,7 +406,7 @@ def page_dashboard_monitoring():
     ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
 
     if ulasan_negatif_list:
-        findings = extract_negative_findings(ulasan_negatif_list, top_n=10)
+        findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
 
         if findings:
             # --- Horizontal Bar Chart: Top frasa temuan negatif ---
