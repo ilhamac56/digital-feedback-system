@@ -452,7 +452,7 @@ def page_dashboard_monitoring():
             )
 
             # --- Tabel detail temuan ---
-            with st.expander("\ud83d\udccb Lihat Detail Tabel Temuan Kritis", expanded=False):
+            with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
                 df_table = pd.DataFrame(findings)
                 df_table["frasa"] = df_table["frasa"].str.capitalize()
                 df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
@@ -470,7 +470,7 @@ def page_dashboard_monitoring():
         else:
             st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
     else:
-        st.success("\ud83c\udf89 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+        st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
