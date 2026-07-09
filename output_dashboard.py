@@ -17,7 +17,7 @@ import plotly.express as px
 from datetime import date, timedelta, datetime, timezone
 
 from core_utils import load_all_feedback
-from process_nlp import get_negative_keyword_frequencies
+from process_nlp import extract_negative_findings
 
 # Timezone WIB (UTC+7) — agar filter tanggal sesuai waktu lokal Indonesia
 _WIB = timezone(timedelta(hours=7))
@@ -396,9 +396,9 @@ def page_dashboard_monitoring():
             st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
 
     # ----------------------------------------------------------------
-    # VISUALISASI TOP 5 KATA KUNCI NEGATIF (FITUR 5)
+    # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
     # ----------------------------------------------------------------
-    st.markdown('<p class="section-header">🔍 Top 5 Kata Kunci Keluhan Terbanyak</p>',
+    st.markdown('<p class="section-header">\u26a0\ufe0f Log Temuan Kritis (Aspect-Based)</p>',
                 unsafe_allow_html=True)
 
     # Ambil ulasan yang bersentimen Negatif dari data terfilter
@@ -406,47 +406,71 @@ def page_dashboard_monitoring():
     ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
 
     if ulasan_negatif_list:
-        neg_freq = get_negative_keyword_frequencies(ulasan_negatif_list, top_n=5)
+        findings = extract_negative_findings(ulasan_negatif_list, top_n=10)
 
-        if neg_freq:
-            df_neg_chart = pd.DataFrame(neg_freq)
-            # Urutkan ascending agar bar terbesar di atas pada horizontal chart
-            df_neg_chart = df_neg_chart.sort_values("persentase", ascending=True)
+        if findings:
+            # --- Horizontal Bar Chart: Top frasa temuan negatif ---
+            df_findings = pd.DataFrame(findings)
+            # Capitalize frasa untuk tampilan
+            df_findings["frasa"] = df_findings["frasa"].str.capitalize()
+            # Urutkan ascending agar bar terbesar di atas
+            df_findings = df_findings.sort_values("frekuensi", ascending=True)
 
-            fig_neg = px.bar(
-                df_neg_chart,
-                x="persentase",
-                y="kata",
+            fig_findings = px.bar(
+                df_findings,
+                x="frekuensi",
+                y="frasa",
                 orientation="h",
-                text=df_neg_chart["persentase"].apply(lambda x: f"{x}%"),
-                color="persentase",
+                text=df_findings.apply(
+                    lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
+                ),
+                color="frekuensi",
                 color_continuous_scale=["#f5b7b1", "#e74c3c", "#922b21"],
             )
-            fig_neg.update_layout(
-                height=350,
-                xaxis_title="Persentase (%)",
+            fig_findings.update_layout(
+                height=max(300, len(df_findings) * 45),
+                xaxis_title="Frekuensi Kemunculan",
                 yaxis_title="",
                 showlegend=False,
                 coloraxis_showscale=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
                 font=dict(family="Inter", size=13),
-                margin=dict(t=20, b=40, l=100, r=30),
+                margin=dict(t=20, b=40, l=200, r=30),
             )
-            fig_neg.update_traces(
+            fig_findings.update_traces(
                 textposition="outside",
                 marker_line_width=0,
                 marker_cornerradius=6,
             )
-            st.plotly_chart(fig_neg, use_container_width=True)
+            st.plotly_chart(fig_findings, use_container_width=True)
+
             st.caption(
                 f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
-                f"(dari {total_ulasan} ulasan terfilter)."
+                f"(dari {total_ulasan} ulasan terfilter). "
+                f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
             )
+
+            # --- Tabel detail temuan ---
+            with st.expander("\ud83d\udccb Lihat Detail Tabel Temuan Kritis", expanded=False):
+                df_table = pd.DataFrame(findings)
+                df_table["frasa"] = df_table["frasa"].str.capitalize()
+                df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
+                df_table.index = range(1, len(df_table) + 1)
+                df_table.index.name = "No"
+                st.dataframe(
+                    df_table,
+                    use_container_width=True,
+                    column_config={
+                        "Frasa Temuan": st.column_config.TextColumn(width="large"),
+                        "Frekuensi": st.column_config.NumberColumn(format="%d"),
+                        "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
+                    },
+                )
         else:
-            st.info("Tidak ditemukan kata kunci negatif yang cocok dengan kamus leksikon.")
+            st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
     else:
-        st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+        st.success("\ud83c\udf89 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi

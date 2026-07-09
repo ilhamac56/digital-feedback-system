@@ -315,42 +315,171 @@ def analyze_feedback(teks: str, rating_bintang: int) -> tuple[str, str]:
 
 
 # ============================================================
-# FUNGSI ANALISIS FREKUENSI KATA KUNCI NEGATIF (FITUR 5)
+# FUNGSI EKSTRAKSI FRASA TEMUAN NEGATIF — ASPECT-BASED (FITUR 5)
 # ============================================================
 
-def get_negative_keyword_frequencies(ulasan_negatif: list[str], top_n: int = 5) -> list[dict]:
+# Kamus kata benda (subjek/objek) umum dalam konteks ulasan hotel
+NOUN_KEYWORDS = {
+    # Kamar & tempat tidur
+    "kamar", "kamar mandi", "bed", "kasur", "tempat tidur", "ranjang",
+    "bantal", "selimut", "sprei", "handuk",
+    # Fasilitas
+    "ac", "air", "air panas", "air hangat", "shower", "toilet", "wc",
+    "wastafel", "tv", "televisi", "wifi", "internet", "kulkas", "minibar",
+    "remote", "lampu", "kunci", "pintu", "jendela", "cermin", "lemari",
+    # Bangunan & area
+    "lobby", "lobi", "parkir", "taman", "kolam", "kolam renang",
+    "restoran", "restaurant", "cafe", "kafe", "mushola", "playground",
+    "gazebo", "balkon", "teras", "lantai", "dinding", "atap", "plafon",
+    # Staf & pelayanan
+    "staf", "staff", "karyawan", "resepsionis", "pelayan", "petugas",
+    "pelayanan", "layanan", "servis", "service",
+    "room service", "housekeeping", "cleaning", "front office",
+    # Makanan
+    "makanan", "sarapan", "breakfast", "makan", "menu", "masakan",
+    "minuman", "kopi", "nasi", "roti", "buah",
+    # Fasilitas rekreasi
+    "spa", "sauna", "pemandian", "hot spring", "waterpark", "waterboom",
+    # Umum
+    "harga", "tarif", "biaya", "fasilitas", "lingkungan", "area",
+    "suasana", "pemandangan", "view", "kebersihan", "keamanan",
+    "lokasi", "akses", "jalan",
+}
+
+# Kata penghubung untuk memecah kalimat menjadi fragmen
+_SPLIT_CONJUNCTIONS = [
+    "tetapi", "namun", "tapi", "akan tetapi", "meskipun",
+    "walaupun", "sedangkan", "sementara", "padahal",
+]
+
+
+def _split_into_fragments(text: str) -> list[str]:
     """
-    Menghitung frekuensi kemunculan kata kunci negatif dari
-    seluruh ulasan yang terdeteksi bersentimen Negatif.
+    Memecah teks ulasan menjadi fragmen-fragmen kalimat berdasarkan
+    tanda baca (. , ; !) dan konjungsi (tetapi, namun, tapi, dll).
+    """
+    if not text or not isinstance(text, str):
+        return []
+
+    text = text.lower().strip()
+
+    # Ganti konjungsi dengan delimiter khusus sebelum split
+    for conj in _SPLIT_CONJUNCTIONS:
+        text = text.replace(conj, " |SPLIT| ")
+
+    # Ganti tanda baca pemisah dengan delimiter
+    text = re.sub(r"[.,;!?]+", " |SPLIT| ", text)
+
+    # Split dan bersihkan
+    fragments = [f.strip() for f in text.split("|SPLIT|") if f.strip()]
+    return fragments
+
+
+def _extract_phrase_from_fragment(fragment: str) -> str | None:
+    """
+    Dari satu fragmen kalimat, ekstrak frasa 'kata benda + kata sifat negatif'.
+    Mengembalikan frasa kontekstual atau None jika tidak cocok.
+
+    Logika:
+    1. Cek apakah fragmen mengandung kata sifat negatif.
+    2. Jika ya, cari kata benda yang ada dalam fragmen.
+    3. Gabungkan kata benda + kata sifat negatif menjadi frasa.
+    """
+    # Bersihkan fragmen — hanya alfabet dan spasi
+    clean = re.sub(r"[^a-z\s]", "", fragment)
+    tokens = clean.split()
+
+    if not tokens:
+        return None
+
+    # Cari kata negatif dalam fragmen
+    negative_set = set(NEGATIVE_KEYWORDS)
+    found_negatives = [t for t in tokens if t in negative_set]
+
+    if not found_negatives:
+        return None
+
+    # Cari kata benda (frasa) dalam fragmen — cek frasa multi-kata dulu
+    found_noun = None
+    # Coba frasa 3-kata, lalu 2-kata, lalu 1-kata
+    for n in (3, 2, 1):
+        for i in range(len(tokens) - n + 1):
+            candidate = " ".join(tokens[i:i + n])
+            if candidate in NOUN_KEYWORDS:
+                found_noun = candidate
+                break
+        if found_noun:
+            break
+
+    # Ambil kata negatif utama (yang pertama ditemukan dalam fragmen)
+    primary_negative = found_negatives[0]
+
+    if found_noun:
+        # Gabungkan: "kamar mandi" + "kotor" → "kamar mandi kotor"
+        phrase = f"{found_noun} {primary_negative}"
+    else:
+        # Tidak ada kata benda eksplisit — gunakan konteks sekitar kata negatif
+        # Ambil 1-2 kata sebelum kata negatif sebagai konteks
+        neg_idx = None
+        for i, t in enumerate(tokens):
+            if t == primary_negative:
+                neg_idx = i
+                break
+
+        if neg_idx is not None and neg_idx > 0:
+            # Ambil hingga 2 kata sebelumnya sebagai konteks
+            start = max(0, neg_idx - 2)
+            context_tokens = tokens[start:neg_idx + 1]
+            phrase = " ".join(context_tokens)
+        else:
+            phrase = primary_negative
+
+    return phrase
+
+
+def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> list[dict]:
+    """
+    Mengekstrak frasa temuan negatif (aspect-based) dari seluruh ulasan
+    yang terdeteksi bersentimen Negatif.
+
+    Logika:
+    1. Pecah setiap ulasan menjadi fragmen kalimat.
+    2. Dari setiap fragmen yang mengandung kata sifat negatif,
+       ekstrak frasa kontekstual (kata benda + kata sifat negatif).
+    3. Hitung frekuensi kemunculan frasa tersebut.
 
     Args:
         ulasan_negatif: List teks ulasan bersentimen Negatif.
-        top_n: Jumlah kata kunci teratas yang dikembalikan.
+        top_n: Jumlah frasa teratas yang dikembalikan.
 
     Returns:
-        List of dict [{"kata": str, "frekuensi": int, "persentase": float}]
+        List of dict [{"frasa": str, "frekuensi": int, "persentase": float}]
         diurutkan dari frekuensi tertinggi.
     """
-    negative_set = set(NEGATIVE_KEYWORDS)
-    word_counter = Counter()
+    phrase_counter = Counter()
 
     for teks in ulasan_negatif:
-        tokens = _preprocess_text(teks)
-        # Hanya hitung token yang cocok dengan kamus kata negatif
-        matched = [t for t in tokens if t in negative_set]
-        word_counter.update(matched)
+        fragments = _split_into_fragments(teks)
+        seen_in_review = set()  # Hindari duplikasi dari satu ulasan
 
-    total_negative_words = sum(word_counter.values())
-    if total_negative_words == 0:
+        for fragment in fragments:
+            phrase = _extract_phrase_from_fragment(fragment)
+            if phrase and phrase not in seen_in_review:
+                phrase_counter[phrase] += 1
+                seen_in_review.add(phrase)
+
+    total_findings = sum(phrase_counter.values())
+    if total_findings == 0:
         return []
 
     results = []
-    for kata, freq in word_counter.most_common(top_n):
+    for frasa, freq in phrase_counter.most_common(top_n):
         results.append({
-            "kata": kata,
+            "frasa": frasa,
             "frekuensi": freq,
-            "persentase": round(freq / total_negative_words * 100, 1),
+            "persentase": round(freq / total_findings * 100, 1),
         })
 
     return results
+
 
