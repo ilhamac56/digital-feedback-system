@@ -434,21 +434,19 @@ def inject_css():
     header { visibility: hidden; }
 
     /* ---------- Dashboard Section Card (st.container with border) ---------- */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        background: linear-gradient(135deg, #f0f7f2 0%, #e4f0e8 100%) !important;
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #f0f7f2 !important;
         border: 1.5px solid #c3dbc9 !important;
         border-radius: 16px !important;
         padding: 16px 20px !important;
         margin: 14px 0 !important;
         box-shadow: 0 3px 15px rgba(30, 132, 73, 0.08) !important;
-        overflow: hidden;
     }
-    /* Inner layers harus transparan agar gradient parent terlihat */
-    [data-testid="stVerticalBlockBorderWrapper"] > div,
-    [data-testid="stVerticalBlockBorderWrapper"] > div > div,
-    [data-testid="stVerticalBlockBorderWrapper"] > div > div > div {
-        background: transparent !important;
-        background-color: transparent !important;
+    
+    /* Paksa pewarnaan pada internal div bawaan Streamlit jika transparan gagal */
+    div[data-testid="stVerticalBlockBorderWrapper"] > div,
+    div[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
+        background-color: #f0f7f2 !important;
     }
     </style>
     """, unsafe_allow_html=True)
