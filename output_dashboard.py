@@ -206,7 +206,7 @@ def page_dashboard_monitoring():
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.divider()
 
     # ----------------------------------------------------------------
     # GRAFIK — berdampingan [3, 2] agar bar chart lebih lebar
@@ -305,6 +305,8 @@ def page_dashboard_monitoring():
         )
         st.plotly_chart(fig_donut, use_container_width=True)
 
+    st.divider()
+
     # ----------------------------------------------------------------
     # BARIS BARU: Donut Reservasi + Rekomendasi DSS (FITUR 3 & 4)
     # ----------------------------------------------------------------
@@ -383,17 +385,22 @@ def page_dashboard_monitoring():
                 icon="💡",
             )
 
-            # Tampilkan ringkasan skor semua dimensi untuk konteks
-            st.markdown("**📋 Ringkasan Skor Seluruh Dimensi:**")
+            # Tampilkan ringkasan skor semua dimensi (font kecil)
+            scores_html = '<div style="margin-top:8px;">'
+            scores_html += '<p style="font-size:0.82rem; font-weight:600; color:#1e293b; margin-bottom:6px;">📋 Ringkasan Skor Seluruh Dimensi:</p>'
             for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
                 label = DIMENSION_LABEL_MAP[dim_key]
-                bar_fill = int(score / 5 * 100)
                 indicator = "🔴" if score < 3.0 else "🟡" if score < 4.0 else "🟢"
-                st.markdown(
-                    f"{indicator} **{label}**: {score:.2f}/5",
+                scores_html += (
+                    f'<p style="font-size:0.78rem; margin:2px 0; color:#334155;">'
+                    f'{indicator} <strong>{label}</strong>: {score:.2f}/5</p>'
                 )
+            scores_html += '</div>'
+            st.markdown(scores_html, unsafe_allow_html=True)
         else:
             st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
+
+    st.divider()
 
     # ----------------------------------------------------------------
     # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
@@ -471,6 +478,8 @@ def page_dashboard_monitoring():
             st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
     else:
         st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+
+    st.divider()
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
