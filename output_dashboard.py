@@ -211,331 +211,329 @@ def page_dashboard_monitoring():
     # ----------------------------------------------------------------
     # GRAFIK — berdampingan [3, 2] agar bar chart lebih lebar
     # ----------------------------------------------------------------
-    chart_col1, chart_col2 = st.columns([3, 2], gap="large")
+    with st.container(border=True):
+        chart_col1, chart_col2 = st.columns([3, 2], gap="large")
 
-    # --- Bar Chart: Rata-rata Skor Dimensi (FITUR 2 — label manajerial) ---
-    with chart_col1:
-        st.markdown('<p class="section-header">📊 Rata-rata Skor per Dimensi SERVPERF</p>',
-                    unsafe_allow_html=True)
+        # --- Bar Chart: Rata-rata Skor Dimensi (FITUR 2 — label manajerial) ---
+        with chart_col1:
+            st.markdown('<p class="section-header">📊 Rata-rata Skor per Dimensi SERVPERF</p>',
+                        unsafe_allow_html=True)
 
-        # Variabel backend tetap q1_reliability dst, label diganti
-        dim_means = pd.DataFrame({
-            "Dimensi": [
-                DIMENSION_LABEL_MAP["Reliability"],
-                DIMENSION_LABEL_MAP["Assurance"],
-                DIMENSION_LABEL_MAP["Tangibles"],
-                DIMENSION_LABEL_MAP["Empathy"],
-                DIMENSION_LABEL_MAP["Responsiveness"],
-            ],
-            "Rata-rata": [
-                df_filtered["q1_reliability"].mean(),
-                df_filtered["q2_assurance"].mean(),
-                df_filtered["q3_tangibles"].mean(),
-                df_filtered["q4_empathy"].mean(),
-                df_filtered["q5_responsiveness"].mean(),
-            ]
-        })
+            # Variabel backend tetap q1_reliability dst, label diganti
+            dim_means = pd.DataFrame({
+                "Dimensi": [
+                    DIMENSION_LABEL_MAP["Reliability"],
+                    DIMENSION_LABEL_MAP["Assurance"],
+                    DIMENSION_LABEL_MAP["Tangibles"],
+                    DIMENSION_LABEL_MAP["Empathy"],
+                    DIMENSION_LABEL_MAP["Responsiveness"],
+                ],
+                "Rata-rata": [
+                    df_filtered["q1_reliability"].mean(),
+                    df_filtered["q2_assurance"].mean(),
+                    df_filtered["q3_tangibles"].mean(),
+                    df_filtered["q4_empathy"].mean(),
+                    df_filtered["q5_responsiveness"].mean(),
+                ]
+            })
 
-        colors = ["#145a32", "#1e8449", "#27ae60", "#2ecc71", "#82e0aa"]
-        fig_bar = px.bar(
-            dim_means,
-            x="Dimensi",
-            y="Rata-rata",
-            color="Dimensi",
-            color_discrete_sequence=colors,
-            text_auto=".2f",
-        )
-        fig_bar.update_layout(
-            height=450,
-            yaxis_range=[0, 5.5],
-            yaxis_title="Skor Rata-rata (1–5)",
-            xaxis_title="",
-            showlegend=False,
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Inter", size=13),
-            margin=dict(t=30, b=60, l=50, r=30),
-            bargap=0.3,
-        )
-        fig_bar.update_traces(
-            textposition="outside",
-            marker_line_width=0,
-            marker_cornerradius=8,
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
+            colors = ["#145a32", "#1e8449", "#27ae60", "#2ecc71", "#82e0aa"]
+            fig_bar = px.bar(
+                dim_means,
+                x="Dimensi",
+                y="Rata-rata",
+                color="Dimensi",
+                color_discrete_sequence=colors,
+                text_auto=".2f",
+            )
+            fig_bar.update_layout(
+                height=450,
+                yaxis_range=[0, 5.5],
+                yaxis_title="Skor Rata-rata (1–5)",
+                xaxis_title="",
+                showlegend=False,
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=13),
+                margin=dict(t=30, b=60, l=50, r=30),
+                bargap=0.3,
+            )
+            fig_bar.update_traces(
+                textposition="outside",
+                marker_line_width=0,
+                marker_cornerradius=8,
+            )
+            st.plotly_chart(fig_bar, use_container_width=True)
 
-    # --- Donut Chart: Distribusi Sentimen ---
-    with chart_col2:
-        st.markdown('<p class="section-header">🎯 Distribusi Sentimen</p>', unsafe_allow_html=True)
+        # --- Donut Chart: Distribusi Sentimen ---
+        with chart_col2:
+            st.markdown('<p class="section-header">🎯 Distribusi Sentimen</p>', unsafe_allow_html=True)
 
-        sentimen_counts = df_filtered["sentimen_akhir"].value_counts().reset_index()
-        sentimen_counts.columns = ["Sentimen", "Jumlah"]
+            sentimen_counts = df_filtered["sentimen_akhir"].value_counts().reset_index()
+            sentimen_counts.columns = ["Sentimen", "Jumlah"]
 
-        color_map = {"Positif": "#2ecc71", "Netral": "#f39c12", "Negatif": "#e74c3c"}
-        fig_donut = px.pie(
-            sentimen_counts,
-            names="Sentimen",
-            values="Jumlah",
-            hole=0.55,
-            color="Sentimen",
-            color_discrete_map=color_map,
-        )
-        fig_donut.update_traces(
-            textinfo="label+percent",
-            textposition="outside",
-            textfont_size=12,
-            pull=[0.03] * len(sentimen_counts),
-        )
-        fig_donut.update_layout(
-            height=450,
-            showlegend=False,
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Inter", size=12),
-            margin=dict(t=30, b=30, l=60, r=40),
-            annotations=[
-                dict(
-                    text=f"<b>{total_ulasan}</b><br>Ulasan",
-                    x=0.5, y=0.5,
-                    font_size=15,
-                    showarrow=False,
-                    font=dict(family="Inter", color="#1e293b"),
-                )
-            ],
-        )
-        st.plotly_chart(fig_donut, use_container_width=True)
-
-    st.divider()
+            color_map = {"Positif": "#2ecc71", "Netral": "#f39c12", "Negatif": "#e74c3c"}
+            fig_donut = px.pie(
+                sentimen_counts,
+                names="Sentimen",
+                values="Jumlah",
+                hole=0.55,
+                color="Sentimen",
+                color_discrete_map=color_map,
+            )
+            fig_donut.update_traces(
+                textinfo="label+percent",
+                textposition="outside",
+                textfont_size=12,
+                pull=[0.03] * len(sentimen_counts),
+            )
+            fig_donut.update_layout(
+                height=450,
+                showlegend=False,
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=12),
+                margin=dict(t=30, b=30, l=60, r=40),
+                annotations=[
+                    dict(
+                        text=f"<b>{total_ulasan}</b><br>Ulasan",
+                        x=0.5, y=0.5,
+                        font_size=15,
+                        showarrow=False,
+                        font=dict(family="Inter", color="#1e293b"),
+                    )
+                ],
+            )
+            st.plotly_chart(fig_donut, use_container_width=True)
 
     # ----------------------------------------------------------------
     # BARIS BARU: Donut Reservasi + Rekomendasi DSS (FITUR 3 & 4)
     # ----------------------------------------------------------------
-    dss_col1, dss_col2 = st.columns([2, 3], gap="large")
+    with st.container(border=True):
+        dss_col1, dss_col2 = st.columns([2, 3], gap="large")
 
-    # --- Donut Chart: Proporsi Metode Reservasi (FITUR 3) ---
-    with dss_col1:
-        st.markdown('<p class="section-header">🏷️ Proporsi Metode Reservasi</p>',
-                    unsafe_allow_html=True)
+        # --- Donut Chart: Proporsi Metode Reservasi (FITUR 3) ---
+        with dss_col1:
+            st.markdown('<p class="section-header">🏷️ Proporsi Metode Reservasi</p>',
+                        unsafe_allow_html=True)
 
-        reservasi_counts = df_filtered["jenis_reservasi"].value_counts().reset_index()
-        reservasi_counts.columns = ["Metode", "Jumlah"]
+            reservasi_counts = df_filtered["jenis_reservasi"].value_counts().reset_index()
+            reservasi_counts.columns = ["Metode", "Jumlah"]
 
-        reservasi_color_map = {
-            "Aplikasi Online (OTA)": "#3498db",
-            "Walk-in": "#e67e22",
-            "Tidak Diketahui": "#95a5a6",
-        }
-        fig_reservasi = px.pie(
-            reservasi_counts,
-            names="Metode",
-            values="Jumlah",
-            hole=0.55,
-            color="Metode",
-            color_discrete_map=reservasi_color_map,
-        )
-        fig_reservasi.update_traces(
-            textinfo="label+percent",
-            textposition="outside",
-            textfont_size=12,
-            pull=[0.03] * len(reservasi_counts),
-        )
-        fig_reservasi.update_layout(
-            height=400,
-            showlegend=False,
-            plot_bgcolor="rgba(0,0,0,0)",
-            paper_bgcolor="rgba(0,0,0,0)",
-            font=dict(family="Inter", size=12),
-            margin=dict(t=30, b=30, l=40, r=40),
-            annotations=[
-                dict(
-                    text=f"<b>{total_ulasan}</b><br>Tamu",
-                    x=0.5, y=0.5,
-                    font_size=14,
-                    showarrow=False,
-                    font=dict(family="Inter", color="#1e293b"),
-                )
-            ],
-        )
-        st.plotly_chart(fig_reservasi, use_container_width=True)
-
-    # --- Rekomendasi Prioritas DSS (FITUR 4) ---
-    with dss_col2:
-        st.markdown('<p class="section-header">💡 Rekomendasi Prioritas (DSS)</p>',
-                    unsafe_allow_html=True)
-
-        if total_ulasan > 0:
-            # Hitung rata-rata per dimensi (backend variable names)
-            dim_scores = {
-                "Tangibles": df_filtered["q3_tangibles"].mean(),
-                "Reliability": df_filtered["q1_reliability"].mean(),
-                "Responsiveness": df_filtered["q5_responsiveness"].mean(),
-                "Assurance": df_filtered["q2_assurance"].mean(),
-                "Empathy": df_filtered["q4_empathy"].mean(),
+            reservasi_color_map = {
+                "Aplikasi Online (OTA)": "#3498db",
+                "Walk-in": "#e67e22",
+                "Tidak Diketahui": "#95a5a6",
             }
-
-            # Cari dimensi dengan skor terendah
-            lowest_dim = min(dim_scores, key=dim_scores.get)
-            lowest_score = dim_scores[lowest_dim]
-            lowest_label = DIMENSION_LABEL_MAP[lowest_dim]
-            recommendation = DSS_RECOMMENDATIONS[lowest_dim]
-
-            st.warning(
-                f"**Dimensi Terendah: {lowest_label}** (Skor rata-rata: **{lowest_score:.2f}**/5)\n\n"
-                f"{recommendation}",
-                icon="💡",
+            fig_reservasi = px.pie(
+                reservasi_counts,
+                names="Metode",
+                values="Jumlah",
+                hole=0.55,
+                color="Metode",
+                color_discrete_map=reservasi_color_map,
             )
+            fig_reservasi.update_traces(
+                textinfo="label+percent",
+                textposition="outside",
+                textfont_size=12,
+                pull=[0.03] * len(reservasi_counts),
+            )
+            fig_reservasi.update_layout(
+                height=400,
+                showlegend=False,
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=12),
+                margin=dict(t=30, b=30, l=40, r=40),
+                annotations=[
+                    dict(
+                        text=f"<b>{total_ulasan}</b><br>Tamu",
+                        x=0.5, y=0.5,
+                        font_size=14,
+                        showarrow=False,
+                        font=dict(family="Inter", color="#1e293b"),
+                    )
+                ],
+            )
+            st.plotly_chart(fig_reservasi, use_container_width=True)
 
-            # Tampilkan ringkasan skor semua dimensi (font kecil)
-            scores_html = '<div style="margin-top:8px;">'
-            scores_html += '<p style="font-size:0.82rem; font-weight:600; color:#1e293b; margin-bottom:6px;">📋 Ringkasan Skor Seluruh Dimensi:</p>'
-            for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
-                label = DIMENSION_LABEL_MAP[dim_key]
-                indicator = "🔴" if score < 3.0 else "🟡" if score < 4.0 else "🟢"
-                scores_html += (
-                    f'<p style="font-size:0.78rem; margin:2px 0; color:#334155;">'
-                    f'{indicator} <strong>{label}</strong>: {score:.2f}/5</p>'
+        # --- Rekomendasi Prioritas DSS (FITUR 4) ---
+        with dss_col2:
+            st.markdown('<p class="section-header">💡 Rekomendasi Prioritas (DSS)</p>',
+                        unsafe_allow_html=True)
+
+            if total_ulasan > 0:
+                # Hitung rata-rata per dimensi (backend variable names)
+                dim_scores = {
+                    "Tangibles": df_filtered["q3_tangibles"].mean(),
+                    "Reliability": df_filtered["q1_reliability"].mean(),
+                    "Responsiveness": df_filtered["q5_responsiveness"].mean(),
+                    "Assurance": df_filtered["q2_assurance"].mean(),
+                    "Empathy": df_filtered["q4_empathy"].mean(),
+                }
+
+                # Cari dimensi dengan skor terendah
+                lowest_dim = min(dim_scores, key=dim_scores.get)
+                lowest_score = dim_scores[lowest_dim]
+                lowest_label = DIMENSION_LABEL_MAP[lowest_dim]
+                recommendation = DSS_RECOMMENDATIONS[lowest_dim]
+
+                st.warning(
+                    f"**Dimensi Terendah: {lowest_label}** (Skor rata-rata: **{lowest_score:.2f}**/5)\n\n"
+                    f"{recommendation}",
+                    icon="💡",
                 )
-            scores_html += '</div>'
-            st.markdown(scores_html, unsafe_allow_html=True)
-        else:
-            st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
 
-    st.divider()
+                # Tampilkan ringkasan skor semua dimensi (font kecil)
+                scores_html = '<div style="margin-top:8px;">'
+                scores_html += '<p style="font-size:0.82rem; font-weight:600; color:#1e293b; margin-bottom:6px;">📋 Ringkasan Skor Seluruh Dimensi:</p>'
+                for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
+                    label = DIMENSION_LABEL_MAP[dim_key]
+                    indicator = "🔴" if score < 3.0 else "🟡" if score < 4.0 else "🟢"
+                    scores_html += (
+                        f'<p style="font-size:0.78rem; margin:2px 0; color:#334155;">'
+                        f'{indicator} <strong>{label}</strong>: {score:.2f}/5</p>'
+                    )
+                scores_html += '</div>'
+                st.markdown(scores_html, unsafe_allow_html=True)
+            else:
+                st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
 
     # ----------------------------------------------------------------
     # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
     # ----------------------------------------------------------------
-    st.markdown('<p class="section-header">\u26a0\ufe0f Log Temuan Kritis (Aspect-Based)</p>',
-                unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<p class="section-header">⚠️ Log Temuan Kritis (Aspect-Based)</p>',
+                    unsafe_allow_html=True)
 
-    # Ambil ulasan yang bersentimen Negatif dari data terfilter
-    df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
-    ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
+        # Ambil ulasan yang bersentimen Negatif dari data terfilter
+        df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+        ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
 
-    if ulasan_negatif_list:
-        findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
+        if ulasan_negatif_list:
+            findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
 
-        if findings:
-            # --- Horizontal Bar Chart: Top frasa temuan negatif ---
-            df_findings = pd.DataFrame(findings)
-            # Capitalize frasa untuk tampilan
-            df_findings["frasa"] = df_findings["frasa"].str.capitalize()
-            # Urutkan ascending agar bar terbesar di atas
-            df_findings = df_findings.sort_values("frekuensi", ascending=True)
+            if findings:
+                # --- Horizontal Bar Chart: Top frasa temuan negatif ---
+                df_findings = pd.DataFrame(findings)
+                # Capitalize frasa untuk tampilan
+                df_findings["frasa"] = df_findings["frasa"].str.capitalize()
+                # Urutkan ascending agar bar terbesar di atas
+                df_findings = df_findings.sort_values("frekuensi", ascending=True)
 
-            fig_findings = px.bar(
-                df_findings,
-                x="frekuensi",
-                y="frasa",
-                orientation="h",
-                text=df_findings.apply(
-                    lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
-                ),
-                color="frekuensi",
-                color_continuous_scale=["#f5b7b1", "#e74c3c", "#922b21"],
-            )
-            fig_findings.update_layout(
-                height=max(300, len(df_findings) * 45),
-                xaxis_title="Frekuensi Kemunculan",
-                yaxis_title="",
-                showlegend=False,
-                coloraxis_showscale=False,
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=13),
-                margin=dict(t=20, b=40, l=200, r=30),
-            )
-            fig_findings.update_traces(
-                textposition="outside",
-                marker_line_width=0,
-                marker_cornerradius=6,
-            )
-            st.plotly_chart(fig_findings, use_container_width=True)
-
-            st.caption(
-                f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
-                f"(dari {total_ulasan} ulasan terfilter). "
-                f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
-            )
-
-            # --- Tabel detail temuan ---
-            with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
-                df_table = pd.DataFrame(findings)
-                df_table["frasa"] = df_table["frasa"].str.capitalize()
-                df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
-                df_table.index = range(1, len(df_table) + 1)
-                df_table.index.name = "No"
-                st.dataframe(
-                    df_table,
-                    use_container_width=True,
-                    column_config={
-                        "Frasa Temuan": st.column_config.TextColumn(width="large"),
-                        "Frekuensi": st.column_config.NumberColumn(format="%d"),
-                        "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
-                    },
+                fig_findings = px.bar(
+                    df_findings,
+                    x="frekuensi",
+                    y="frasa",
+                    orientation="h",
+                    text=df_findings.apply(
+                        lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
+                    ),
+                    color="frekuensi",
+                    color_continuous_scale=["#f5b7b1", "#e74c3c", "#922b21"],
                 )
-        else:
-            st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
-    else:
-        st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+                fig_findings.update_layout(
+                    height=max(300, len(df_findings) * 45),
+                    xaxis_title="Frekuensi Kemunculan",
+                    yaxis_title="",
+                    showlegend=False,
+                    coloraxis_showscale=False,
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    font=dict(family="Inter", size=13),
+                    margin=dict(t=20, b=40, l=200, r=30),
+                )
+                fig_findings.update_traces(
+                    textposition="outside",
+                    marker_line_width=0,
+                    marker_cornerradius=6,
+                )
+                st.plotly_chart(fig_findings, use_container_width=True)
 
-    st.divider()
+                st.caption(
+                    f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
+                    f"(dari {total_ulasan} ulasan terfilter). "
+                    f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
+                )
+
+                # --- Tabel detail temuan ---
+                with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
+                    df_table = pd.DataFrame(findings)
+                    df_table["frasa"] = df_table["frasa"].str.capitalize()
+                    df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
+                    df_table.index = range(1, len(df_table) + 1)
+                    df_table.index.name = "No"
+                    st.dataframe(
+                        df_table,
+                        use_container_width=True,
+                        column_config={
+                            "Frasa Temuan": st.column_config.TextColumn(width="large"),
+                            "Frekuensi": st.column_config.NumberColumn(format="%d"),
+                            "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
+                        },
+                    )
+            else:
+                st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
+        else:
+            st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
     # ----------------------------------------------------------------
-    st.markdown('<p class="section-header">📋 Data Ulasan Tamu</p>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<p class="section-header">📋 Data Ulasan Tamu</p>', unsafe_allow_html=True)
 
-    active_filters = []
-    if filter_sentimen != "Semua":
-        active_filters.append(f"Sentimen={filter_sentimen}")
-    if filter_dimensi != "Semua":
-        active_filters.append(f"Dimensi={filter_dimensi}")
-    if filter_terbaru != "Semua Waktu":
-        active_filters.append(f"Waktu={filter_terbaru}")
-    if filter_reservasi != "Semua":
-        active_filters.append(f"Reservasi={filter_reservasi}")
+        active_filters = []
+        if filter_sentimen != "Semua":
+            active_filters.append(f"Sentimen={filter_sentimen}")
+        if filter_dimensi != "Semua":
+            active_filters.append(f"Dimensi={filter_dimensi}")
+        if filter_terbaru != "Semua Waktu":
+            active_filters.append(f"Waktu={filter_terbaru}")
+        if filter_reservasi != "Semua":
+            active_filters.append(f"Reservasi={filter_reservasi}")
 
-    total_semua = len(df)
-    if active_filters:
-        st.caption(
-            f"🔎 Menampilkan {len(df_filtered)} dari {total_semua} ulasan "
-            f"(Filter: {', '.join(active_filters)})"
+        total_semua = len(df)
+        if active_filters:
+            st.caption(
+                f"🔎 Menampilkan {len(df_filtered)} dari {total_semua} ulasan "
+                f"(Filter: {', '.join(active_filters)})"
+            )
+        else:
+            st.caption(f"Menampilkan seluruh {total_semua} ulasan")
+
+        # Pilih & rename kolom untuk tampilan
+        display_cols = {
+            "tanggal": "Tanggal",
+            "nama_tamu": "Nama Tamu",
+            "jenis_reservasi": "Jenis Reservasi",
+            "rating_bintang": "Rating Bintang",
+            "q1_reliability": "Q1 Reliability",
+            "q2_assurance": "Q2 Assurance",
+            "q3_tangibles": "Q3 Tangibles",
+            "q4_empathy": "Q4 Empathy",
+            "q5_responsiveness": "Q5 Responsiveness",
+            "dimensi_terdeteksi": "Dimensi Terdeteksi",
+            "sentimen_akhir": "Sentimen",
+            "teks_ulasan": "Teks Ulasan",
+        }
+        df_display = df_filtered[list(display_cols.keys())].rename(columns=display_cols)
+
+        st.dataframe(
+            df_display,
+            use_container_width=True,
+            hide_index=True,
+            height=400,
+            column_config={
+                "Tanggal": st.column_config.DateColumn(format="DD MMM YYYY"),
+                "Rating Bintang": st.column_config.NumberColumn(format="%d ⭐"),
+                "X1 Reliability": st.column_config.NumberColumn(format="%d"),
+                "X2 Assurance": st.column_config.NumberColumn(format="%d"),
+                "X3 Tangibles": st.column_config.NumberColumn(format="%d"),
+                "X4 Empathy": st.column_config.NumberColumn(format="%d"),
+                "X5 Responsiveness": st.column_config.NumberColumn(format="%d"),
+                "Sentimen": st.column_config.TextColumn(width="small"),
+                "Jenis Reservasi": st.column_config.TextColumn(width="medium"),
+            },
         )
-    else:
-        st.caption(f"Menampilkan seluruh {total_semua} ulasan")
-
-    # Pilih & rename kolom untuk tampilan
-    display_cols = {
-        "tanggal": "Tanggal",
-        "nama_tamu": "Nama Tamu",
-        "jenis_reservasi": "Jenis Reservasi",
-        "rating_bintang": "Rating Bintang",
-        "q1_reliability": "Q1 Reliability",
-        "q2_assurance": "Q2 Assurance",
-        "q3_tangibles": "Q3 Tangibles",
-        "q4_empathy": "Q4 Empathy",
-        "q5_responsiveness": "Q5 Responsiveness",
-        "dimensi_terdeteksi": "Dimensi Terdeteksi",
-        "sentimen_akhir": "Sentimen",
-        "teks_ulasan": "Teks Ulasan",
-    }
-    df_display = df_filtered[list(display_cols.keys())].rename(columns=display_cols)
-
-    st.dataframe(
-        df_display,
-        use_container_width=True,
-        hide_index=True,
-        height=400,
-        column_config={
-            "Tanggal": st.column_config.DateColumn(format="DD MMM YYYY"),
-            "Rating Bintang": st.column_config.NumberColumn(format="%d ⭐"),
-            "X1 Reliability": st.column_config.NumberColumn(format="%d"),
-            "X2 Assurance": st.column_config.NumberColumn(format="%d"),
-            "X3 Tangibles": st.column_config.NumberColumn(format="%d"),
-            "X4 Empathy": st.column_config.NumberColumn(format="%d"),
-            "X5 Responsiveness": st.column_config.NumberColumn(format="%d"),
-            "Sentimen": st.column_config.TextColumn(width="small"),
-            "Jenis Reservasi": st.column_config.TextColumn(width="medium"),
-        },
-    )

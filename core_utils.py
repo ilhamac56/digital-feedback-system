@@ -432,6 +432,16 @@ def inject_css():
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     header { visibility: hidden; }
+
+    /* ---------- Dashboard Section Card (st.container with border) ---------- */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background: linear-gradient(135deg, #f8faf9 0%, #edf5f0 100%);
+        border: 1px solid #d5e8dc !important;
+        border-radius: 16px !important;
+        padding: 8px !important;
+        margin: 10px 0 !important;
+        box-shadow: 0 2px 12px rgba(30, 132, 73, 0.06);
+    }
     </style>
     """, unsafe_allow_html=True)
 
