@@ -96,9 +96,18 @@ def init_database():
                 q5_responsiveness TINYINT NOT NULL CHECK(q5_responsiveness BETWEEN 1 AND 5),
                 teks_ulasan TEXT,
                 dimensi_terdeteksi VARCHAR(500),
-                sentimen_akhir ENUM('Positif', 'Netral', 'Negatif')
+                sentimen_akhir ENUM('Positif', 'Netral', 'Negatif'),
+                jenis_reservasi VARCHAR(50) DEFAULT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
         """)
+        # Backward-compatible: tambahkan kolom jika tabel sudah ada tapi kolom belum
+        try:
+            cursor.execute("""
+                ALTER TABLE guest_feedback
+                ADD COLUMN jenis_reservasi VARCHAR(50) DEFAULT NULL
+            """)
+        except mysql.connector.Error:
+            pass  # Kolom sudah ada, abaikan error
         conn.commit()
         conn.close()
     except Exception:
@@ -120,8 +129,8 @@ def insert_feedback(data: dict) -> bool:
             (tanggal, nama_tamu, rating_bintang,
              q1_reliability, q2_assurance, q3_tangibles,
              q4_empathy, q5_responsiveness, teks_ulasan,
-             dimensi_terdeteksi, sentimen_akhir)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             dimensi_terdeteksi, sentimen_akhir, jenis_reservasi)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             data["tanggal"],
             data["nama_tamu"],
@@ -134,6 +143,7 @@ def insert_feedback(data: dict) -> bool:
             data["teks_ulasan"],
             data["dimensi_terdeteksi"],
             data["sentimen_akhir"],
+            data.get("jenis_reservasi"),
         ))
         conn.commit()
         conn.close()
@@ -159,8 +169,8 @@ def insert_feedback_batch(rows: list[dict]) -> int:
                     (tanggal, nama_tamu, rating_bintang,
                      q1_reliability, q2_assurance, q3_tangibles,
                      q4_empathy, q5_responsiveness, teks_ulasan,
-                     dimensi_terdeteksi, sentimen_akhir)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     dimensi_terdeteksi, sentimen_akhir, jenis_reservasi)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     data["tanggal"],
                     data["nama_tamu"],
@@ -173,6 +183,7 @@ def insert_feedback_batch(rows: list[dict]) -> int:
                     data["teks_ulasan"],
                     data["dimensi_terdeteksi"],
                     data["sentimen_akhir"],
+                    data.get("jenis_reservasi"),
                 ))
                 success_count += 1
             except mysql.connector.Error:

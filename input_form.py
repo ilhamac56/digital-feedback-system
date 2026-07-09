@@ -76,6 +76,21 @@ def page_guest_form():
 
             st.markdown("---")
 
+            # Jenis Reservasi — radio button
+            st.markdown("##### 🏷️ Bagaimana Anda melakukan reservasi kamar?")
+            jenis_reservasi = st.radio(
+                "Metode Reservasi",
+                options=[
+                    "Aplikasi Online (Traveloka, Agoda, dll)",
+                    "Datang Langsung / Resepsionis (Walk-in)",
+                ],
+                index=0,
+                label_visibility="collapsed",
+                key="jenis_reservasi",
+            )
+
+            st.markdown("---")
+
             # Star Rating — radio horizontal
             st.markdown("##### ⭐ Rating Keseluruhan")
             st.caption("Berikan penilaian keseluruhan pengalaman Anda (1 = Sangat Buruk, 5 = Sangat Baik)")
@@ -165,6 +180,12 @@ def page_guest_form():
             dimensi, sentimen = analyze_feedback(ulasan, rating)
 
             # Siapkan data
+            # Mapping jenis reservasi ke nilai ringkas untuk database
+            reservasi_map = {
+                "Aplikasi Online (Traveloka, Agoda, dll)": "Aplikasi Online (OTA)",
+                "Datang Langsung / Resepsionis (Walk-in)": "Walk-in",
+            }
+
             data = {
                 "tanggal": tanggal_menginap.isoformat(),
                 "nama_tamu": nama.strip(),
@@ -177,6 +198,7 @@ def page_guest_form():
                 "teks_ulasan": ulasan.strip() if ulasan else "",
                 "dimensi_terdeteksi": dimensi,
                 "sentimen_akhir": sentimen,
+                "jenis_reservasi": reservasi_map.get(jenis_reservasi, jenis_reservasi),
             }
 
             # Simpan ke database
@@ -343,6 +365,7 @@ def page_upload_ota():
                         "teks_ulasan": ulasan_val,
                         "dimensi_terdeteksi": dimensi,
                         "sentimen_akhir": sentimen,
+                        "jenis_reservasi": "Aplikasi Online (OTA)",
                     })
 
                 except Exception:

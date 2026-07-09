@@ -8,6 +8,7 @@ Berisi logika analisis teks ulasan:
 """
 
 import re
+from collections import Counter
 
 
 # ============================================================
@@ -311,3 +312,45 @@ def analyze_feedback(teks: str, rating_bintang: int) -> tuple[str, str]:
 
     dim_str = ", ".join(dimensions) if dimensions else "Tidak Terdeteksi"
     return dim_str, sentiment
+
+
+# ============================================================
+# FUNGSI ANALISIS FREKUENSI KATA KUNCI NEGATIF (FITUR 5)
+# ============================================================
+
+def get_negative_keyword_frequencies(ulasan_negatif: list[str], top_n: int = 5) -> list[dict]:
+    """
+    Menghitung frekuensi kemunculan kata kunci negatif dari
+    seluruh ulasan yang terdeteksi bersentimen Negatif.
+
+    Args:
+        ulasan_negatif: List teks ulasan bersentimen Negatif.
+        top_n: Jumlah kata kunci teratas yang dikembalikan.
+
+    Returns:
+        List of dict [{"kata": str, "frekuensi": int, "persentase": float}]
+        diurutkan dari frekuensi tertinggi.
+    """
+    negative_set = set(NEGATIVE_KEYWORDS)
+    word_counter = Counter()
+
+    for teks in ulasan_negatif:
+        tokens = _preprocess_text(teks)
+        # Hanya hitung token yang cocok dengan kamus kata negatif
+        matched = [t for t in tokens if t in negative_set]
+        word_counter.update(matched)
+
+    total_negative_words = sum(word_counter.values())
+    if total_negative_words == 0:
+        return []
+
+    results = []
+    for kata, freq in word_counter.most_common(top_n):
+        results.append({
+            "kata": kata,
+            "frekuensi": freq,
+            "persentase": round(freq / total_negative_words * 100, 1),
+        })
+
+    return results
+

@@ -5,6 +5,9 @@ Berisi halaman dashboard admin untuk menampilkan:
 - KPI Cards (total ulasan, sentimen negatif, rata-rata rating, rata-rata SERVPERF)
 - Grafik bar rata-rata skor per dimensi SERVPERF
 - Donut chart distribusi sentimen
+- Donut chart proporsi metode reservasi
+- Rekomendasi Prioritas DSS (rule-based)
+- Horizontal bar chart Top 5 kata kunci keluhan negatif
 - Tabel data ulasan tamu dengan filter
 """
 
@@ -14,9 +17,47 @@ import plotly.express as px
 from datetime import date, timedelta, datetime, timezone
 
 from core_utils import load_all_feedback
+from process_nlp import get_negative_keyword_frequencies
 
 # Timezone WIB (UTC+7) — agar filter tanggal sesuai waktu lokal Indonesia
 _WIB = timezone(timedelta(hours=7))
+
+# ============================================================
+# MAPPING LABEL DIMENSI MANAJERIAL (FITUR 2)
+# ============================================================
+DIMENSION_LABEL_MAP = {
+    "Tangibles": "Fasilitas Fisik & Kebersihan",
+    "Reliability": "Keandalan & Ketepatan Layanan",
+    "Responsiveness": "Kecepatan & Kesigapan Staf",
+    "Assurance": "Keamanan & Kompetensi Staf",
+    "Empathy": "Kepedulian & Perhatian Personal",
+}
+
+# ============================================================
+# REKOMENDASI DSS RULE-BASED (FITUR 4)
+# ============================================================
+DSS_RECOMMENDATIONS = {
+    "Tangibles": (
+        "Fokuskan pengawasan minggu ini pada **perbaikan fasilitas fisik dan kebersihan kamar**. "
+        "Lakukan inspeksi rutin terhadap kondisi kamar, toilet, dan area publik."
+    ),
+    "Reliability": (
+        "Tingkatkan **konsistensi layanan** agar sesuai dengan janji dan ekspektasi tamu. "
+        "Pastikan proses check-in/check-out, reservasi, dan informasi harga akurat."
+    ),
+    "Responsiveness": (
+        "Evaluasi **kecepatan pelayanan staf front-office** dalam menangani keluhan. "
+        "Terapkan SOP waktu respons maksimal untuk setiap permintaan tamu."
+    ),
+    "Assurance": (
+        "Adakan **pelatihan tambahan** untuk meningkatkan kompetensi dan kesopanan staf. "
+        "Pastikan keamanan area hotel dan keramahan pelayanan terjaga."
+    ),
+    "Empathy": (
+        "Dorong staf untuk lebih **proaktif memahami dan memenuhi kebutuhan personal tamu**. "
+        "Latih kemampuan komunikasi empatik dan perhatian terhadap detail."
+    ),
+}
 
 
 # ============================================================
@@ -42,6 +83,12 @@ def page_dashboard_monitoring():
     # Normalisasi ke date-only (tanpa waktu) agar perbandingan konsisten
     df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
     df["tanggal"] = df["tanggal"].dt.normalize()  # Set waktu ke 00:00:00
+
+    # Normalisasi kolom jenis_reservasi (backward-compatible jika NULL)
+    if "jenis_reservasi" not in df.columns:
+        df["jenis_reservasi"] = "Tidak Diketahui"
+    else:
+        df["jenis_reservasi"] = df["jenis_reservasi"].fillna("Tidak Diketahui")
 
     # ----------------------------------------------------------------
     # SIDEBAR: FILTER (ditambahkan ke sidebar yang sudah ada)
@@ -70,6 +117,13 @@ def page_dashboard_monitoring():
         dimensi_options = ["Semua"] + sorted(all_dimensions)
         filter_dimensi = st.selectbox("Dimensi", dimensi_options, key="filter_dimensi")
 
+        # Filter Jenis Reservasi (FITUR 3)
+        filter_reservasi = st.selectbox(
+            "🏷️ Jenis Reservasi",
+            ["Semua", "Aplikasi Online (OTA)", "Walk-in"],
+            key="filter_reservasi",
+        )
+
     # Terapkan filter
     df_filtered = df.copy()
 
@@ -79,6 +133,8 @@ def page_dashboard_monitoring():
         df_filtered = df_filtered[
             df_filtered["dimensi_terdeteksi"].str.contains(filter_dimensi, na=False)
         ]
+    if filter_reservasi != "Semua":
+        df_filtered = df_filtered[df_filtered["jenis_reservasi"] == filter_reservasi]
 
     # Filter berdasarkan waktu — gunakan WIB (UTC+7) dan batasi sampai hari ini
     today = pd.Timestamp(datetime.now(_WIB).date())
@@ -157,14 +213,20 @@ def page_dashboard_monitoring():
     # ----------------------------------------------------------------
     chart_col1, chart_col2 = st.columns([3, 2], gap="large")
 
-    # --- Bar Chart: Rata-rata Skor Dimensi ---
+    # --- Bar Chart: Rata-rata Skor Dimensi (FITUR 2 — label manajerial) ---
     with chart_col1:
         st.markdown('<p class="section-header">📊 Rata-rata Skor per Dimensi SERVPERF</p>',
                     unsafe_allow_html=True)
 
+        # Variabel backend tetap q1_reliability dst, label diganti
         dim_means = pd.DataFrame({
-            "Dimensi": ["Q1 Reliability", "Q2 Assurance", "Q3 Tangibles",
-                         "Q4 Empathy", "Q5 Responsiveness"],
+            "Dimensi": [
+                DIMENSION_LABEL_MAP["Reliability"],
+                DIMENSION_LABEL_MAP["Assurance"],
+                DIMENSION_LABEL_MAP["Tangibles"],
+                DIMENSION_LABEL_MAP["Empathy"],
+                DIMENSION_LABEL_MAP["Responsiveness"],
+            ],
             "Rata-rata": [
                 df_filtered["q1_reliability"].mean(),
                 df_filtered["q2_assurance"].mean(),
@@ -244,7 +306,150 @@ def page_dashboard_monitoring():
         st.plotly_chart(fig_donut, use_container_width=True)
 
     # ----------------------------------------------------------------
-    # TABEL DATA — termasuk kolom X1–X5
+    # BARIS BARU: Donut Reservasi + Rekomendasi DSS (FITUR 3 & 4)
+    # ----------------------------------------------------------------
+    dss_col1, dss_col2 = st.columns([2, 3], gap="large")
+
+    # --- Donut Chart: Proporsi Metode Reservasi (FITUR 3) ---
+    with dss_col1:
+        st.markdown('<p class="section-header">🏷️ Proporsi Metode Reservasi</p>',
+                    unsafe_allow_html=True)
+
+        reservasi_counts = df_filtered["jenis_reservasi"].value_counts().reset_index()
+        reservasi_counts.columns = ["Metode", "Jumlah"]
+
+        reservasi_color_map = {
+            "Aplikasi Online (OTA)": "#3498db",
+            "Walk-in": "#e67e22",
+            "Tidak Diketahui": "#95a5a6",
+        }
+        fig_reservasi = px.pie(
+            reservasi_counts,
+            names="Metode",
+            values="Jumlah",
+            hole=0.55,
+            color="Metode",
+            color_discrete_map=reservasi_color_map,
+        )
+        fig_reservasi.update_traces(
+            textinfo="label+percent",
+            textposition="outside",
+            textfont_size=12,
+            pull=[0.03] * len(reservasi_counts),
+        )
+        fig_reservasi.update_layout(
+            height=400,
+            showlegend=False,
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(family="Inter", size=12),
+            margin=dict(t=30, b=30, l=40, r=40),
+            annotations=[
+                dict(
+                    text=f"<b>{total_ulasan}</b><br>Tamu",
+                    x=0.5, y=0.5,
+                    font_size=14,
+                    showarrow=False,
+                    font=dict(family="Inter", color="#1e293b"),
+                )
+            ],
+        )
+        st.plotly_chart(fig_reservasi, use_container_width=True)
+
+    # --- Rekomendasi Prioritas DSS (FITUR 4) ---
+    with dss_col2:
+        st.markdown('<p class="section-header">💡 Rekomendasi Prioritas (DSS)</p>',
+                    unsafe_allow_html=True)
+
+        if total_ulasan > 0:
+            # Hitung rata-rata per dimensi (backend variable names)
+            dim_scores = {
+                "Tangibles": df_filtered["q3_tangibles"].mean(),
+                "Reliability": df_filtered["q1_reliability"].mean(),
+                "Responsiveness": df_filtered["q5_responsiveness"].mean(),
+                "Assurance": df_filtered["q2_assurance"].mean(),
+                "Empathy": df_filtered["q4_empathy"].mean(),
+            }
+
+            # Cari dimensi dengan skor terendah
+            lowest_dim = min(dim_scores, key=dim_scores.get)
+            lowest_score = dim_scores[lowest_dim]
+            lowest_label = DIMENSION_LABEL_MAP[lowest_dim]
+            recommendation = DSS_RECOMMENDATIONS[lowest_dim]
+
+            st.warning(
+                f"**Dimensi Terendah: {lowest_label}** (Skor rata-rata: **{lowest_score:.2f}**/5)\n\n"
+                f"{recommendation}",
+                icon="💡",
+            )
+
+            # Tampilkan ringkasan skor semua dimensi untuk konteks
+            st.markdown("**📋 Ringkasan Skor Seluruh Dimensi:**")
+            for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
+                label = DIMENSION_LABEL_MAP[dim_key]
+                bar_fill = int(score / 5 * 100)
+                indicator = "🔴" if score < 3.0 else "🟡" if score < 4.0 else "🟢"
+                st.markdown(
+                    f"{indicator} **{label}**: {score:.2f}/5",
+                )
+        else:
+            st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
+
+    # ----------------------------------------------------------------
+    # VISUALISASI TOP 5 KATA KUNCI NEGATIF (FITUR 5)
+    # ----------------------------------------------------------------
+    st.markdown('<p class="section-header">🔍 Top 5 Kata Kunci Keluhan Terbanyak</p>',
+                unsafe_allow_html=True)
+
+    # Ambil ulasan yang bersentimen Negatif dari data terfilter
+    df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+    ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
+
+    if ulasan_negatif_list:
+        neg_freq = get_negative_keyword_frequencies(ulasan_negatif_list, top_n=5)
+
+        if neg_freq:
+            df_neg_chart = pd.DataFrame(neg_freq)
+            # Urutkan ascending agar bar terbesar di atas pada horizontal chart
+            df_neg_chart = df_neg_chart.sort_values("persentase", ascending=True)
+
+            fig_neg = px.bar(
+                df_neg_chart,
+                x="persentase",
+                y="kata",
+                orientation="h",
+                text=df_neg_chart["persentase"].apply(lambda x: f"{x}%"),
+                color="persentase",
+                color_continuous_scale=["#f5b7b1", "#e74c3c", "#922b21"],
+            )
+            fig_neg.update_layout(
+                height=350,
+                xaxis_title="Persentase (%)",
+                yaxis_title="",
+                showlegend=False,
+                coloraxis_showscale=False,
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=13),
+                margin=dict(t=20, b=40, l=100, r=30),
+            )
+            fig_neg.update_traces(
+                textposition="outside",
+                marker_line_width=0,
+                marker_cornerradius=6,
+            )
+            st.plotly_chart(fig_neg, use_container_width=True)
+            st.caption(
+                f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
+                f"(dari {total_ulasan} ulasan terfilter)."
+            )
+        else:
+            st.info("Tidak ditemukan kata kunci negatif yang cocok dengan kamus leksikon.")
+    else:
+        st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+
+    # ----------------------------------------------------------------
+    # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
     # ----------------------------------------------------------------
     st.markdown('<p class="section-header">📋 Data Ulasan Tamu</p>', unsafe_allow_html=True)
 
@@ -255,6 +460,8 @@ def page_dashboard_monitoring():
         active_filters.append(f"Dimensi={filter_dimensi}")
     if filter_terbaru != "Semua Waktu":
         active_filters.append(f"Waktu={filter_terbaru}")
+    if filter_reservasi != "Semua":
+        active_filters.append(f"Reservasi={filter_reservasi}")
 
     total_semua = len(df)
     if active_filters:
@@ -269,6 +476,7 @@ def page_dashboard_monitoring():
     display_cols = {
         "tanggal": "Tanggal",
         "nama_tamu": "Nama Tamu",
+        "jenis_reservasi": "Jenis Reservasi",
         "rating_bintang": "Rating Bintang",
         "q1_reliability": "Q1 Reliability",
         "q2_assurance": "Q2 Assurance",
@@ -295,5 +503,6 @@ def page_dashboard_monitoring():
             "X4 Empathy": st.column_config.NumberColumn(format="%d"),
             "X5 Responsiveness": st.column_config.NumberColumn(format="%d"),
             "Sentimen": st.column_config.TextColumn(width="small"),
+            "Jenis Reservasi": st.column_config.TextColumn(width="medium"),
         },
     )
