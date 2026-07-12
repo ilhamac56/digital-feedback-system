@@ -202,10 +202,10 @@ def insert_feedback_batch(rows: list[dict]) -> int:
 
 
 def load_all_feedback() -> pd.DataFrame:
-    """Mengambil data feedback dari database (dibatasi 50 baris untuk mencegah crash cloud)."""
+    """Mengambil seluruh data feedback dari database."""
     try:
         conn = get_connection()
-        query = "SELECT * FROM guest_feedback ORDER BY id DESC LIMIT 50"
+        query = "SELECT * FROM guest_feedback ORDER BY id DESC"
         df = pd.read_sql(query, conn)
         conn.close()
         return df
