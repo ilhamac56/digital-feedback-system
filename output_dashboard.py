@@ -407,16 +407,16 @@ def page_dashboard_monitoring():
                     else:
                         bar_color = "linear-gradient(90deg, #10b981, #34d399)"
                         indicator = "🟢"
-                    scores_html += f'''
-                    <div class="score-row">
-                        <span style="min-width:22px;">{indicator}</span>
-                        <span style="min-width:200px; font-weight:600;">{label}</span>
-                        <div class="score-bar-track">
-                            <div class="score-bar-fill" style="width:{pct:.0f}%; background:{bar_color};"></div>
-                        </div>
-                        <span style="min-width:55px; text-align:right; font-weight:700; color:#e2e8f0;">{score:.2f}/5</span>
-                    </div>
-                    '''
+                    scores_html += f"""
+<div class="score-row">
+    <span style="min-width:22px;">{indicator}</span>
+    <span style="min-width:200px; font-weight:600;">{label}</span>
+    <div class="score-bar-track">
+        <div class="score-bar-fill" style="width:{pct:.0f}%; background:{bar_color};"></div>
+    </div>
+    <span style="min-width:55px; text-align:right; font-weight:700; color:#e2e8f0;">{score:.2f}/5</span>
+</div>
+"""
                 scores_html += '</div>'
                 st.markdown(scores_html, unsafe_allow_html=True)
             else:
