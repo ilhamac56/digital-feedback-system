@@ -54,10 +54,10 @@ def page_admin_dashboard():
     # --- Sidebar: Branding + Menu Admin + Logout ---
     with st.sidebar:
         st.markdown("""
-        <div style="text-align:center; padding: 1rem 0;">
-            <span style="font-size:2.5rem;">🏨</span>
-            <h2 style="margin:0; font-size:1.2rem; font-weight:700;">Kampung Sumber Alam</h2>
-            <p style="margin:0; font-size:0.8rem; opacity:0.7;">Panel Admin</p>
+        <div style="text-align:center; padding: 1.2rem 0;">
+            <div style="font-size:2.8rem; animation: float 3s ease-in-out infinite;">🏨</div>
+            <h2 style="margin:0; font-size:1.15rem; font-weight:800; background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Kampung Sumber Alam</h2>
+            <p style="margin:4px 0 0; font-size:0.75rem; font-weight:500; color:#6ee7b7 !important; letter-spacing:1px; text-transform:uppercase;">Panel Admin</p>
         </div>
         """, unsafe_allow_html=True)
 
