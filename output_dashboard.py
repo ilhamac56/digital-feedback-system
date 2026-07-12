@@ -71,6 +71,7 @@ def page_dashboard_monitoring():
     st.markdown('<p class="dash-title">📊 Dashboard Monitoring Ulasan</p>', unsafe_allow_html=True)
     st.markdown('<p class="dash-subtitle">Kampung Sumber Alam — Analisis Real-time Feedback Tamu</p>',
                 unsafe_allow_html=True)
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Muat data
     df = load_all_feedback()
@@ -171,7 +172,7 @@ def page_dashboard_monitoring():
 
     with k1:
         st.markdown(f"""
-        <div class="kpi-card">
+        <div class="kpi-card kpi-emerald">
             <div class="kpi-icon">📝</div>
             <div class="kpi-value">{total_ulasan}</div>
             <div class="kpi-label">Total Ulasan</div>
@@ -179,18 +180,17 @@ def page_dashboard_monitoring():
         """, unsafe_allow_html=True)
 
     with k2:
-        color_neg = "#e74c3c" if pct_negatif > 30 else "#f39c12" if pct_negatif > 15 else "#2ecc71"
         st.markdown(f"""
-        <div class="kpi-card">
+        <div class="kpi-card kpi-rose">
             <div class="kpi-icon">⚠️</div>
-            <div class="kpi-value" style="background:none;-webkit-text-fill-color:{color_neg};">{pct_negatif:.1f}%</div>
+            <div class="kpi-value">{pct_negatif:.1f}%</div>
             <div class="kpi-label">Sentimen Negatif</div>
         </div>
         """, unsafe_allow_html=True)
 
     with k3:
         st.markdown(f"""
-        <div class="kpi-card">
+        <div class="kpi-card kpi-amber">
             <div class="kpi-icon">⭐</div>
             <div class="kpi-value">{avg_rating:.2f}</div>
             <div class="kpi-label">Rata-rata Rating</div>
@@ -199,14 +199,14 @@ def page_dashboard_monitoring():
 
     with k4:
         st.markdown(f"""
-        <div class="kpi-card">
+        <div class="kpi-card kpi-violet">
             <div class="kpi-icon">📊</div>
             <div class="kpi-value">{avg_servperf:.2f}</div>
             <div class="kpi-label">Rata-rata SERVPERF</div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.divider()
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # ----------------------------------------------------------------
     # GRAFIK — berdampingan [3, 2] agar bar chart lebih lebar
@@ -237,7 +237,7 @@ def page_dashboard_monitoring():
                 ]
             })
 
-            colors = ["#145a32", "#1e8449", "#27ae60", "#2ecc71", "#82e0aa"]
+            colors = ["#10b981", "#34d399", "#6ee7b7", "#a7f3d0", "#059669"]
             fig_bar = px.bar(
                 dim_means,
                 x="Dimensi",
@@ -254,14 +254,17 @@ def page_dashboard_monitoring():
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=13),
+                font=dict(family="Inter", size=13, color="#94a3b8"),
                 margin=dict(t=30, b=60, l=50, r=30),
                 bargap=0.3,
+                xaxis=dict(gridcolor="rgba(255,255,255,0.05)", linecolor="rgba(255,255,255,0.1)"),
+                yaxis=dict(gridcolor="rgba(255,255,255,0.05)", linecolor="rgba(255,255,255,0.1)"),
             )
             fig_bar.update_traces(
                 textposition="outside",
+                textfont=dict(color="#e2e8f0", size=13),
                 marker_line_width=0,
-                marker_cornerradius=8,
+                marker_cornerradius=10,
             )
             st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -272,7 +275,7 @@ def page_dashboard_monitoring():
             sentimen_counts = df_filtered["sentimen_akhir"].value_counts().reset_index()
             sentimen_counts.columns = ["Sentimen", "Jumlah"]
 
-            color_map = {"Positif": "#2ecc71", "Netral": "#f39c12", "Negatif": "#e74c3c"}
+            color_map = {"Positif": "#10b981", "Netral": "#f59e0b", "Negatif": "#f43f5e"}
             fig_donut = px.pie(
                 sentimen_counts,
                 names="Sentimen",
@@ -292,7 +295,7 @@ def page_dashboard_monitoring():
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=12),
+                font=dict(family="Inter", size=12, color="#94a3b8"),
                 margin=dict(t=30, b=30, l=60, r=40),
                 annotations=[
                     dict(
@@ -300,7 +303,7 @@ def page_dashboard_monitoring():
                         x=0.5, y=0.5,
                         font_size=15,
                         showarrow=False,
-                        font=dict(family="Inter", color="#1e293b"),
+                        font=dict(family="Inter", color="#e2e8f0"),
                     )
                 ],
             )
@@ -321,9 +324,9 @@ def page_dashboard_monitoring():
             reservasi_counts.columns = ["Metode", "Jumlah"]
 
             reservasi_color_map = {
-                "Aplikasi Online (OTA)": "#3498db",
-                "Walk-in": "#e67e22",
-                "Tidak Diketahui": "#95a5a6",
+                "Aplikasi Online (OTA)": "#3b82f6",
+                "Walk-in": "#f59e0b",
+                "Tidak Diketahui": "#6b7280",
             }
             fig_reservasi = px.pie(
                 reservasi_counts,
@@ -344,7 +347,7 @@ def page_dashboard_monitoring():
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=12),
+                font=dict(family="Inter", size=12, color="#94a3b8"),
                 margin=dict(t=30, b=30, l=40, r=40),
                 annotations=[
                     dict(
@@ -352,7 +355,7 @@ def page_dashboard_monitoring():
                         x=0.5, y=0.5,
                         font_size=14,
                         showarrow=False,
-                        font=dict(family="Inter", color="#1e293b"),
+                        font=dict(family="Inter", color="#e2e8f0"),
                     )
                 ],
             )
@@ -379,22 +382,41 @@ def page_dashboard_monitoring():
                 lowest_label = DIMENSION_LABEL_MAP[lowest_dim]
                 recommendation = DSS_RECOMMENDATIONS[lowest_dim]
 
-                st.warning(
-                    f"**Dimensi Terendah: {lowest_label}** (Skor rata-rata: **{lowest_score:.2f}**/5)\n\n"
-                    f"{recommendation}",
-                    icon="💡",
-                )
+                # DSS Recommendation Card — premium styling
+                st.markdown(f"""
+                <div class="dss-card">
+                    <span class="dss-badge">⚡ Prioritas Utama</span>
+                    <div class="dss-dim-name">📌 {lowest_label}</div>
+                    <div class="dss-score">Skor rata-rata: <strong>{lowest_score:.2f}</strong> / 5.00</div>
+                    <div class="dss-text">{recommendation}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-                # Tampilkan ringkasan skor semua dimensi (font kecil)
-                scores_html = '<div style="margin-top:8px;">'
-                scores_html += '<p style="font-size:0.82rem; font-weight:600; color:#1e293b; margin-bottom:6px;">📋 Ringkasan Skor Seluruh Dimensi:</p>'
+                # Tampilkan ringkasan skor semua dimensi — visual progress bars
+                scores_html = '<div style="margin-top:14px;">'
+                scores_html += '<p style="font-size:0.82rem; font-weight:700; color:#e2e8f0; margin-bottom:10px;">📋 Ringkasan Skor Seluruh Dimensi</p>'
                 for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
                     label = DIMENSION_LABEL_MAP[dim_key]
-                    indicator = "🔴" if score < 3.0 else "🟡" if score < 4.0 else "🟢"
-                    scores_html += (
-                        f'<p style="font-size:0.78rem; margin:2px 0; color:#334155;">'
-                        f'{indicator} <strong>{label}</strong>: {score:.2f}/5</p>'
-                    )
+                    pct = (score / 5.0) * 100
+                    if score < 3.0:
+                        bar_color = "linear-gradient(90deg, #f43f5e, #fb7185)"
+                        indicator = "🔴"
+                    elif score < 4.0:
+                        bar_color = "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                        indicator = "🟡"
+                    else:
+                        bar_color = "linear-gradient(90deg, #10b981, #34d399)"
+                        indicator = "🟢"
+                    scores_html += f'''
+                    <div class="score-row">
+                        <span style="min-width:22px;">{indicator}</span>
+                        <span style="min-width:200px; font-weight:600;">{label}</span>
+                        <div class="score-bar-track">
+                            <div class="score-bar-fill" style="width:{pct:.0f}%; background:{bar_color};"></div>
+                        </div>
+                        <span style="min-width:55px; text-align:right; font-weight:700; color:#e2e8f0;">{score:.2f}/5</span>
+                    </div>
+                    '''
                 scores_html += '</div>'
                 st.markdown(scores_html, unsafe_allow_html=True)
             else:
@@ -431,7 +453,7 @@ def page_dashboard_monitoring():
                         lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
                     ),
                     color="frekuensi",
-                    color_continuous_scale=["#f5b7b1", "#e74c3c", "#922b21"],
+                    color_continuous_scale=["#fda4af", "#f43f5e", "#be123c"],
                 )
                 fig_findings.update_layout(
                     height=max(300, len(df_findings) * 45),
@@ -441,13 +463,16 @@ def page_dashboard_monitoring():
                     coloraxis_showscale=False,
                     plot_bgcolor="rgba(0,0,0,0)",
                     paper_bgcolor="rgba(0,0,0,0)",
-                    font=dict(family="Inter", size=13),
+                    font=dict(family="Inter", size=13, color="#94a3b8"),
                     margin=dict(t=20, b=40, l=200, r=30),
+                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
                 )
                 fig_findings.update_traces(
                     textposition="outside",
+                    textfont=dict(color="#e2e8f0"),
                     marker_line_width=0,
-                    marker_cornerradius=6,
+                    marker_cornerradius=8,
                 )
                 st.plotly_chart(fig_findings, use_container_width=True)
 
