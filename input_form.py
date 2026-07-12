@@ -28,7 +28,7 @@ def page_guest_form():
 
     with col_tengah:
 
-        # --- Hero Header ---
+        # --- Header dengan tombol admin yang lega ---
         col_header_teks, col_header_tombol = st.columns([3, 2])
         with col_header_teks:
             st.markdown("""
@@ -45,24 +45,13 @@ def page_guest_form():
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
-        # --- Hero Banner ---
         st.markdown("""
-        <div class="form-hero">
-            <span class="hero-icon">🏨</span>
-            <h1>Kampung Sumber Alam</h1>
-            <p class="hero-subtitle">Hot Spring Resort & Spa — Garut, Jawa Barat</p>
-            <span class="hero-badge">✦ Guest Feedback Form</span>
+        <div style="text-align: center; margin-bottom: 1rem; color: #1e8449; font-size: 0.85rem; line-height: 1.5;">
+            <strong style="font-size: 1rem; color: #145a32;">Bantu Kami Menjadi Lebih Baik</strong><br><br>
+            Kepuasan pengunjung adalah prioritas utama di Kampung Sumber Alam. Kami mengundang Anda untuk membagikan kesan dan pesan selama berada di resor kami. Jawaban jujur yang Anda berikan akan langsung kami jadikan acuan untuk meningkatkan standar kualitas layanan kami. Terima kasih atas partisipasi Anda.
         </div>
         """, unsafe_allow_html=True)
-
-        # --- Intro Card ---
-        st.markdown("""
-        <div class="form-intro">
-            <strong>🌿 Bantu Kami Menjadi Lebih Baik</strong>
-            <p>Kepuasan pengunjung adalah prioritas utama di Kampung Sumber Alam. Kami mengundang Anda untuk membagikan kesan dan pesan selama berada di resor kami. Jawaban jujur yang Anda berikan akan langsung kami jadikan acuan untuk meningkatkan standar kualitas layanan kami. Terima kasih atas partisipasi Anda.</p>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+        st.divider()
 
         # --- Form (semua elemen tersusun VERTIKAL, mobile-friendly) ---
         with st.form("feedback_form", clear_on_submit=True):
@@ -247,9 +236,9 @@ def page_login():
     with col_c:
         st.markdown("""
         <div class="login-card">
-            <div style="font-size:3.5rem; margin-bottom:8px; animation: float 3s ease-in-out infinite;">🔐</div>
+            <span style="font-size:3rem;">🔐</span>
             <h2>Login Dashboard Admin</h2>
-            <p>Masukkan kredensial untuk mengakses<br>dashboard monitoring & analitik</p>
+            <p>Masukkan kredensial untuk mengakses dashboard monitoring</p>
         </div>
         """, unsafe_allow_html=True)
 
