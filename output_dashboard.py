@@ -343,12 +343,12 @@ def page_dashboard_monitoring():
                 pull=[0.03] * len(reservasi_counts),
             )
             fig_reservasi.update_layout(
-                height=400,
+                height=260,
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
                 font=dict(family="Inter", size=12, color="#94a3b8"),
-                margin=dict(t=30, b=30, l=40, r=40),
+                margin=dict(t=10, b=10, l=10, r=10),
                 annotations=[
                     dict(
                         text=f"<b>{total_ulasan}</b><br>Tamu",
