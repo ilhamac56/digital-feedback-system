@@ -377,62 +377,67 @@ def _split_into_fragments(text: str) -> list[str]:
 
 def _extract_phrase_from_fragment(fragment: str) -> str | None:
     """
-    Dari satu fragmen kalimat, ekstrak frasa 'kata benda + kata sifat negatif'.
-    Mengembalikan frasa kontekstual atau None jika tidak cocok.
-
-    Logika:
-    1. Cek apakah fragmen mengandung kata sifat negatif.
-    2. Jika ya, cari kata benda yang ada dalam fragmen.
-    3. Gabungkan kata benda + kata sifat negatif menjadi frasa.
+    Dari satu fragmen kalimat, ekstrak frasa keluhan secara utuh.
+    Logika baru: Ambil rentang kata dari Kata Benda hingga Kata Sifat,
+    beserta kata keterangan (modifier) di sekitarnya.
     """
-    # Bersihkan fragmen — hanya alfabet dan spasi
     clean = re.sub(r"[^a-z\s]", "", fragment)
     tokens = clean.split()
-
     if not tokens:
         return None
 
-    # Cari kata negatif dalam fragmen
     negative_set = set(NEGATIVE_KEYWORDS)
     found_negatives = [t for t in tokens if t in negative_set]
-
     if not found_negatives:
         return None
 
-    # Cari kata benda (frasa) dalam fragmen — cek frasa multi-kata dulu
+    noun_idx = -1
     found_noun = None
-    # Coba frasa 3-kata, lalu 2-kata, lalu 1-kata
-    for n in (3, 2, 1):
-        for i in range(len(tokens) - n + 1):
-            candidate = " ".join(tokens[i:i + n])
-            if candidate in NOUN_KEYWORDS:
-                found_noun = candidate
-                break
-        if found_noun:
+    # Cari noun terpanjang (hingga 3 kata)
+    for i in range(len(tokens)):
+        candidate_3 = " ".join(tokens[i:i+3]) if i < len(tokens)-2 else ""
+        candidate_2 = " ".join(tokens[i:i+2]) if i < len(tokens)-1 else ""
+        candidate_1 = tokens[i]
+        
+        if candidate_3 in NOUN_KEYWORDS:
+            noun_idx, found_noun = i, candidate_3
+            break
+        elif candidate_2 in NOUN_KEYWORDS:
+            noun_idx, found_noun = i, candidate_2
+            break
+        elif candidate_1 in NOUN_KEYWORDS:
+            noun_idx, found_noun = i, candidate_1
             break
 
-    # Ambil kata negatif utama (yang pertama ditemukan dalam fragmen)
-    primary_negative = found_negatives[0]
+    # Cari index kata negatif terakhir di fragmen
+    neg_idx = -1
+    for i in range(len(tokens)-1, -1, -1):
+        if tokens[i] in negative_set:
+            neg_idx = i
+            break
 
-    if found_noun:
-        # Gabungkan: "kamar mandi" + "kotor" → "kamar mandi kotor"
-        phrase = f"{found_noun} {primary_negative}"
+    if noun_idx != -1 and neg_idx != -1:
+        # Ambil seluruh kata di antara kata benda dan kata negatif
+        noun_len = len(found_noun.split())
+        start = min(noun_idx, neg_idx)
+        end = max(noun_idx + noun_len - 1, neg_idx)
+        
+        modifiers = {"sangat", "paling", "terlalu", "cukup", "lumayan", "kurang", "tidak", "gak", "agak", "belum"}
+        
+        # Masukkan kata keterangan sebelum frasa jika ada (e.g. "sangat kotor")
+        if start > 0 and tokens[start-1] in modifiers:
+            start -= 1
+            
+        # Jika kata negatif terakhir adalah modifier (misal "kurang", "tidak"), 
+        # ambil 1 kata setelahnya (e.g. "kurang" + "kencang")
+        if tokens[neg_idx] in modifiers and neg_idx < len(tokens) - 1:
+            end += 1
+            
+        phrase = " ".join(tokens[start:end+1])
     else:
-        # Tidak ada kata benda eksplisit — gunakan konteks sekitar kata negatif
-        # Ambil 1-2 kata sebelum kata negatif sebagai konteks
-        neg_idx = None
-        for i, t in enumerate(tokens):
-            if t == primary_negative:
-                neg_idx = i
-                break
-
-        if neg_idx is not None and neg_idx > 0:
-            # Ambil hingga 2 kata sebelumnya sebagai konteks
-            start = max(0, neg_idx - 2)
-            context_tokens = tokens[start:neg_idx + 1]
-            phrase = " ".join(context_tokens)
-        else:
-            phrase = primary_negative
+        # Jika tidak ada noun eksplisit, ambil hingga 2 kata sebelum kata negatif terakhir
+        start = max(0, neg_idx - 2)
+        phrase = " ".join(tokens[start:neg_idx + 1])
 
     return phrase
 
