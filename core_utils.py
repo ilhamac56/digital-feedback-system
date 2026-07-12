@@ -110,8 +110,9 @@ def init_database():
             pass  # Kolom sudah ada, abaikan error
         conn.commit()
         conn.close()
-    except Exception:
-        st.error("⚠️ **Gagal terhubung ke Database MySQL!**\n\nSistem sedang mengalami gangguan koneksi. Mohon hubungi administrator.")
+    except Exception as e:
+        config_host = DB_CONFIG.get('host', 'unknown')
+        st.error(f"⚠️ **Gagal terhubung ke Database MySQL (Host: {config_host})!**\n\nDetail Error: `{e}`\n\nPastikan pengaturan Secrets di Streamlit Cloud sudah benar.")
         st.stop()
 
 
