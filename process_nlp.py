@@ -375,112 +375,118 @@ def _split_into_fragments(text: str) -> list[str]:
     return fragments
 
 
-def _extract_phrase_from_fragment(fragment: str) -> str | None:
+# Kategori Temuan Baku (Predefined ABSA Categories)
+ABSA_CATEGORIES = [
+    {
+        "name": "Kamar & Toilet Kurang Bersih",
+        "nouns": ["kamar", "toilet", "wc", "kamar mandi", "lantai", "kasur", "sprei", "handuk", "ruangan", "kaca", "wastafel", "debu"],
+        "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "berantakan", "buluk"]
+    },
+    {
+        "name": "Fasilitas Kamar Rusak",
+        "nouns": ["ac", "air", "tv", "lampu", "pintu", "kunci", "fasilitas", "shower", "kran", "air panas", "flush", "remot", "kulkas"],
+        "negatives": ["rusak", "bocor", "mati", "tidak dingin", "panas", "error", "macet", "tidak fungsi", "tidak nyala", "jebol", "copot"]
+    },
+    {
+        "name": "Pelayanan Staf Kurang Memuaskan",
+        "nouns": ["staf", "staff", "pelayanan", "resepsionis", "layanan", "karyawan", "petugas", "security", "satpam", "receptionist"],
+        "negatives": ["lambat", "lama", "ketus", "jutek", "kurang ramah", "tidak ramah", "cuek", "kasar", "judes", "sombong", "buruk", "mengecewakan", "lelet"]
+    },
+    {
+        "name": "Koneksi WiFi Buruk",
+        "nouns": ["wifi", "internet", "koneksi", "sinyal", "jaringan"],
+        "negatives": ["lemot", "lambat", "putus", "hilang", "susah", "jelek", "kurang", "tidak konek", "mati", "error"]
+    },
+    {
+        "name": "Kualitas Makanan / Sarapan Kurang",
+        "nouns": ["makanan", "sarapan", "menu", "rasa", "makan", "kentang", "nasi", "kopi", "teh", "roti", "resto", "restoran", "breakfast"],
+        "negatives": ["hambar", "dingin", "kurang", "sedikit", "asin", "basi", "keras", "tidak enak", "kurang enak", "standar", "biasa", "habis"]
+    },
+    {
+        "name": "Suasana Berisik / Kurang Nyaman",
+        "nouns": ["suasana", "lingkungan", "suara", "berisik", "kamar", "tidur", "malam", "jalan", "kendaraan", "pintu"],
+        "negatives": ["berisik", "bising", "ribut", "gaduh", "ramai", "tidak nyaman", "kurang nyaman", "terganggu", "kedengaran", "tembus"]
+    }
+]
+
+def _extract_category_from_fragment(fragment: str) -> str | None:
     """
-    Dari satu fragmen kalimat, ekstrak frasa keluhan secara utuh.
-    Logika baru: Ambil rentang kata dari Kata Benda hingga Kata Sifat,
-    beserta kata keterangan (modifier) di sekitarnya.
+    Memetakan fragmen kalimat ke dalam salah satu Kategori Keluhan Baku (ABSA_CATEGORIES).
     """
     clean = re.sub(r"[^a-z\s]", "", fragment)
     tokens = clean.split()
     if not tokens:
         return None
 
-    negative_set = set(NEGATIVE_KEYWORDS)
-    found_negatives = [t for t in tokens if t in negative_set]
-    if not found_negatives:
-        return None
+    # Bi-grams dan Tri-grams untuk pencocokan multi-kata
+    token_phrases = tokens.copy()
+    for i in range(len(tokens) - 1):
+        token_phrases.append(f"{tokens[i]} {tokens[i+1]}")
+    for i in range(len(tokens) - 2):
+        token_phrases.append(f"{tokens[i]} {tokens[i+1]} {tokens[i+2]}")
 
-    noun_idx = -1
-    found_noun = None
-    # Cari noun terpanjang (hingga 3 kata)
-    for i in range(len(tokens)):
-        candidate_3 = " ".join(tokens[i:i+3]) if i < len(tokens)-2 else ""
-        candidate_2 = " ".join(tokens[i:i+2]) if i < len(tokens)-1 else ""
-        candidate_1 = tokens[i]
+    # Prioritaskan Kategori Spesifik
+    for category in ABSA_CATEGORIES:
+        has_noun = any(noun in token_phrases for noun in category["nouns"])
+        has_negative = any(neg in token_phrases for neg in category["negatives"])
         
-        if candidate_3 in NOUN_KEYWORDS:
-            noun_idx, found_noun = i, candidate_3
-            break
-        elif candidate_2 in NOUN_KEYWORDS:
-            noun_idx, found_noun = i, candidate_2
-            break
-        elif candidate_1 in NOUN_KEYWORDS:
-            noun_idx, found_noun = i, candidate_1
-            break
+        # Jika ketemu kombinasi kata benda dan keluhan yang cocok
+        if has_noun and has_negative:
+            return category["name"]
 
-    # Cari index kata negatif terakhir di fragmen
-    neg_idx = -1
-    for i in range(len(tokens)-1, -1, -1):
-        if tokens[i] in negative_set:
-            neg_idx = i
-            break
+    # Fallback 1: Jika tidak ada noun, tapi ada negative yang sangat spesifik
+    # Contoh: "Kotor banget", "Resepsionisnya jutek"
+    for category in ABSA_CATEGORIES:
+        has_negative = any(neg in token_phrases for neg in category["negatives"])
+        if has_negative:
+            # Pastikan ini benar-benar ada di NEGATIVE_KEYWORDS asli untuk menghindari false positive
+            if any(n in NEGATIVE_KEYWORDS for n in token_phrases):
+                # Jika keluhannya "hambar", "basi", pasti tentang makanan
+                if any(neg in ["hambar", "basi", "asin"] for neg in token_phrases):
+                    return "Kualitas Makanan / Sarapan Kurang"
+                # Jika keluhannya "bocor", "rusak", "tidak dingin", pasti fasilitas
+                if any(neg in ["bocor", "rusak", "tidak dingin", "macet"] for neg in token_phrases):
+                    return "Fasilitas Kamar Rusak"
+                # Jika keluhannya "ketus", "jutek", pasti staf
+                if any(neg in ["ketus", "jutek", "judes", "tidak ramah"] for neg in token_phrases):
+                    return "Pelayanan Staf Kurang Memuaskan"
+                # Jika keluhannya "berisik", "bising", pasti suasana
+                if any(neg in ["berisik", "bising", "gaduh"] for neg in token_phrases):
+                    return "Suasana Berisik / Kurang Nyaman"
+                
+                # Fallback umum jika hanya menemukan kata negatif tapi bingung benda apa
+                return "Keluhan Umum Lainnya"
 
-    if noun_idx != -1 and neg_idx != -1:
-        # Ambil seluruh kata di antara kata benda dan kata negatif
-        noun_len = len(found_noun.split())
-        start = min(noun_idx, neg_idx)
-        end = max(noun_idx + noun_len - 1, neg_idx)
-        
-        modifiers = {"sangat", "paling", "terlalu", "cukup", "lumayan", "kurang", "tidak", "gak", "agak", "belum"}
-        
-        # Masukkan kata keterangan sebelum frasa jika ada (e.g. "sangat kotor")
-        if start > 0 and tokens[start-1] in modifiers:
-            start -= 1
-            
-        # Jika kata negatif terakhir adalah modifier (misal "kurang", "tidak"), 
-        # ambil 1 kata setelahnya (e.g. "kurang" + "kencang")
-        if tokens[neg_idx] in modifiers and neg_idx < len(tokens) - 1:
-            end += 1
-            
-        phrase = " ".join(tokens[start:end+1])
-    else:
-        # Jika tidak ada noun eksplisit, ambil hingga 2 kata sebelum kata negatif terakhir
-        start = max(0, neg_idx - 2)
-        phrase = " ".join(tokens[start:neg_idx + 1])
-
-    return phrase
+    return None
 
 
 def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> list[dict]:
     """
-    Mengekstrak frasa temuan negatif (aspect-based) dari seluruh ulasan
-    yang terdeteksi bersentimen Negatif.
-
-    Logika:
-    1. Pecah setiap ulasan menjadi fragmen kalimat.
-    2. Dari setiap fragmen yang mengandung kata sifat negatif,
-       ekstrak frasa kontekstual (kata benda + kata sifat negatif).
-    3. Hitung frekuensi kemunculan frasa tersebut.
-
-    Args:
-        ulasan_negatif: List teks ulasan bersentimen Negatif.
-        top_n: Jumlah frasa teratas yang dikembalikan.
+    Mengekstrak Kategori Temuan Negatif baku dari seluruh ulasan bersentimen Negatif.
 
     Returns:
         List of dict [{"frasa": str, "frekuensi": int, "persentase": float}]
-        diurutkan dari frekuensi tertinggi.
     """
-    phrase_counter = Counter()
+    category_counter = Counter()
 
     for teks in ulasan_negatif:
         fragments = _split_into_fragments(teks)
-        seen_in_review = set()  # Hindari duplikasi dari satu ulasan
+        seen_in_review = set()
 
         for fragment in fragments:
-            phrase = _extract_phrase_from_fragment(fragment)
-            if phrase and phrase not in seen_in_review:
-                phrase_counter[phrase] += 1
-                seen_in_review.add(phrase)
+            category = _extract_category_from_fragment(fragment)
+            if category and category not in seen_in_review:
+                category_counter[category] += 1
+                seen_in_review.add(category)
 
-    total_findings = sum(phrase_counter.values())
+    total_findings = sum(category_counter.values())
     if total_findings == 0:
         return []
 
     results = []
-    for frasa, freq in phrase_counter.most_common(top_n):
+    for kategori, freq in category_counter.most_common(top_n):
         results.append({
-            "frasa": frasa,
+            "frasa": kategori, # Tetap pakai key "frasa" agar tidak perlu ubah dashboard UI
             "frekuensi": freq,
             "persentase": round(freq / total_findings * 100, 1),
         })
