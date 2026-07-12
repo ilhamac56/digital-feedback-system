@@ -35,6 +35,11 @@ def _get_secret(key: str, default: str = "") -> str:
                     return str(sec[key])
                 # Coba key lowercase (misal: host, port, user, dll.)
                 key_lower = key.replace("DB_", "").lower()
+                
+                # Pemetaan khusus untuk DB_NAME -> database
+                if key == "DB_NAME" and "database" in sec:
+                    return str(sec["database"])
+                    
                 if key_lower in sec:
                     return str(sec[key_lower])
             # Coba langsung dari root secrets (tanpa section [database])
