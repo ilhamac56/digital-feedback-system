@@ -392,116 +392,81 @@ def page_dashboard_monitoring():
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Tampilkan ringkasan skor semua dimensi — visual progress bars
-                scores_html = '<div style="margin-top:14px;">'
-                scores_html += '<p style="font-size:0.82rem; font-weight:700; color:#e2e8f0; margin-bottom:10px;">📋 Ringkasan Skor Seluruh Dimensi</p>'
-                for dim_key, score in sorted(dim_scores.items(), key=lambda x: x[1]):
-                    label = DIMENSION_LABEL_MAP[dim_key]
-                    pct = (score / 5.0) * 100
-                    if score < 3.0:
-                        bar_color = "linear-gradient(90deg, #f43f5e, #fb7185)"
-                        indicator = "🔴"
-                    elif score < 4.0:
-                        bar_color = "linear-gradient(90deg, #f59e0b, #fbbf24)"
-                        indicator = "🟡"
+                # ----------------------------------------------------------------
+                # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED
+                # ----------------------------------------------------------------
+                st.markdown('<p class="section-header" style="margin-top:20px;">⚠️ Log Temuan Kritis (Aspect-Based)</p>', unsafe_allow_html=True)
+
+                # Ambil ulasan yang bersentimen Negatif dari data terfilter
+                df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+                ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
+
+                if ulasan_negatif_list:
+                    findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
+
+                    if findings:
+                        # --- Horizontal Bar Chart: Top frasa temuan negatif ---
+                        df_findings = pd.DataFrame(findings)
+                        # Capitalize frasa untuk tampilan
+                        df_findings["frasa"] = df_findings["frasa"].str.capitalize()
+                        # Urutkan ascending agar bar terbesar di atas
+                        df_findings = df_findings.sort_values("frekuensi", ascending=True)
+
+                        fig_findings = px.bar(
+                            df_findings,
+                            x="frekuensi",
+                            y="frasa",
+                            orientation="h",
+                            text=df_findings.apply(
+                                lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
+                            ),
+                            color="frekuensi",
+                            color_continuous_scale=["#fda4af", "#f43f5e", "#be123c"],
+                        )
+                        fig_findings.update_layout(
+                            height=max(250, len(df_findings) * 45),
+                            xaxis_title="",
+                            yaxis_title="",
+                            showlegend=False,
+                            coloraxis_showscale=False,
+                            plot_bgcolor="rgba(0,0,0,0)",
+                            paper_bgcolor="rgba(0,0,0,0)",
+                            font=dict(family="Inter", size=12, color="#94a3b8"),
+                            margin=dict(t=0, b=0, l=150, r=20),
+                            xaxis=dict(gridcolor="rgba(255,255,255,0.05)", visible=False),
+                            yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+                        )
+                        fig_findings.update_traces(
+                            textposition="outside",
+                            textfont=dict(color="#e2e8f0"),
+                            marker_line_width=0,
+                            marker_cornerradius=6,
+                        )
+                        st.plotly_chart(fig_findings, use_container_width=True)
+
+                        # --- Tabel detail temuan ---
+                        with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
+                            df_table = pd.DataFrame(findings)
+                            df_table["frasa"] = df_table["frasa"].str.capitalize()
+                            df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
+                            df_table.index = range(1, len(df_table) + 1)
+                            df_table.index.name = "No"
+                            st.dataframe(
+                                df_table,
+                                use_container_width=True,
+                                column_config={
+                                    "Frasa Temuan": st.column_config.TextColumn(width="large"),
+                                    "Frekuensi": st.column_config.NumberColumn(format="%d"),
+                                    "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
+                                },
+                            )
                     else:
-                        bar_color = "linear-gradient(90deg, #10b981, #34d399)"
-                        indicator = "🟢"
-                    scores_html += f"""
-<div class="score-row">
-    <span style="min-width:22px;">{indicator}</span>
-    <span style="min-width:200px; font-weight:600;">{label}</span>
-    <div class="score-bar-track">
-        <div class="score-bar-fill" style="width:{pct:.0f}%; background:{bar_color};"></div>
-    </div>
-    <span style="min-width:55px; text-align:right; font-weight:700; color:#e2e8f0;">{score:.2f}/5</span>
-</div>
-"""
-                scores_html += '</div>'
-                st.markdown(scores_html, unsafe_allow_html=True)
+                        st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
+                else:
+                    st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
             else:
                 st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
 
-    # ----------------------------------------------------------------
-    # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
-    # ----------------------------------------------------------------
-    with st.container(border=True):
-        st.markdown('<p class="section-header">⚠️ Log Temuan Kritis (Aspect-Based)</p>',
-                    unsafe_allow_html=True)
-
-        # Ambil ulasan yang bersentimen Negatif dari data terfilter
-        df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
-        ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
-
-        if ulasan_negatif_list:
-            findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
-
-            if findings:
-                # --- Horizontal Bar Chart: Top frasa temuan negatif ---
-                df_findings = pd.DataFrame(findings)
-                # Capitalize frasa untuk tampilan
-                df_findings["frasa"] = df_findings["frasa"].str.capitalize()
-                # Urutkan ascending agar bar terbesar di atas
-                df_findings = df_findings.sort_values("frekuensi", ascending=True)
-
-                fig_findings = px.bar(
-                    df_findings,
-                    x="frekuensi",
-                    y="frasa",
-                    orientation="h",
-                    text=df_findings.apply(
-                        lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
-                    ),
-                    color="frekuensi",
-                    color_continuous_scale=["#fda4af", "#f43f5e", "#be123c"],
-                )
-                fig_findings.update_layout(
-                    height=max(300, len(df_findings) * 45),
-                    xaxis_title="Frekuensi Kemunculan",
-                    yaxis_title="",
-                    showlegend=False,
-                    coloraxis_showscale=False,
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    font=dict(family="Inter", size=13, color="#94a3b8"),
-                    margin=dict(t=20, b=40, l=200, r=30),
-                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                )
-                fig_findings.update_traces(
-                    textposition="outside",
-                    textfont=dict(color="#e2e8f0"),
-                    marker_line_width=0,
-                    marker_cornerradius=8,
-                )
-                st.plotly_chart(fig_findings, use_container_width=True)
-
-                st.caption(
-                    f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
-                    f"(dari {total_ulasan} ulasan terfilter). "
-                    f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
-                )
-
-                # --- Tabel detail temuan ---
-                with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
-                    df_table = pd.DataFrame(findings)
-                    df_table["frasa"] = df_table["frasa"].str.capitalize()
-                    df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
-                    df_table.index = range(1, len(df_table) + 1)
-                    df_table.index.name = "No"
-                    st.dataframe(
-                        df_table,
-                        use_container_width=True,
-                        column_config={
-                            "Frasa Temuan": st.column_config.TextColumn(width="large"),
-                            "Frekuensi": st.column_config.NumberColumn(format="%d"),
-                            "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
-                        },
-                    )
-            else:
-                st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
-        else:
-            st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
