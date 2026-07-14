@@ -456,22 +456,24 @@ def page_dashboard_monitoring():
                     f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
                 )
 
-                # --- Tabel detail temuan ---
-                with st.expander("📋 Lihat Detail Tabel Temuan Kritis", expanded=False):
-                    df_table = pd.DataFrame(findings)
-                    df_table["frasa"] = df_table["frasa"].str.capitalize()
-                    df_table.columns = ["Frasa Temuan", "Frekuensi", "Proporsi (%)"]
-                    df_table.index = range(1, len(df_table) + 1)
-                    df_table.index.name = "No"
-                    st.dataframe(
-                        df_table,
-                        use_container_width=True,
-                        column_config={
-                            "Frasa Temuan": st.column_config.TextColumn(width="large"),
-                            "Frekuensi": st.column_config.NumberColumn(format="%d"),
-                            "Proporsi (%)": st.column_config.NumberColumn(format="%.1f%%"),
-                        },
-                    )
+                # --- Detail ulasan asli per kategori ---
+                for finding in findings:
+                    kategori_nama = finding["frasa"].capitalize()
+                    daftar_ulasan = finding.get("ulasan", [])
+                    jumlah = finding["frekuensi"]
+
+                    with st.expander(
+                        f"📋 {kategori_nama} — {jumlah} ulasan",
+                        expanded=False,
+                    ):
+                        if daftar_ulasan:
+                            for idx, ulasan_teks in enumerate(daftar_ulasan, 1):
+                                st.markdown(
+                                    f"**{idx}.** {ulasan_teks}",
+                                )
+                            st.caption(f"Menampilkan {len(daftar_ulasan)} ulasan asli tamu.")
+                        else:
+                            st.info("Tidak ada data ulasan asli yang tersedia.")
             else:
                 st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
         else:

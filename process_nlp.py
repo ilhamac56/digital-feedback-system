@@ -441,9 +441,10 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
     Mengekstrak Kategori Temuan Negatif baku dari seluruh ulasan bersentimen Negatif.
 
     Returns:
-        List of dict [{"frasa": str, "frekuensi": int, "persentase": float}]
+        List of dict [{"frasa": str, "frekuensi": int, "persentase": float, "ulasan": list[str]}]
     """
     category_counter = Counter()
+    category_reviews: dict[str, list[str]] = {}  # Menyimpan ulasan asli per kategori
 
     for teks in ulasan_negatif:
         fragments = _split_into_fragments(teks)
@@ -455,6 +456,12 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
                 category_counter[category] += 1
                 seen_in_review.add(category)
 
+                # Simpan ulasan asli (hindari duplikat teks yang sama)
+                if category not in category_reviews:
+                    category_reviews[category] = []
+                if teks not in category_reviews[category]:
+                    category_reviews[category].append(teks)
+
     total_findings = sum(category_counter.values())
     if total_findings == 0:
         return []
@@ -462,9 +469,10 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
     results = []
     for kategori, freq in category_counter.most_common(top_n):
         results.append({
-            "frasa": kategori, # Tetap pakai key "frasa" agar tidak perlu ubah dashboard UI
+            "frasa": kategori,  # Tetap pakai key "frasa" agar tidak perlu ubah dashboard UI
             "frekuensi": freq,
             "persentase": round(freq / total_findings * 100, 1),
+            "ulasan": category_reviews.get(kategori, []),
         })
 
     return results
