@@ -66,7 +66,7 @@ def page_admin_dashboard():
         # Menu navigasi admin
         admin_menu = st.radio(
             "📂 Menu Admin",
-            ["📊 Dashboard Monitoring", "📤 Upload Data OTA"],
+            ["📊 Dashboard Monitoring", "📤 Upload Data (Excel)"],
             label_visibility="collapsed",
             key="admin_menu",
         )
