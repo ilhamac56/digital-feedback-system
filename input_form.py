@@ -24,7 +24,7 @@ def page_guest_form():
     inject_css()
 
     # --- Trik layout: bungkus form di kolom tengah agar menyerupai layar HP ---
-    col_kiri, col_tengah, col_kanan = st.columns([1, 2, 1])
+    _, col_tengah, _ = st.columns([1, 2, 1])
 
     with col_tengah:
 
@@ -242,7 +242,7 @@ def page_login():
     inject_css()
 
     # Centering login di layar wide
-    col_l, col_c, col_r = st.columns([1, 2, 1])
+    _, col_c, _ = st.columns([1, 2, 1])
 
     with col_c:
         st.markdown("""

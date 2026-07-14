@@ -282,7 +282,9 @@ def _classify_sentiment(tokens: list[str], rating: int) -> str:
         sentiment = "Netral"
 
     # RATING OVERRIDE RULE
-    if rating <= 2:
+    if rating >= 4:
+        sentiment = "Positif"
+    elif rating <= 2:
         sentiment = "Negatif"
     elif rating == 3 and sentiment == "Positif":
         sentiment = "Netral"
@@ -317,34 +319,6 @@ def analyze_feedback(teks: str, rating_bintang: int) -> tuple[str, str]:
 # ============================================================
 # FUNGSI EKSTRAKSI FRASA TEMUAN NEGATIF — ASPECT-BASED (FITUR 5)
 # ============================================================
-
-# Kamus kata benda (subjek/objek) umum dalam konteks ulasan hotel
-NOUN_KEYWORDS = {
-    # Kamar & tempat tidur
-    "kamar", "kamar mandi", "bed", "kasur", "tempat tidur", "ranjang",
-    "bantal", "selimut", "sprei", "handuk",
-    # Fasilitas
-    "ac", "air", "air panas", "air hangat", "shower", "toilet", "wc",
-    "wastafel", "tv", "televisi", "wifi", "internet", "kulkas", "minibar",
-    "remote", "lampu", "kunci", "pintu", "jendela", "cermin", "lemari",
-    # Bangunan & area
-    "lobby", "lobi", "parkir", "taman", "kolam", "kolam renang",
-    "restoran", "restaurant", "cafe", "kafe", "mushola", "playground",
-    "gazebo", "balkon", "teras", "lantai", "dinding", "atap", "plafon",
-    # Staf & pelayanan
-    "staf", "staff", "karyawan", "resepsionis", "pelayan", "petugas",
-    "pelayanan", "layanan", "servis", "service",
-    "room service", "housekeeping", "cleaning", "front office",
-    # Makanan
-    "makanan", "sarapan", "breakfast", "makan", "menu", "masakan",
-    "minuman", "kopi", "nasi", "roti", "buah",
-    # Fasilitas rekreasi
-    "spa", "sauna", "pemandian", "hot spring", "waterpark", "waterboom",
-    # Umum
-    "harga", "tarif", "biaya", "fasilitas", "lingkungan", "area",
-    "suasana", "pemandangan", "view", "kebersihan", "keamanan",
-    "lokasi", "akses", "jalan",
-}
 
 # Kata penghubung untuk memecah kalimat menjadi fragmen
 _SPLIT_CONJUNCTIONS = [
@@ -434,29 +408,31 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
         if has_noun and has_negative:
             return category["name"]
 
-    # Fallback 1: Jika tidak ada noun, tapi ada negative yang sangat spesifik
+    # Fallback: Jika tidak ada noun, tapi ada negative yang sangat spesifik
     # Contoh: "Kotor banget", "Resepsionisnya jutek"
     for category in ABSA_CATEGORIES:
         has_negative = any(neg in token_phrases for neg in category["negatives"])
         if has_negative:
-            # Pastikan ini benar-benar ada di NEGATIVE_KEYWORDS asli untuk menghindari false positive
-            if any(n in NEGATIVE_KEYWORDS for n in token_phrases):
-                # Jika keluhannya "hambar", "basi", pasti tentang makanan
-                if any(neg in ["hambar", "basi", "asin"] for neg in token_phrases):
-                    return "Kualitas Makanan / Sarapan Kurang"
-                # Jika keluhannya "bocor", "rusak", "tidak dingin", pasti fasilitas
-                if any(neg in ["bocor", "rusak", "tidak dingin", "macet"] for neg in token_phrases):
-                    return "Fasilitas Kamar Rusak"
-                # Jika keluhannya "ketus", "jutek", pasti staf
-                if any(neg in ["ketus", "jutek", "judes", "tidak ramah"] for neg in token_phrases):
-                    return "Pelayanan Staf Kurang Memuaskan"
-                # Jika keluhannya "berisik", "bising", pasti suasana
-                if any(neg in ["berisik", "bising", "gaduh"] for neg in token_phrases):
-                    return "Suasana Berisik / Kurang Nyaman"
-                
-                # Fallback umum jika hanya menemukan kata negatif tapi bingung benda apa
-                return "Keluhan Umum Lainnya"
+            # Jika keluhannya "hambar", "basi", pasti tentang makanan
+            if any(neg in ["hambar", "basi", "asin"] for neg in token_phrases):
+                return "Kualitas Makanan / Sarapan Kurang"
+            # Jika keluhannya "bocor", "rusak", "tidak dingin", pasti fasilitas
+            if any(neg in ["bocor", "rusak", "tidak dingin", "macet"] for neg in token_phrases):
+                return "Fasilitas Kamar Rusak"
+            # Jika keluhannya "ketus", "jutek", pasti staf
+            if any(neg in ["ketus", "jutek", "judes", "tidak ramah"] for neg in token_phrases):
+                return "Pelayanan Staf Kurang Memuaskan"
+            # Jika keluhannya "berisik", "bising", pasti suasana
+            if any(neg in ["berisik", "bising", "gaduh"] for neg in token_phrases):
+                return "Suasana Berisik / Kurang Nyaman"
+            # Jika keluhannya "kotor", "bau", "jorok", pasti kebersihan
+            if any(neg in ["kotor", "bau", "jorok", "apek", "berdebu", "buluk"] for neg in token_phrases):
+                return "Kamar & Toilet Kurang Bersih"
+            # Jika keluhannya "lemot", "putus", pasti wifi
+            if any(neg in ["lemot", "putus", "tidak konek"] for neg in token_phrases):
+                return "Koneksi WiFi Buruk"
 
+    # Jika tidak cocok dengan kategori mana pun, abaikan (tidak ada "Keluhan Umum Lainnya")
     return None
 
 
