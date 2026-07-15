@@ -749,6 +749,20 @@ def inject_css():
         font-size: 0.88rem;
         color: #e2e8f0;
         line-height: 1.6;
+        margin-bottom: 8px;
+    }
+    .dss-card .dss-separator {
+        border-top: 1px solid rgba(245,158,11,0.15);
+        margin: 12px 0;
+    }
+    .dss-card .dss-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #fbbf24;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        margin-top: 10px;
     }
 
     /* ---------- Score Indicator Row ---------- */

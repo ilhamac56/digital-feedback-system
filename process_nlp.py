@@ -353,33 +353,45 @@ def _split_into_fragments(text: str) -> list[str]:
 ABSA_CATEGORIES = [
     {
         "name": "Kamar & Toilet Kurang Bersih",
+        "dimension": "Tangibles",
         "nouns": ["kamar", "toilet", "wc", "kamar mandi", "lantai", "kasur", "sprei", "handuk", "ruangan", "kaca", "wastafel", "debu"],
         "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "berantakan", "buluk"]
     },
     {
         "name": "Fasilitas Kamar Rusak",
+        "dimension": "Tangibles",
         "nouns": ["ac", "air", "tv", "lampu", "pintu", "kunci", "fasilitas", "shower", "kran", "air panas", "flush", "remot", "kulkas"],
         "negatives": ["rusak", "bocor", "mati", "tidak dingin", "panas", "error", "macet", "tidak fungsi", "tidak nyala", "jebol", "copot"]
     },
     {
         "name": "Pelayanan Staf Kurang Memuaskan",
+        "dimension": "Responsiveness",
         "nouns": ["staf", "staff", "pelayanan", "resepsionis", "layanan", "karyawan", "petugas", "security", "satpam", "receptionist"],
         "negatives": ["lambat", "lama", "ketus", "jutek", "kurang ramah", "tidak ramah", "cuek", "kasar", "judes", "sombong", "buruk", "mengecewakan", "lelet"]
     },
     {
         "name": "Koneksi WiFi Buruk",
+        "dimension": "Reliability",
         "nouns": ["wifi", "internet", "koneksi", "sinyal", "jaringan"],
         "negatives": ["lemot", "lambat", "putus", "hilang", "susah", "jelek", "kurang", "tidak konek", "mati", "error"]
     },
     {
         "name": "Kualitas Makanan / Sarapan Kurang",
+        "dimension": "Tangibles",
         "nouns": ["makanan", "sarapan", "menu", "rasa", "makan", "kentang", "nasi", "kopi", "teh", "roti", "resto", "restoran", "breakfast"],
         "negatives": ["hambar", "dingin", "kurang", "sedikit", "asin", "basi", "keras", "tidak enak", "kurang enak", "standar", "biasa", "habis"]
     },
     {
         "name": "Suasana Berisik / Kurang Nyaman",
+        "dimension": "Assurance",
         "nouns": ["suasana", "lingkungan", "suara", "berisik", "kamar", "tidur", "malam", "jalan", "kendaraan", "pintu"],
         "negatives": ["berisik", "bising", "ribut", "gaduh", "ramai", "tidak nyaman", "kurang nyaman", "terganggu", "kedengaran", "tembus"]
+    },
+    {
+        "name": "Staf Kurang Peduli / Cuek",
+        "dimension": "Empathy",
+        "nouns": ["staf", "karyawan", "pelayanan", "resepsionis", "petugas", "perhatian", "bantuan", "keluhan", "tamu"],
+        "negatives": ["cuek", "tidak peduli", "mengabaikan", "masa bodoh", "tidak membantu", "abai", "acuh"]
     }
 ]
 
@@ -431,6 +443,9 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
             # Jika keluhannya "lemot", "putus", pasti wifi
             if any(neg in ["lemot", "putus", "tidak konek"] for neg in token_phrases):
                 return "Koneksi WiFi Buruk"
+            # Jika keluhannya "cuek", "tidak peduli", pasti empati
+            if any(neg in ["cuek", "tidak peduli", "mengabaikan", "acuh"] for neg in token_phrases):
+                return "Staf Kurang Peduli / Cuek"
 
     # Jika tidak cocok dengan kategori mana pun, abaikan (tidak ada "Keluhan Umum Lainnya")
     return None
@@ -466,10 +481,13 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
     if total_findings == 0:
         return []
 
+    CATEGORY_DIMENSION_MAP = {c["name"]: c.get("dimension", "Unknown") for c in ABSA_CATEGORIES}
+
     results = []
     for kategori, freq in category_counter.most_common(top_n):
         results.append({
             "frasa": kategori,  # Tetap pakai key "frasa" agar tidak perlu ubah dashboard UI
+            "dimensi": CATEGORY_DIMENSION_MAP.get(kategori, "Unknown"),
             "frekuensi": freq,
             "persentase": round(freq / total_findings * 100, 1),
             "ulasan": category_reviews.get(kategori, []),

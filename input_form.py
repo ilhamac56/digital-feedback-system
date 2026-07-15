@@ -275,14 +275,14 @@ def page_login():
 
 
 # ============================================================
-# HALAMAN ADMIN: UPLOAD DATA EXCEL
+# HALAMAN ADMIN: UPLOAD DATA OTA
 # ============================================================
 
 def page_upload_ota():
-    """Render halaman upload data dari file Excel."""
+    """Render halaman upload data OTA dari file Excel."""
 
-    st.markdown('<p class="dash-title">📤 Unggah Data Ulasan (Excel)</p>', unsafe_allow_html=True)
-    st.markdown('<p class="dash-subtitle">Impor data ulasan tamu (OTA / Walk-in) secara massal ke dalam sistem</p>',
+    st.markdown('<p class="dash-title">📤 Unggah Data Ekstraksi OTA</p>', unsafe_allow_html=True)
+    st.markdown('<p class="dash-subtitle">Impor data ulasan dari platform OTA ke dalam sistem</p>',
                 unsafe_allow_html=True)
 
     # Informasi format yang diharapkan
@@ -298,23 +298,6 @@ def page_upload_ota():
         • <strong>Ulasan</strong> — Teks ulasan tamu
     </div>
     """, unsafe_allow_html=True)
-
-    st.markdown("##### 🏷️ Pilih Jenis Reservasi untuk Data Ini")
-    pilihan_reservasi = st.radio(
-        "Jenis Reservasi",
-        options=[
-            "Aplikasi Online (Traveloka, Agoda, dll)",
-            "Datang Langsung / Resepsionis (Walk-in)",
-        ],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-    reservasi_map = {
-        "Aplikasi Online (Traveloka, Agoda, dll)": "Aplikasi Online (OTA)",
-        "Datang Langsung / Resepsionis (Walk-in)": "Datang Langsung (Walk-in)"
-    }
-    jenis_reservasi_db = reservasi_map.get(pilihan_reservasi, pilihan_reservasi)
 
     # File uploader
     uploaded_file = st.file_uploader(
@@ -393,7 +376,7 @@ def page_upload_ota():
                         "teks_ulasan": ulasan_val,
                         "dimensi_terdeteksi": dimensi,
                         "sentimen_akhir": sentimen,
-                        "jenis_reservasi": jenis_reservasi_db,
+                        "jenis_reservasi": "Aplikasi Online (OTA)",
                     })
 
                 except Exception:

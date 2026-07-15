@@ -34,30 +34,82 @@ DIMENSION_LABEL_MAP = {
 }
 
 # ============================================================
-# REKOMENDASI DSS RULE-BASED (FITUR 4)
+# KNOWLEDGE BASE DSS RULE-BASED — ANALISIS 5 WHY (FITUR 4)
 # ============================================================
-DSS_RECOMMENDATIONS = {
-    "Tangibles": (
-        "Fokuskan pengawasan minggu ini pada **perbaikan fasilitas fisik dan kebersihan kamar**. "
-        "Lakukan inspeksi rutin terhadap kondisi kamar, toilet, dan area publik."
-    ),
-    "Reliability": (
-        "Tingkatkan **konsistensi layanan** agar sesuai dengan janji dan ekspektasi tamu. "
-        "Pastikan proses check-in/check-out, reservasi, dan informasi harga akurat."
-    ),
-    "Responsiveness": (
-        "Evaluasi **kecepatan pelayanan staf front-office** dalam menangani keluhan. "
-        "Terapkan SOP waktu respons maksimal untuk setiap permintaan tamu."
-    ),
-    "Assurance": (
-        "Adakan **pelatihan tambahan** untuk meningkatkan kompetensi dan kesopanan staf. "
-        "Pastikan keamanan area hotel dan keramahan pelayanan terjaga."
-    ),
-    "Empathy": (
-        "Dorong staf untuk lebih **proaktif memahami dan memenuhi kebutuhan personal tamu**. "
-        "Latih kemampuan komunikasi empatik dan perhatian terhadap detail."
-    ),
+# Key harus PERSIS sama dengan field "name" di ABSA_CATEGORIES (process_nlp.py)
+DSS_KNOWLEDGE_BASE = {
+    "Kamar & Toilet Kurang Bersih": {
+        "akar_masalah": (
+            "Pelaksanaan deep cleaning area basah kurang optimal "
+            "akibat keterbatasan waktu staf di jam sibuk."
+        ),
+        "rekomendasi": (
+            "Wajibkan inspeksi silang (cross-check) oleh Room & Laundry "
+            "Supervisor sebelum status kamar diubah menjadi Ready di sistem FO."
+        ),
+    },
+    "Fasilitas Kamar Rusak": {
+        "akar_masalah": (
+            "Lemahnya sistem audit kelayakan aset dan ketiadaan jadwal "
+            "peremajaan inventaris berkala."
+        ),
+        "rekomendasi": (
+            "Buat logbook umur ekonomis aset dan terapkan jadwal Preventive "
+            "Replacement sebelum perabotan kamar melewati batas aus."
+        ),
+    },
+    "Pelayanan Staf Kurang Memuaskan": {
+        "akar_masalah": (
+            "Kurangnya standarisasi interaksi pelayanan pada saat beban "
+            "tamu sedang tinggi (peak season)."
+        ),
+        "rekomendasi": (
+            "Lakukan penyegaran (refreshment) SOP Hospitality dan roleplay "
+            "penanganan komplain tamu bagi seluruh staf garda terdepan."
+        ),
+    },
+    "Koneksi WiFi Buruk": {
+        "akar_masalah": (
+            "Kapasitas bandwidth tidak sebanding dengan jumlah perangkat "
+            "yang terhubung, terutama saat occupancy tinggi."
+        ),
+        "rekomendasi": (
+            "Upgrade infrastruktur jaringan (access point & bandwidth) dan "
+            "terapkan manajemen bandwidth per-kamar untuk menjamin kualitas koneksi."
+        ),
+    },
+    "Kualitas Makanan / Sarapan Kurang": {
+        "akar_masalah": (
+            "Rotasi menu terbatas dan kontrol kualitas bahan baku kurang "
+            "ketat sehingga cita rasa tidak konsisten."
+        ),
+        "rekomendasi": (
+            "Terapkan siklus menu mingguan dengan variasi dan wajibkan "
+            "uji rasa (taste test) oleh F&B Supervisor sebelum penyajian."
+        ),
+    },
+    "Suasana Berisik / Kurang Nyaman": {
+        "akar_masalah": (
+            "Isolasi suara antar-kamar dan dari area publik belum memadai, "
+            "diperparah minimnya aturan ketenangan malam."
+        ),
+        "rekomendasi": (
+            "Pasang peredam suara pada dinding dan pintu kamar, serta "
+            "terapkan kebijakan quiet hours (22.00–06.00) yang dikomunikasikan saat check-in."
+        ),
+    },
+    "Staf Kurang Peduli / Cuek": {
+        "akar_masalah": (
+            "Belum ada program pelatihan empati terstruktur dan sistem "
+            "reward berbasis kepuasan tamu untuk memotivasi staf."
+        ),
+        "rekomendasi": (
+            "Adakan pelatihan komunikasi empatik berkala dan terapkan "
+            "program insentif berdasarkan skor ulasan kepuasan tamu."
+        ),
+    },
 }
+
 
 
 # ============================================================
@@ -361,40 +413,62 @@ def page_dashboard_monitoring():
             )
             st.plotly_chart(fig_reservasi, use_container_width=True)
 
-        # --- Rekomendasi Prioritas DSS (FITUR 4) ---
+        # --- Rekomendasi Prioritas DSS (FITUR 4 — Knowledge Base) ---
         with dss_col2:
             st.markdown('<p class="section-header">💡 Rekomendasi Prioritas (DSS)</p>',
                         unsafe_allow_html=True)
 
-            if total_ulasan > 0:
-                # Hitung rata-rata per dimensi (backend variable names)
-                dim_scores = {
-                    "Tangibles": df_filtered["q3_tangibles"].mean(),
-                    "Reliability": df_filtered["q1_reliability"].mean(),
-                    "Responsiveness": df_filtered["q5_responsiveness"].mean(),
-                    "Assurance": df_filtered["q2_assurance"].mean(),
-                    "Empathy": df_filtered["q4_empathy"].mean(),
-                }
+            # Ambil ulasan bersentimen Negatif dari data terfilter
+            df_neg_dss = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+            ulasan_neg_dss = df_neg_dss["teks_ulasan"].dropna().tolist()
 
-                # Cari dimensi dengan skor terendah
-                lowest_dim = min(dim_scores, key=dim_scores.get)
-                lowest_score = dim_scores[lowest_dim]
-                lowest_label = DIMENSION_LABEL_MAP[lowest_dim]
-                recommendation = DSS_RECOMMENDATIONS[lowest_dim]
+            if ulasan_neg_dss:
+                # Hitung Top 1 kategori keluhan ABSA
+                top_findings = extract_negative_findings(ulasan_neg_dss, top_n=1)
 
-                # DSS Recommendation Card — premium styling
-                st.markdown(f"""
-                <div class="dss-card">
-                    <span class="dss-badge">⚡ Prioritas Utama</span>
-                    <div class="dss-dim-name">📌 {lowest_label}</div>
-                    <div class="dss-score">Skor rata-rata: <strong>{lowest_score:.2f}</strong> / 5.00</div>
-                    <div class="dss-text">{recommendation}</div>
-                </div>
-                """, unsafe_allow_html=True)
+                if top_findings:
+                    top = top_findings[0]
+                    top_kategori = top["frasa"]          # nama kategori ABSA
+                    top_dimensi = top.get("dimensi", "")
+                    top_freq = top["frekuensi"]
 
-                # Ringkasan skor semua dimensi disembunyikan sesuai permintaan
+                    # Lookup Knowledge Base (case-insensitive key matching)
+                    kb_entry = DSS_KNOWLEDGE_BASE.get(top_kategori)
+                    if not kb_entry:
+                        # Coba case-insensitive fallback
+                        kb_lower = {k.lower(): v for k, v in DSS_KNOWLEDGE_BASE.items()}
+                        kb_entry = kb_lower.get(top_kategori.lower(), {
+                            "akar_masalah": "Belum tersedia analisis akar masalah untuk kategori ini.",
+                            "rekomendasi": "Lakukan investigasi lanjutan terhadap keluhan ini.",
+                        })
+
+                    akar = kb_entry["akar_masalah"]
+                    rekom = kb_entry["rekomendasi"]
+                    dim_label = DIMENSION_LABEL_MAP.get(top_dimensi, top_dimensi)
+
+                    # DSS Recommendation Card — premium styling
+                    st.markdown(f"""
+                    <div class="dss-card">
+                        <span class="dss-badge">⚡ PRIORITAS UTAMA</span>
+                        <div class="dss-dim-name">📌 {top_kategori}</div>
+                        <div class="dss-score">Dimensi: <strong>{dim_label}</strong> · Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>
+                        <div class="dss-separator"></div>
+                        <div class="dss-label">🔍 Akar Masalah Historis:</div>
+                        <div class="dss-text">{akar}</div>
+                        <div class="dss-label">💊 Rekomendasi Tindakan (DSS):</div>
+                        <div class="dss-text">{rekom}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.success(
+                        "✅ Tidak ada temuan kritis pada periode ini. "
+                        "Pertahankan kualitas pelayanan!"
+                    )
             else:
-                st.info("Tidak cukup data untuk menghasilkan rekomendasi.")
+                st.success(
+                    "✅ Tidak ada temuan kritis pada periode ini. "
+                    "Pertahankan kualitas pelayanan!"
+                )
 
     # ----------------------------------------------------------------
     # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
@@ -415,30 +489,33 @@ def page_dashboard_monitoring():
                 df_findings = pd.DataFrame(findings)
                 # Capitalize frasa untuk tampilan
                 df_findings["frasa"] = df_findings["frasa"].str.capitalize()
+                # Tambahkan label dimensi
+                df_findings["frasa_display"] = "[" + df_findings["dimensi"] + "] " + df_findings["frasa"]
                 # Urutkan ascending agar bar terbesar di atas
                 df_findings = df_findings.sort_values("frekuensi", ascending=True)
 
                 fig_findings = px.bar(
                     df_findings,
                     x="frekuensi",
-                    y="frasa",
+                    y="frasa_display",
                     orientation="h",
                     text=df_findings.apply(
                         lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
                     ),
-                    color="frekuensi",
-                    color_continuous_scale=["#fda4af", "#f43f5e", "#be123c"],
+                    color="dimensi",
+                    color_discrete_sequence=px.colors.qualitative.Pastel,
                 )
                 fig_findings.update_layout(
                     height=max(300, len(df_findings) * 45),
                     xaxis_title="Frekuensi Kemunculan",
                     yaxis_title="",
-                    showlegend=False,
+                    showlegend=True,
+                    legend_title="Dimensi SERVPERF",
                     coloraxis_showscale=False,
                     plot_bgcolor="rgba(0,0,0,0)",
                     paper_bgcolor="rgba(0,0,0,0)",
                     font=dict(family="Inter", size=13, color="#94a3b8"),
-                    margin=dict(t=20, b=40, l=200, r=30),
+                    margin=dict(t=20, b=40, l=250, r=30),
                     xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
                     yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
                 )
@@ -459,11 +536,12 @@ def page_dashboard_monitoring():
                 # --- Detail ulasan asli per kategori ---
                 for finding in findings:
                     kategori_nama = finding["frasa"].capitalize()
+                    dimensi = finding.get("dimensi", "Unknown")
                     daftar_ulasan = finding.get("ulasan", [])
                     jumlah = finding["frekuensi"]
 
                     with st.expander(
-                        f"📋 {kategori_nama} — {jumlah} ulasan",
+                        f"📋 [{dimensi}] {kategori_nama} — {jumlah} ulasan",
                         expanded=False,
                     ):
                         if daftar_ulasan:
