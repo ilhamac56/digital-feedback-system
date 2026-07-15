@@ -38,14 +38,24 @@ DIMENSION_LABEL_MAP = {
 # ============================================================
 # Key harus PERSIS sama dengan field "name" di ABSA_CATEGORIES (process_nlp.py)
 DSS_KNOWLEDGE_BASE = {
-    "Kamar & Toilet Kurang Bersih": {
+    "Kebersihan Kamar Kurang": {
         "akar_masalah": (
-            "Pelaksanaan deep cleaning area basah kurang optimal "
-            "akibat keterbatasan waktu staf di jam sibuk."
+            "Standar kebersihan kamar tidur belum terjaga konsisten "
+            "akibat beban kerja housekeeping yang tinggi di jam sibuk."
         ),
         "rekomendasi": (
-            "Wajibkan inspeksi silang (cross-check) oleh Room & Laundry "
-            "Supervisor sebelum status kamar diubah menjadi Ready di sistem FO."
+            "Wajibkan inspeksi silang (cross-check) oleh Room Supervisor "
+            "sebelum status kamar diubah menjadi Ready di sistem FO."
+        ),
+    },
+    "Kamar Mandi / Toilet Kotor": {
+        "akar_masalah": (
+            "Pelaksanaan deep cleaning area basah (toilet, wastafel, shower) "
+            "kurang optimal dan belum masuk dalam checklist wajib harian."
+        ),
+        "rekomendasi": (
+            "Terapkan Form Checklist Deep Cleaning Kamar Mandi harian yang "
+            "wajib ditandatangani housekeeping dan diverifikasi supervisor."
         ),
     },
     "Fasilitas Kamar Rusak": {

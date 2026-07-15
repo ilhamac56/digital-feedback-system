@@ -352,10 +352,16 @@ def _split_into_fragments(text: str) -> list[str]:
 # Kategori Temuan Baku (Predefined ABSA Categories)
 ABSA_CATEGORIES = [
     {
-        "name": "Kamar & Toilet Kurang Bersih",
+        "name": "Kebersihan Kamar Kurang",
         "dimension": "Tangibles",
-        "nouns": ["kamar", "toilet", "wc", "kamar mandi", "lantai", "kasur", "sprei", "handuk", "ruangan", "kaca", "wastafel", "debu"],
+        "nouns": ["kamar", "lantai", "kasur", "sprei", "selimut", "bantal", "ruangan", "kaca", "debu", "dinding", "karpet", "meja", "lemari"],
         "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "berantakan", "buluk"]
+    },
+    {
+        "name": "Kamar Mandi / Toilet Kotor",
+        "dimension": "Tangibles",
+        "nouns": ["toilet", "wc", "kamar mandi", "wastafel", "shower", "closet", "kloset", "bathub", "bathtub", "handuk", "sabun", "kran"],
+        "negatives": ["kotor", "bau", "jorok", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "licin", "buluk", "mampet", "tersumbat"]
     },
     {
         "name": "Fasilitas Kamar Rusak",
@@ -437,9 +443,12 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
             # Jika keluhannya "berisik", "bising", pasti suasana
             if any(neg in ["berisik", "bising", "gaduh"] for neg in token_phrases):
                 return "Suasana Berisik / Kurang Nyaman"
-            # Jika keluhannya "kotor", "bau", "jorok", pasti kebersihan
-            if any(neg in ["kotor", "bau", "jorok", "apek", "berdebu", "buluk"] for neg in token_phrases):
-                return "Kamar & Toilet Kurang Bersih"
+            # Jika keluhannya "kotor", "bau", "jorok" + ada kata toilet/wc
+            if any(neg in ["kotor", "bau", "jorok", "apek", "buluk", "mampet"] for neg in token_phrases):
+                # Cek apakah konteksnya kamar mandi atau kamar tidur
+                if any(noun in token_phrases for noun in ["toilet", "wc", "kamar mandi", "wastafel", "closet", "kloset"]):
+                    return "Kamar Mandi / Toilet Kotor"
+                return "Kebersihan Kamar Kurang"
             # Jika keluhannya "lemot", "putus", pasti wifi
             if any(neg in ["lemot", "putus", "tidak konek"] for neg in token_phrases):
                 return "Koneksi WiFi Buruk"
