@@ -38,84 +38,159 @@ DIMENSION_LABEL_MAP = {
 # ============================================================
 # Key harus PERSIS sama dengan field "name" di ABSA_CATEGORIES (process_nlp.py)
 DSS_KNOWLEDGE_BASE = {
+    # --- TANGIBLES ---
     "Kebersihan Kamar Kurang": {
         "akar_masalah": (
-            "Standar kebersihan kamar tidur belum terjaga konsisten "
-            "akibat beban kerja housekeeping yang tinggi di jam sibuk."
+            "Kemungkinan standar kebersihan kamar belum terjaga secara konsisten, "
+            "bisa disebabkan oleh beban kerja housekeeping yang tinggi atau kurangnya pengawasan."
         ),
         "rekomendasi": (
-            "Wajibkan inspeksi silang (cross-check) oleh Room Supervisor "
-            "sebelum status kamar diubah menjadi Ready di sistem FO."
+            "Terapkan inspeksi silang (cross-check) oleh supervisor sebelum status kamar "
+            "diubah menjadi siap huni, serta evaluasi beban kerja staf housekeeping."
         ),
     },
     "Kamar Mandi / Toilet Kotor": {
         "akar_masalah": (
-            "Pelaksanaan deep cleaning area basah (toilet, wastafel, shower) "
-            "kurang optimal dan belum masuk dalam checklist wajib harian."
+            "Kemungkinan pembersihan area basah (toilet, wastafel, shower) belum dilakukan "
+            "secara menyeluruh atau belum ada checklist khusus untuk area kamar mandi."
         ),
         "rekomendasi": (
-            "Terapkan Form Checklist Deep Cleaning Kamar Mandi harian yang "
-            "wajib ditandatangani housekeeping dan diverifikasi supervisor."
+            "Terapkan checklist deep cleaning kamar mandi yang wajib diisi setiap pembersihan "
+            "dan diverifikasi oleh supervisor sebelum kamar diserahkan ke tamu."
         ),
     },
     "Fasilitas Kamar Rusak": {
         "akar_masalah": (
-            "Lemahnya sistem audit kelayakan aset dan ketiadaan jadwal "
-            "peremajaan inventaris berkala."
+            "Kemungkinan belum ada sistem pemeliharaan preventif yang teratur, "
+            "sehingga kerusakan baru terdeteksi setelah ada keluhan dari tamu."
         ),
         "rekomendasi": (
-            "Buat logbook umur ekonomis aset dan terapkan jadwal Preventive "
-            "Replacement sebelum perabotan kamar melewati batas aus."
+            "Buat jadwal pemeliharaan berkala untuk seluruh fasilitas kamar "
+            "dan sediakan logbook pelaporan kerusakan yang mudah diakses staf."
         ),
     },
-    "Pelayanan Staf Kurang Memuaskan": {
+    "AC Tidak Dingin / Bermasalah": {
         "akar_masalah": (
-            "Kurangnya standarisasi interaksi pelayanan pada saat beban "
-            "tamu sedang tinggi (peak season)."
+            "Kemungkinan unit AC kurang mendapat perawatan rutin seperti pembersihan filter "
+            "atau servis berkala, sehingga performanya menurun seiring waktu."
         ),
         "rekomendasi": (
-            "Lakukan penyegaran (refreshment) SOP Hospitality dan roleplay "
-            "penanganan komplain tamu bagi seluruh staf garda terdepan."
+            "Jadwalkan servis AC secara berkala (minimal sebulan sekali), "
+            "dan pastikan ada mekanisme pelaporan cepat dari tamu ke tim engineering."
         ),
     },
-    "Koneksi WiFi Buruk": {
+    "Air Panas Tidak Tersedia / Bermasalah": {
         "akar_masalah": (
-            "Kapasitas bandwidth tidak sebanding dengan jumlah perangkat "
-            "yang terhubung, terutama saat occupancy tinggi."
+            "Kemungkinan kapasitas water heater tidak memadai untuk seluruh kamar "
+            "atau ada kendala teknis pada instalasi pipa air panas."
         ),
         "rekomendasi": (
-            "Upgrade infrastruktur jaringan (access point & bandwidth) dan "
-            "terapkan manajemen bandwidth per-kamar untuk menjamin kualitas koneksi."
+            "Lakukan pengecekan rutin pada water heater dan instalasi pipa, "
+            "serta pertimbangkan penambahan kapasitas jika sering terjadi keluhan."
+        ),
+    },
+    "Kolam / Area Publik Kurang Terawat": {
+        "akar_masalah": (
+            "Kemungkinan frekuensi pembersihan area publik (kolam, taman, lobby) "
+            "belum memadai atau belum ada jadwal perawatan yang ketat."
+        ),
+        "rekomendasi": (
+            "Terapkan checklist inspeksi harian khusus area publik yang harus diselesaikan "
+            "sebelum jam operasional dimulai, dan evaluasi jadwal perawatan secara berkala."
         ),
     },
     "Kualitas Makanan / Sarapan Kurang": {
         "akar_masalah": (
-            "Rotasi menu terbatas dan kontrol kualitas bahan baku kurang "
-            "ketat sehingga cita rasa tidak konsisten."
+            "Kemungkinan variasi menu terbatas atau kontrol kualitas bahan baku "
+            "dan proses penyajian belum cukup ketat."
         ),
         "rekomendasi": (
-            "Terapkan siklus menu mingguan dengan variasi dan wajibkan "
-            "uji rasa (taste test) oleh F&B Supervisor sebelum penyajian."
+            "Evaluasi rotasi menu secara berkala, lakukan uji rasa (taste test) "
+            "sebelum penyajian, dan minta feedback langsung dari tamu terkait menu."
         ),
     },
+    # --- RELIABILITY ---
+    "Koneksi WiFi Buruk": {
+        "akar_masalah": (
+            "Kemungkinan kapasitas jaringan belum sebanding dengan jumlah pengguna, "
+            "atau ada kendala teknis pada infrastruktur access point."
+        ),
+        "rekomendasi": (
+            "Evaluasi kapasitas bandwidth dan jumlah access point, "
+            "pertimbangkan upgrade infrastruktur jaringan jika sering terjadi keluhan."
+        ),
+    },
+    "Check-in / Check-out Lambat": {
+        "akar_masalah": (
+            "Kemungkinan proses administrasi check-in/check-out masih manual "
+            "atau jumlah staf front desk belum memadai saat jam sibuk."
+        ),
+        "rekomendasi": (
+            "Evaluasi efisiensi proses registrasi, pertimbangkan sistem express check-in, "
+            "dan tambah personel front desk pada jam-jam puncak kedatangan tamu."
+        ),
+    },
+    "Harga Tidak Sebanding": {
+        "akar_masalah": (
+            "Kemungkinan ekspektasi tamu terhadap kualitas layanan tidak sesuai "
+            "dengan harga yang dibayarkan, atau kurangnya nilai tambah yang dirasakan."
+        ),
+        "rekomendasi": (
+            "Evaluasi value proposition hotel, pertimbangkan penambahan benefit atau amenities "
+            "kecil yang meningkatkan persepsi nilai, dan pastikan deskripsi promosi akurat."
+        ),
+    },
+    # --- RESPONSIVENESS ---
+    "Pelayanan Staf Kurang Memuaskan": {
+        "akar_masalah": (
+            "Kemungkinan belum ada standar pelayanan yang konsisten "
+            "atau staf memerlukan pelatihan tambahan dalam menangani tamu."
+        ),
+        "rekomendasi": (
+            "Lakukan pelatihan ulang SOP pelayanan dan roleplay penanganan keluhan "
+            "bagi seluruh staf, serta terapkan sistem evaluasi pelayanan berkala."
+        ),
+    },
+    # --- ASSURANCE ---
     "Suasana Berisik / Kurang Nyaman": {
         "akar_masalah": (
-            "Isolasi suara antar-kamar dan dari area publik belum memadai, "
-            "diperparah minimnya aturan ketenangan malam."
+            "Kemungkinan isolasi suara antar-kamar atau dari area publik "
+            "belum memadai, atau belum ada aturan ketenangan yang jelas."
         ),
         "rekomendasi": (
-            "Pasang peredam suara pada dinding dan pintu kamar, serta "
-            "terapkan kebijakan quiet hours (22.00–06.00) yang dikomunikasikan saat check-in."
+            "Pertimbangkan pemasangan peredam suara, terapkan kebijakan quiet hours "
+            "yang dikomunikasikan kepada tamu saat check-in."
         ),
     },
-    "Staf Kurang Peduli / Cuek": {
+    "Keamanan Kurang Terjamin": {
         "akar_masalah": (
-            "Belum ada program pelatihan empati terstruktur dan sistem "
-            "reward berbasis kepuasan tamu untuk memotivasi staf."
+            "Kemungkinan sistem keamanan (CCTV, kunci, petugas) belum optimal "
+            "atau tamu merasa kurang aman karena minimnya visibilitas petugas keamanan."
         ),
         "rekomendasi": (
-            "Adakan pelatihan komunikasi empatik berkala dan terapkan "
-            "program insentif berdasarkan skor ulasan kepuasan tamu."
+            "Evaluasi dan tingkatkan sistem keamanan area hotel, pastikan CCTV berfungsi, "
+            "dan tambah frekuensi patroli keamanan terutama pada malam hari."
+        ),
+    },
+    "Parkir Kurang Memadai": {
+        "akar_masalah": (
+            "Kemungkinan kapasitas lahan parkir terbatas dibandingkan jumlah tamu, "
+            "atau tata letak parkir belum optimal."
+        ),
+        "rekomendasi": (
+            "Evaluasi kapasitas dan tata letak area parkir, pertimbangkan penggunaan "
+            "valet parking atau kerjasama dengan lahan parkir terdekat sebagai solusi alternatif."
+        ),
+    },
+    # --- EMPATHY ---
+    "Staf Kurang Peduli / Cuek": {
+        "akar_masalah": (
+            "Kemungkinan belum ada budaya pelayanan yang menekankan empati, "
+            "atau staf kurang termotivasi untuk memberikan perhatian personal kepada tamu."
+        ),
+        "rekomendasi": (
+            "Adakan pelatihan komunikasi empatik secara berkala dan pertimbangkan "
+            "program apresiasi staf berbasis kepuasan tamu untuk meningkatkan motivasi."
         ),
     },
 }
