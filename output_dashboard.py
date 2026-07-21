@@ -140,6 +140,30 @@ DSS_KNOWLEDGE_BASE = {
             "kecil yang meningkatkan persepsi nilai, dan pastikan deskripsi promosi akurat."
         ),
     },
+    "Deskripsi / Promosi Tidak Sesuai Kenyataan": {
+        "akar_masalah": (
+            "Kemungkinan materi promosi (foto, deskripsi di OTA atau website) sudah tidak "
+            "diperbarui sesuai kondisi terkini, atau terdapat perbedaan antara ekspektasi "
+            "yang dibangun oleh promosi dengan pengalaman aktual tamu."
+        ),
+        "rekomendasi": (
+            "Audit seluruh materi promosi di website dan platform OTA, pastikan foto dan "
+            "deskripsi mencerminkan kondisi terkini, dan terapkan kebijakan update konten "
+            "promosi secara berkala setiap ada renovasi atau perubahan fasilitas."
+        ),
+    },
+    "Jam Operasional Fasilitas Tidak Jelas": {
+        "akar_masalah": (
+            "Kemungkinan informasi jam operasional fasilitas (kolam renang, spa, sarapan, dll) "
+            "belum dikomunikasikan secara jelas kepada tamu saat check-in atau melalui media "
+            "informasi di kamar, sehingga tamu datang saat fasilitas sudah tutup."
+        ),
+        "rekomendasi": (
+            "Pasang papan informasi jam operasional yang jelas di setiap fasilitas, "
+            "sertakan informasi tersebut di welcome card kamar dan sampaikan saat check-in, "
+            "serta update informasi di website dan platform OTA."
+        ),
+    },
     # --- RESPONSIVENESS ---
     "Pelayanan Staf Kurang Memuaskan": {
         "akar_masalah": (
@@ -149,6 +173,42 @@ DSS_KNOWLEDGE_BASE = {
         "rekomendasi": (
             "Lakukan pelatihan ulang SOP pelayanan dan roleplay penanganan keluhan "
             "bagi seluruh staf, serta terapkan sistem evaluasi pelayanan berkala."
+        ),
+    },
+    "Room Service / Housekeeping Lambat": {
+        "akar_masalah": (
+            "Kemungkinan jumlah staf housekeeping tidak sebanding dengan jumlah kamar "
+            "yang harus dilayani, atau belum ada sistem prioritas dan tracking permintaan "
+            "tamu yang efisien."
+        ),
+        "rekomendasi": (
+            "Evaluasi rasio staf housekeeping terhadap jumlah kamar, terapkan sistem "
+            "tracking permintaan tamu (digital atau manual), dan tetapkan standar waktu "
+            "respons maksimal untuk setiap jenis permintaan."
+        ),
+    },
+    "Keluhan Tidak Ditindaklanjuti": {
+        "akar_masalah": (
+            "Kemungkinan belum ada prosedur eskalasi keluhan yang jelas atau sistem "
+            "pencatatan keluhan belum terdigitalisasi, sehingga keluhan tamu terlewat "
+            "atau tidak sampai ke pihak yang berwenang menyelesaikannya."
+        ),
+        "rekomendasi": (
+            "Terapkan sistem pencatatan keluhan terpusat dengan mekanisme eskalasi "
+            "berjenjang, tetapkan batas waktu penyelesaian (SLA) untuk setiap jenis "
+            "keluhan, dan pastikan tamu menerima konfirmasi bahwa keluhannya sedang diproses."
+        ),
+    },
+    "Waktu Tunggu Pelayanan Lama": {
+        "akar_masalah": (
+            "Kemungkinan alur kerja pelayanan belum efisien atau jumlah staf yang "
+            "bertugas tidak memadai pada jam-jam sibuk, menyebabkan antrian dan "
+            "waktu tunggu yang lama bagi tamu."
+        ),
+        "rekomendasi": (
+            "Analisis jam-jam puncak pelayanan dan sesuaikan penjadwalan staf, "
+            "optimalkan alur kerja pelayanan, dan pertimbangkan sistem antrian atau "
+            "notifikasi agar tamu tidak perlu menunggu di tempat."
         ),
     },
     # --- ASSURANCE ---
@@ -182,6 +242,30 @@ DSS_KNOWLEDGE_BASE = {
             "valet parking atau kerjasama dengan lahan parkir terdekat sebagai solusi alternatif."
         ),
     },
+    "Akses Lokasi Sulit / Petunjuk Kurang": {
+        "akar_masalah": (
+            "Kemungkinan petunjuk arah menuju resor belum memadai, titik lokasi di "
+            "Google Maps belum akurat, atau kondisi jalan akses kurang terawat, "
+            "sehingga tamu kesulitan menemukan atau menjangkau lokasi."
+        ),
+        "rekomendasi": (
+            "Pastikan titik lokasi di Google Maps akurat dan terkini, pasang papan "
+            "petunjuk arah di persimpangan kunci, sediakan panduan arah di konfirmasi "
+            "booking, dan koordinasi dengan pemerintah daerah untuk perbaikan jalan akses."
+        ),
+    },
+    "Privasi Tamu Kurang Terjaga": {
+        "akar_masalah": (
+            "Kemungkinan desain kamar atau area penginapan kurang memperhatikan aspek "
+            "privasi, seperti sekat yang tipis, gorden yang tidak rapat, atau jarak "
+            "antar-kamar yang terlalu dekat."
+        ),
+        "rekomendasi": (
+            "Evaluasi dan perbaiki elemen privasi kamar (gorden, sekat, kunci), pastikan "
+            "jendela dan pintu tertutup rapat, dan pertimbangkan pemasangan kaca film "
+            "atau tirai tambahan pada kamar yang menghadap area publik."
+        ),
+    },
     # --- EMPATHY ---
     "Staf Kurang Peduli / Cuek": {
         "akar_masalah": (
@@ -191,6 +275,43 @@ DSS_KNOWLEDGE_BASE = {
         "rekomendasi": (
             "Adakan pelatihan komunikasi empatik secara berkala dan pertimbangkan "
             "program apresiasi staf berbasis kepuasan tamu untuk meningkatkan motivasi."
+        ),
+    },
+    "Komunikasi / Informasi Kurang Jelas": {
+        "akar_masalah": (
+            "Kemungkinan staf belum terbiasa menyampaikan informasi secara proaktif "
+            "dan jelas kepada tamu, atau belum ada standar komunikasi yang baku "
+            "untuk informasi penting seperti aturan, prosedur, dan fasilitas."
+        ),
+        "rekomendasi": (
+            "Buat panduan komunikasi standar (script) untuk informasi yang sering "
+            "ditanyakan tamu, sediakan brosur atau kartu informasi di kamar, dan "
+            "latih staf untuk menyampaikan informasi penting secara proaktif saat check-in."
+        ),
+    },
+    "Kurang Ramah Terhadap Anak / Keluarga": {
+        "akar_masalah": (
+            "Kemungkinan fasilitas dan layanan resor belum dirancang dengan "
+            "mempertimbangkan kebutuhan keluarga dengan anak kecil, seperti area bermain "
+            "yang aman, menu anak, atau perlengkapan bayi."
+        ),
+        "rekomendasi": (
+            "Sediakan fasilitas ramah anak (playground aman, kids corner, menu anak), "
+            "tawarkan perlengkapan bayi (baby cot, high chair) sebagai layanan tambahan, "
+            "dan latih staf untuk memberikan perhatian khusus kepada tamu keluarga."
+        ),
+    },
+    "Kebutuhan Khusus Tidak Diakomodasi": {
+        "akar_masalah": (
+            "Kemungkinan resor belum memiliki fasilitas aksesibilitas yang memadai "
+            "untuk tamu berkebutuhan khusus (disabilitas, lansia, alergi makanan), "
+            "atau staf belum terlatih menangani permintaan khusus."
+        ),
+        "rekomendasi": (
+            "Evaluasi aksesibilitas fasilitas untuk tamu disabilitas dan lansia, "
+            "sediakan opsi menu untuk alergi dan diet khusus, latih staf mengenali "
+            "dan merespons kebutuhan khusus tamu, dan komunikasikan ketersediaan "
+            "layanan ini di platform booking."
         ),
     },
 }
@@ -692,12 +813,87 @@ def page_dashboard_monitoring():
             column_config={
                 "Tanggal": st.column_config.DateColumn(format="DD MMM YYYY"),
                 "Rating Bintang": st.column_config.NumberColumn(format="%d ⭐"),
-                "X1 Reliability": st.column_config.NumberColumn(format="%d"),
-                "X2 Assurance": st.column_config.NumberColumn(format="%d"),
-                "X3 Tangibles": st.column_config.NumberColumn(format="%d"),
-                "X4 Empathy": st.column_config.NumberColumn(format="%d"),
-                "X5 Responsiveness": st.column_config.NumberColumn(format="%d"),
+                "Q1 Reliability": st.column_config.NumberColumn(format="%d"),
+                "Q2 Assurance": st.column_config.NumberColumn(format="%d"),
+                "Q3 Tangibles": st.column_config.NumberColumn(format="%d"),
+                "Q4 Empathy": st.column_config.NumberColumn(format="%d"),
+                "Q5 Responsiveness": st.column_config.NumberColumn(format="%d"),
                 "Sentimen": st.column_config.TextColumn(width="small"),
                 "Jenis Reservasi": st.column_config.TextColumn(width="medium"),
             },
+        )
+
+        # --- Tombol Ekspor ke Excel (dengan formatting rapi) ---
+        from io import BytesIO
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
+        df_export = df_display.copy()
+        # Konversi kolom Tanggal ke string agar tidak error
+        if "Tanggal" in df_export.columns:
+            df_export["Tanggal"] = pd.to_datetime(
+                df_export["Tanggal"], errors="coerce"
+            ).dt.strftime("%Y-%m-%d")
+
+        # Gunakan pd.ExcelWriter untuk memastikan kolom terpisah dengan benar
+        excel_buffer = BytesIO()
+        with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+            df_export.to_excel(writer, index=False, sheet_name="Feedback")
+
+            # Ambil worksheet untuk styling
+            ws = writer.sheets["Feedback"]
+
+            # --- Styling Header ---
+            header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
+            header_fill = PatternFill(start_color="166534", end_color="166534", fill_type="solid")
+            header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+            cell_font = Font(name="Calibri", size=11)
+            cell_alignment = Alignment(vertical="top", wrap_text=True)
+            thin_border = Border(
+                left=Side(style="thin", color="D1D5DB"),
+                right=Side(style="thin", color="D1D5DB"),
+                top=Side(style="thin", color="D1D5DB"),
+                bottom=Side(style="thin", color="D1D5DB"),
+            )
+
+            # Terapkan styling ke header (baris 1)
+            for cell in ws[1]:
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = header_alignment
+                cell.border = thin_border
+
+            # Terapkan styling ke data (baris 2+)
+            for row in ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=ws.max_column):
+                for cell in row:
+                    cell.font = cell_font
+                    cell.alignment = cell_alignment
+                    cell.border = thin_border
+
+            # Auto-fit lebar kolom
+            for col in ws.columns:
+                max_length = 0
+                col_letter = col[0].column_letter
+                for cell in col:
+                    if cell.value is not None:
+                        cell_len = min(len(str(cell.value)), 60)
+                        if cell_len > max_length:
+                            max_length = cell_len
+                ws.column_dimensions[col_letter].width = max(max_length + 3, 12)
+
+            # Freeze header row
+            ws.freeze_panes = "A2"
+
+        # Ambil bytes dari buffer
+        excel_bytes = excel_buffer.getvalue()
+
+        timestamp_file = datetime.now(_WIB).strftime("%Y%m%d_%H%M%S")
+        filename = f"feedback_data_{timestamp_file}.xlsx"
+
+        st.download_button(
+            label="📥 Ekspor ke Excel",
+            data=excel_bytes,
+            file_name=filename,
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="btn_export_excel",
+            use_container_width=True,
         )
