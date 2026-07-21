@@ -823,68 +823,31 @@ def page_dashboard_monitoring():
             },
         )
 
-        # --- Tombol Ekspor ke Excel (dengan formatting rapi) ---
-        from io import BytesIO
-        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        # --- Tombol Ekspor ke Excel ---
+        import os
+        import tempfile
 
         df_export = df_display.copy()
-        # Konversi kolom Tanggal ke string agar tidak error
+        # Konversi kolom Tanggal ke string
         if "Tanggal" in df_export.columns:
             df_export["Tanggal"] = pd.to_datetime(
                 df_export["Tanggal"], errors="coerce"
             ).dt.strftime("%Y-%m-%d")
 
-        # Gunakan pd.ExcelWriter untuk memastikan kolom terpisah dengan benar
-        excel_buffer = BytesIO()
-        with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
-            df_export.to_excel(writer, index=False, sheet_name="Feedback")
+        # Simpan ke file sementara di disk (cara yang terbukti berhasil)
+        tmp_dir = tempfile.gettempdir()
+        tmp_path = os.path.join(tmp_dir, "_feedback_export_temp.xlsx")
+        df_export.to_excel(tmp_path, index=False, engine="openpyxl", sheet_name="Feedback")
 
-            # Ambil worksheet untuk styling
-            ws = writer.sheets["Feedback"]
+        # Baca bytes dari file yang sudah tersimpan
+        with open(tmp_path, "rb") as f:
+            excel_bytes = f.read()
 
-            # --- Styling Header ---
-            header_font = Font(name="Calibri", bold=True, color="FFFFFF", size=11)
-            header_fill = PatternFill(start_color="166534", end_color="166534", fill_type="solid")
-            header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-            cell_font = Font(name="Calibri", size=11)
-            cell_alignment = Alignment(vertical="top", wrap_text=True)
-            thin_border = Border(
-                left=Side(style="thin", color="D1D5DB"),
-                right=Side(style="thin", color="D1D5DB"),
-                top=Side(style="thin", color="D1D5DB"),
-                bottom=Side(style="thin", color="D1D5DB"),
-            )
-
-            # Terapkan styling ke header (baris 1)
-            for cell in ws[1]:
-                cell.font = header_font
-                cell.fill = header_fill
-                cell.alignment = header_alignment
-                cell.border = thin_border
-
-            # Terapkan styling ke data (baris 2+)
-            for row in ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=ws.max_column):
-                for cell in row:
-                    cell.font = cell_font
-                    cell.alignment = cell_alignment
-                    cell.border = thin_border
-
-            # Auto-fit lebar kolom
-            for col in ws.columns:
-                max_length = 0
-                col_letter = col[0].column_letter
-                for cell in col:
-                    if cell.value is not None:
-                        cell_len = min(len(str(cell.value)), 60)
-                        if cell_len > max_length:
-                            max_length = cell_len
-                ws.column_dimensions[col_letter].width = max(max_length + 3, 12)
-
-            # Freeze header row
-            ws.freeze_panes = "A2"
-
-        # Ambil bytes dari buffer
-        excel_bytes = excel_buffer.getvalue()
+        # Hapus file sementara
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
 
         timestamp_file = datetime.now(_WIB).strftime("%Y%m%d_%H%M%S")
         filename = f"feedback_data_{timestamp_file}.xlsx"
