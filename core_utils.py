@@ -776,26 +776,44 @@ def inject_css():
     }
 
     /* ---------- Expander — fix arrow overlapping text ---------- */
-    .streamlit-expanderHeader,
-    div[data-testid="stExpander"] summary,
-    div[data-testid="stExpander"] details > summary {
-        padding-left: 2rem !important;
-        position: relative !important;
-        overflow: visible !important;
+    /* Hide the built-in Material icon that overlaps text */
+    div[data-testid="stExpander"] summary span[data-testid="stExpanderToggleIcon"],
+    div[data-testid="stExpander"] summary svg,
+    div[data-testid="stExpander"] summary > span:first-child:has(svg),
+    .streamlit-expanderHeader svg {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        visibility: hidden !important;
     }
-    div[data-testid="stExpander"] summary > span {
+    /* Ensure summary text is fully visible */
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] details > summary,
+    .streamlit-expanderHeader {
+        overflow: visible !important;
+        gap: 0 !important;
+    }
+    div[data-testid="stExpander"] summary > span,
+    div[data-testid="stExpander"] summary p,
+    .streamlit-expanderHeader > span {
         overflow: visible !important;
         text-overflow: unset !important;
         white-space: normal !important;
+        width: 100% !important;
     }
-    /* Ensure the toggle icon doesn't overlap */
-    div[data-testid="stExpander"] summary svg,
-    div[data-testid="stExpander"] details > summary > svg {
-        position: absolute !important;
-        left: 0 !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
+    /* Add a clean CSS-only arrow indicator */
+    div[data-testid="stExpander"] details > summary::before {
+        content: '▶' !important;
+        display: inline-block !important;
+        margin-right: 8px !important;
+        font-size: 0.7rem !important;
+        transition: transform 0.2s ease !important;
+        color: #10b981 !important;
         flex-shrink: 0 !important;
+    }
+    div[data-testid="stExpander"] details[open] > summary::before {
+        content: '▼' !important;
     }
     </style>
     """, unsafe_allow_html=True)
