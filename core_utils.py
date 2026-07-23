@@ -239,14 +239,7 @@ def inject_css():
         from { opacity: 0; }
         to   { opacity: 1; }
     }
-    @keyframes shimmer {
-        0%   { background-position: -200% center; }
-        100% { background-position: 200% center; }
-    }
-    @keyframes pulse-glow {
-        0%, 100% { box-shadow: 0 0 15px rgba(16,185,129,0.15); }
-        50%      { box-shadow: 0 0 30px rgba(16,185,129,0.3); }
-    }
+
     @keyframes float {
         0%, 100% { transform: translateY(0); }
         50%      { transform: translateY(-6px); }
@@ -765,27 +758,7 @@ def inject_css():
         margin-top: 10px;
     }
 
-    /* ---------- Score Indicator Row ---------- */
-    .score-row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 6px 0;
-        font-size: 0.82rem;
-        color: #cbd5e1;
-    }
-    .score-bar-track {
-        flex: 1;
-        height: 8px;
-        background: rgba(255,255,255,0.06);
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    .score-bar-fill {
-        height: 100%;
-        border-radius: 10px;
-        transition: width 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
+
 
     /* ---------- Divider Decoration ---------- */
     .section-divider {
@@ -800,6 +773,29 @@ def inject_css():
     .stRadio label, .stSelectbox label, .stFileUploader label {
         color: #e2e8f0 !important;
         font-weight: 600 !important;
+    }
+
+    /* ---------- Expander — fix arrow overlapping text ---------- */
+    .streamlit-expanderHeader,
+    div[data-testid="stExpander"] summary,
+    div[data-testid="stExpander"] details > summary {
+        padding-left: 2rem !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+    div[data-testid="stExpander"] summary > span {
+        overflow: visible !important;
+        text-overflow: unset !important;
+        white-space: normal !important;
+    }
+    /* Ensure the toggle icon doesn't overlap */
+    div[data-testid="stExpander"] summary svg,
+    div[data-testid="stExpander"] details > summary > svg {
+        position: absolute !important;
+        left: 0 !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        flex-shrink: 0 !important;
     }
     </style>
     """, unsafe_allow_html=True)

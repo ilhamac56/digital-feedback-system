@@ -413,12 +413,43 @@ ABSA_CATEGORIES = [
         "nouns": ["harga", "tarif", "rate", "biaya", "bayar", "mahal", "nilai", "value", "worth"],
         "negatives": ["mahal", "kemahalan", "tidak sebanding", "tidak worth", "overpriced", "tidak sesuai", "kecewa", "rugi", "menyesal"]
     },
+    # --- RELIABILITY ---
+    {
+        "name": "Deskripsi / Promosi Tidak Sesuai Kenyataan",
+        "dimension": "Reliability",
+        "nouns": ["foto", "gambar", "deskripsi", "iklan", "promosi", "promo", "website", "aplikasi", "brosur", "ekspektasi", "harapan", "kenyataan"],
+        "negatives": ["tidak sesuai", "beda", "berbeda", "bohong", "tipu", "menipu", "palsu", "zonk", "kecewa", "mengecewakan", "jauh", "menyesatkan"]
+    },
+    {
+        "name": "Jam Operasional Fasilitas Tidak Jelas",
+        "dimension": "Reliability",
+        "nouns": ["jam", "jadwal", "operasional", "buka", "tutup", "waktu", "kolam", "sarapan", "spa", "gym", "fitness", "renang"],
+        "negatives": ["tidak jelas", "bingung", "berubah", "tidak konsisten", "tutup", "sudah tutup", "belum buka", "terlambat buka", "tidak ada informasi", "tidak ada info"]
+    },
     # --- RESPONSIVENESS ---
     {
         "name": "Pelayanan Staf Kurang Memuaskan",
         "dimension": "Responsiveness",
         "nouns": ["staf", "staff", "pelayanan", "resepsionis", "layanan", "karyawan", "petugas", "security", "satpam", "receptionist"],
         "negatives": ["lambat", "lama", "ketus", "jutek", "kurang ramah", "tidak ramah", "kasar", "judes", "sombong", "buruk", "mengecewakan", "lelet"]
+    },
+    {
+        "name": "Room Service / Housekeeping Lambat",
+        "dimension": "Responsiveness",
+        "nouns": ["room service", "housekeeping", "cleaning", "handuk", "sprei", "perlengkapan", "amenities", "air minum", "extra bed", "bantal"],
+        "negatives": ["lambat", "lama", "tidak datang", "tidak ada", "menunggu", "nunggu", "tunggu", "belum", "tidak diganti", "tidak dibersihkan"]
+    },
+    {
+        "name": "Keluhan Tidak Ditindaklanjuti",
+        "dimension": "Responsiveness",
+        "nouns": ["keluhan", "komplain", "aduan", "laporan", "masalah", "permintaan", "request", "lapor"],
+        "negatives": ["diabaikan", "tidak ditindak", "tidak diproses", "tidak ada tindakan", "tidak ada solusi", "tidak ada respon", "lama", "berulang", "masih", "tetap"]
+    },
+    {
+        "name": "Waktu Tunggu Pelayanan Lama",
+        "dimension": "Responsiveness",
+        "nouns": ["antrian", "antri", "antre", "tunggu", "menunggu", "pesanan", "order", "makanan", "minuman"],
+        "negatives": ["lama", "lambat", "berjam", "terlalu lama", "tidak kunjung", "berkali kali", "berulang kali"]
     },
     # --- ASSURANCE ---
     {
@@ -439,12 +470,42 @@ ABSA_CATEGORIES = [
         "nouns": ["parkir", "lahan parkir", "tempat parkir", "garasi", "motor", "mobil", "kendaraan"],
         "negatives": ["sempit", "kurang", "penuh", "susah", "sulit", "jauh", "tidak ada", "terbatas", "panas"]
     },
+    {
+        "name": "Akses Lokasi Sulit / Petunjuk Kurang",
+        "dimension": "Assurance",
+        "nouns": ["lokasi", "akses", "jalan", "arah", "petunjuk", "papan nama", "signage", "maps", "google maps", "alamat", "rute"],
+        "negatives": ["sulit", "susah", "jauh", "bingung", "tidak jelas", "nyasar", "tersesat", "gelap", "rusak", "berlubang", "sempit"]
+    },
+    {
+        "name": "Privasi Tamu Kurang Terjaga",
+        "dimension": "Assurance",
+        "nouns": ["privasi", "kamar", "pintu", "jendela", "gorden", "tirai", "dinding", "kaca", "sekat"],
+        "negatives": ["kurang", "tidak ada", "tembus", "terlihat", "terbuka", "transparan", "tipis", "bolong", "terganggu"]
+    },
     # --- EMPATHY ---
     {
         "name": "Staf Kurang Peduli / Cuek",
         "dimension": "Empathy",
         "nouns": ["staf", "karyawan", "pelayanan", "resepsionis", "petugas", "perhatian", "bantuan", "keluhan", "tamu"],
         "negatives": ["cuek", "tidak peduli", "mengabaikan", "masa bodoh", "tidak membantu", "abai", "acuh", "tidak tanggap"]
+    },
+    {
+        "name": "Komunikasi / Informasi Kurang Jelas",
+        "dimension": "Empathy",
+        "nouns": ["informasi", "info", "komunikasi", "penjelasan", "arahan", "panduan", "petunjuk", "aturan", "prosedur", "pemberitahuan"],
+        "negatives": ["kurang jelas", "tidak jelas", "bingung", "membingungkan", "salah informasi", "tidak ada", "tidak diberitahu", "tidak dikasih tahu", "misinformasi"]
+    },
+    {
+        "name": "Kurang Ramah Terhadap Anak / Keluarga",
+        "dimension": "Empathy",
+        "nouns": ["anak", "bayi", "balita", "keluarga", "family", "anak kecil", "anak anak", "baby", "kids", "stroller"],
+        "negatives": ["tidak ramah", "kurang", "tidak ada", "susah", "sulit", "berbahaya", "bahaya", "tidak aman", "sempit", "repot", "ribet"]
+    },
+    {
+        "name": "Kebutuhan Khusus Tidak Diakomodasi",
+        "dimension": "Empathy",
+        "nouns": ["disabilitas", "difabel", "kursi roda", "lansia", "alergi", "halal", "vegetarian", "vegan", "diet", "khusus", "spesial"],
+        "negatives": ["tidak ada", "tidak tersedia", "tidak bisa", "sulit", "susah", "tidak diakomodasi", "tidak disediakan", "kurang", "tidak ramah"]
     }
 ]
 
@@ -512,6 +573,18 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
             # Jika keluhannya "hilang", "dicuri", pasti keamanan
             if any(neg in ["hilang", "kehilangan", "dicuri", "bobol"] for neg in token_phrases):
                 return "Keamanan Kurang Terjamin"
+            # Jika keluhannya "tidak sesuai", "beda", pasti deskripsi
+            if any(neg in ["tidak sesuai", "beda", "berbeda", "bohong", "tipu", "zonk"] for neg in token_phrases):
+                return "Deskripsi / Promosi Tidak Sesuai Kenyataan"
+            # Jika keluhannya "diabaikan", "tidak ditindak", pasti keluhan
+            if any(neg in ["diabaikan", "tidak ditindak", "tidak diproses", "tidak ada solusi"] for neg in token_phrases):
+                return "Keluhan Tidak Ditindaklanjuti"
+            # Jika keluhannya "nyasar", "tersesat", pasti akses
+            if any(neg in ["nyasar", "tersesat", "berlubang"] for neg in token_phrases):
+                return "Akses Lokasi Sulit / Petunjuk Kurang"
+            # Jika keluhannya "tidak jelas", "bingung" + konteks info
+            if any(neg in ["tidak jelas", "membingungkan", "salah informasi", "misinformasi"] for neg in token_phrases):
+                return "Komunikasi / Informasi Kurang Jelas"
 
     # Jika tidak cocok dengan kategori mana pun, abaikan
     return None

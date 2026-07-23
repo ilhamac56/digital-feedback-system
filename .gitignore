@@ -1,10 +1,6 @@
 # Virtual Environment
 venv/
 
-# Database files
-database.db
-*.db
-
 # Python cache
 __pycache__/
 *.py[cod]
