@@ -733,40 +733,40 @@ def page_dashboard_monitoring():
 
                     # Build table HTML for Fishbone
                     table_html = """
-                    <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;">
-                        <thead>
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
-                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Faktor (6M)</th>
-                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Kemungkinan Penyebab</th>
-                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Rekomendasi Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                    """
+<table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;">
+    <thead>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+            <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Faktor (6M)</th>
+            <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Kemungkinan Penyebab</th>
+            <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Rekomendasi Tindakan</th>
+        </tr>
+    </thead>
+    <tbody>
+"""
                     for entry in kb_entries:
                         table_html += f"""
-                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                <td style="padding: 8px 4px; color: #38bdf8; font-weight: 500; vertical-align: top;">{entry['faktor']}</td>
-                                <td style="padding: 8px 4px; color: #e2e8f0; vertical-align: top;">{entry['penyebab']}</td>
-                                <td style="padding: 8px 4px; color: #34d399; vertical-align: top;">{entry['rekomendasi']}</td>
-                            </tr>
-                        """
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 8px 4px; color: #38bdf8; font-weight: 500; vertical-align: top;">{entry['faktor']}</td>
+            <td style="padding: 8px 4px; color: #e2e8f0; vertical-align: top;">{entry['penyebab']}</td>
+            <td style="padding: 8px 4px; color: #34d399; vertical-align: top;">{entry['rekomendasi']}</td>
+        </tr>
+"""
                     table_html += """
-                        </tbody>
-                    </table>
-                    """
+    </tbody>
+</table>
+"""
 
                     # DSS Recommendation Card — premium styling
                     st.markdown(f"""
-                    <div class="dss-card">
-                        <span class="dss-badge">⚡ PRIORITAS UTAMA</span>
-                        <div class="dss-dim-name">📌 {top_kategori}</div>
-                        <div class="dss-score">Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>
-                        <div class="dss-separator"></div>
-                        <div class="dss-label">🔍 Analisis Fishbone & Rekomendasi Tindakan (DSS):</div>
-                        {table_html}
-                    </div>
-                    """, unsafe_allow_html=True)
+<div class="dss-card">
+    <span class="dss-badge">⚡ PRIORITAS UTAMA</span>
+    <div class="dss-dim-name">📌 {top_kategori}</div>
+    <div class="dss-score">Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>
+    <div class="dss-separator"></div>
+    <div class="dss-label">🔍 Analisis Fishbone & Rekomendasi Tindakan (DSS):</div>
+    {table_html}
+</div>
+""", unsafe_allow_html=True)
                 else:
                     st.success(
                         "✅ Tidak ada temuan kritis pada periode ini. "
