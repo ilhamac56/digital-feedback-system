@@ -359,11 +359,11 @@ ABSA_CATEGORIES = [
     },
     {
         "name": "Fasilitas kamar tidak memadai",
-        "nouns": ["fasilitas", "kamar", "tv", "kulkas", "lemari", "cermin", "remote", "remot", "stop kontak", "gorden",
-                  "kasur", "bantal", "selimut", "sprei", "ranjang", "tempat tidur", "bed", "flush", "kunci", "pintu"],
+        "nouns": ["fasilitas", "tv", "kulkas", "lemari", "cermin", "remote", "remot", "stop kontak", "gorden",
+                  "kasur", "bantal", "selimut", "sprei", "ranjang", "tempat tidur", "bed", "flush", "kunci", "pintu", "chanel tv"],
         "negatives": ["rusak", "tidak memadai", "kurang", "jelek", "tidak fungsi", "tidak nyala", "jebol", "copot",
                       "lepas", "pecah", "retak", "macet", "error", "mati", "bocor", "tidak berfungsi", "kurang lengkap",
-                      "tidak layak", "buruk", "usang", "tua", "kusam", "lecek"]
+                      "tidak layak", "buruk", "usang", "tua", "kusam", "lecek", "keras"]
     },
     {
         "name": "Serangga dan hewan pengganggu",
@@ -383,20 +383,19 @@ ABSA_CATEGORIES = [
     {
         "name": "Kamar mandi/toilet kurang bersih",
         "nouns": ["toilet", "wc", "kamar mandi", "wastafel", "shower", "closet", "kloset", "bathub", "bathtub",
-                  "kran", "lantai kamar mandi"],
+                  "kran", "lantai kamar mandi", "saluran air"],
         "negatives": ["kotor", "bau", "jorok", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "licin",
                       "buluk", "mampet", "tersumbat", "kurang bersih", "tidak bersih", "berkerak", "lumut"]
     },
     {
         "name": "Kebersihan kamar kurang",
-        "nouns": ["kamar", "lantai", "kasur", "sprei", "selimut", "bantal", "ruangan", "kaca", "dinding",
-                  "karpet", "meja", "lemari", "debu"],
+        "nouns": ["kamar", "lantai", "kaca", "dinding", "karpet", "meja", "debu"],
         "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur",
-                      "kusam", "berantakan", "buluk", "kurang bersih", "tidak bersih", "dekil"]
+                      "kusam", "berantakan", "buluk", "kurang bersih", "tidak bersih", "dekil", "lengket", "belum dipel"]
     },
     {
         "name": "Sanitasi kolam ikan kurang terjaga",
-        "nouns": ["kolam ikan", "ikan", "kolam", "air kolam"],
+        "nouns": ["kolam ikan", "ikan", "air kolam"],
         "negatives": ["kotor", "keruh", "bau", "jorok", "lumut", "tidak terawat", "kurang terawat", "hijau",
                       "berlumut", "mati", "sampah", "kurang terjaga", "tidak terjaga"]
     },
@@ -411,21 +410,19 @@ ABSA_CATEGORIES = [
     {
         "name": "Kebersihan lingkungan resort kurang",
         "nouns": ["lingkungan", "halaman", "taman", "area", "jalan", "lorong", "koridor", "lobby", "lobi",
-                  "resort", "sekitar", "luar", "outdoor"],
+                  "resort", "outdoor"],
         "negatives": ["kotor", "sampah", "bau", "jorok", "kusam", "becek", "kurang bersih", "tidak bersih",
                       "tidak terawat", "kurang terawat", "berantakan", "kumuh", "berserakan"]
     },
     {
         "name": "Penerangan kamar dan lingkungan kurang",
-        "nouns": ["lampu", "penerangan", "cahaya", "kamar", "lingkungan", "lorong", "koridor", "jalan",
-                  "area", "teras", "balkon"],
+        "nouns": ["lampu", "penerangan", "cahaya", "teras", "balkon"],
         "negatives": ["gelap", "remang", "redup", "kurang", "mati", "rusak", "tidak nyala", "suram",
                       "kurang terang", "tidak terang", "temaram"]
     },
     {
         "name": "Gangguan lingkungan",
-        "nouns": ["suasana", "lingkungan", "suara", "kamar", "tidur", "malam", "jalan", "kendaraan",
-                  "pintu", "dinding", "tetangga", "musik", "konstruksi", "ayam", "hewan"],
+        "nouns": ["suasana", "suara", "malam", "tetangga", "musik", "konstruksi", "ayam", "hewan"],
         "negatives": ["berisik", "bising", "ribut", "gaduh", "ramai", "tidak nyaman", "kurang nyaman",
                       "terganggu", "kedengaran", "tembus", "keras", "mengganggu", "gangguan"]
     },
@@ -444,32 +441,32 @@ ABSA_CATEGORIES = [
     },
     {
         "name": "Lantai kamar berbunyi saat dipijak",
-        "nouns": ["lantai", "lantai kamar", "lantai kayu", "papan", "kayu"],
+        "nouns": ["lantai kayu", "papan", "kayu"],
         "negatives": ["bunyi", "berbunyi", "berderit", "derit", "goyang", "gerak", "bergoyang",
                       "tidak kokoh", "keropos", "lapuk", "berisik", "berdecit", "bersuara"]
     },
     {
         "name": "Jarak akses pintu masuk ke unit jauh",
-        "nouns": ["akses", "pintu masuk", "jalan masuk", "gerbang", "pintu", "jarak", "unit", "kamar",
+        "nouns": ["akses", "pintu masuk", "jalan masuk", "gerbang", "pintu", "jarak", "unit",
                   "lokasi", "area"],
         "negatives": ["jauh", "terlalu jauh", "susah", "sulit", "panjang", "capek", "capai", "lelah",
                       "tidak mudah", "ribet", "memutar", "jalan kaki"]
     },
     {
         "name": "Desain kamar kurang ergonomis",
-        "nouns": ["desain", "kamar", "layout", "tata letak", "ruangan", "interior", "ukuran"],
+        "nouns": ["desain", "layout", "tata letak", "interior", "ukuran"],
         "negatives": ["sempit", "kecil", "sesak", "sumpek", "tidak ergonomis", "kurang ergonomis",
                       "tidak nyaman", "aneh", "kurang pas", "tidak praktis", "kurang luas"]
     },
     {
         "name": "Sirkulasi udara kamar kurang",
-        "nouns": ["udara", "sirkulasi", "ventilasi", "jendela", "kamar", "ruangan", "angin"],
+        "nouns": ["sirkulasi", "ventilasi", "jendela", "angin"],
         "negatives": ["pengap", "sumpek", "tidak ada", "kurang", "sesak", "panas", "gerah", "lembab",
                       "tertutup", "tidak ada ventilasi", "kurang sirkulasi", "душно"]
     },
     {
         "name": "Keamanan kolam kurang terjamin",
-        "nouns": ["kolam", "kolam renang", "pool", "renang", "kolam anak", "kolam rendam", "air"],
+        "nouns": ["kolam renang", "pool", "renang", "kolam anak", "pengawas", "pagar"],
         "negatives": ["bahaya", "berbahaya", "tidak aman", "kurang aman", "licin", "dalam", "terlalu dalam",
                       "tidak ada pagar", "tidak ada pengawas", "rawan", "khawatir", "takut"]
     },
@@ -489,8 +486,7 @@ ABSA_CATEGORIES = [
     },
     {
         "name": "Parkir kurang memadai",
-        "nouns": ["parkir", "lahan parkir", "tempat parkir", "garasi", "motor", "mobil", "kendaraan",
-                  "area parkir"],
+        "nouns": ["parkir", "lahan parkir", "tempat parkir", "garasi", "kendaraan", "area parkir"],
         "negatives": ["sempit", "kurang", "penuh", "susah", "sulit", "jauh", "tidak ada", "terbatas",
                       "panas", "tidak memadai", "kurang luas", "kurang memadai"]
     },
@@ -512,13 +508,13 @@ ABSA_CATEGORIES = [
     {
         "name": "Fasilitas belanja sekitar resort tidak tersedia",
         "nouns": ["belanja", "toko", "warung", "minimarket", "indomaret", "alfamart", "oleh oleh",
-                  "oleh-oleh", "souvenir", "jajanan", "sekitar", "luar"],
+                  "oleh-oleh", "souvenir", "jajanan"],
         "negatives": ["tidak ada", "tidak tersedia", "jauh", "susah", "sulit", "tidak ditemukan", "kosong",
                       "sepi", "tutup", "kurang", "terbatas"]
     },
     {
         "name": "Kamar panas",
-        "nouns": ["kamar", "ruangan", "udara", "suhu", "temperatur"],
+        "nouns": ["suhu", "temperatur"],
         "negatives": ["panas", "gerah", "sumuk", "kepanasan", "tidak sejuk", "kurang sejuk",
                       "tidak dingin", "душно", "terik", "menyengat"]
     },
