@@ -349,164 +349,179 @@ def _split_into_fragments(text: str) -> list[str]:
     return fragments
 
 
-# Kategori Temuan Baku (Predefined ABSA Categories)
+# Kategori Temuan Baku — 25 Kategori Final (Tanpa Label Dimensi)
+# Berdasarkan temuan magang & terhubung ke temuan DFS
 ABSA_CATEGORIES = [
-    # --- TANGIBLES ---
     {
-        "name": "Kebersihan Kamar Kurang",
-        "dimension": "Tangibles",
-        "nouns": ["kamar", "lantai", "kasur", "sprei", "selimut", "bantal", "ruangan", "kaca", "debu", "dinding", "karpet", "meja", "lemari"],
-        "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "berantakan", "buluk"]
+        "name": "Tidak ada AC",
+        "nouns": ["ac", "pendingin", "pendingin ruangan", "air conditioner"],
+        "negatives": ["tidak ada", "belum ada", "tidak tersedia", "tidak disediakan", "tidak dipasang", "ga ada", "gak ada", "tanpa"]
     },
     {
-        "name": "Kamar Mandi / Toilet Kotor",
-        "dimension": "Tangibles",
-        "nouns": ["toilet", "wc", "kamar mandi", "wastafel", "shower", "closet", "kloset", "bathub", "bathtub", "handuk", "sabun", "kran"],
-        "negatives": ["kotor", "bau", "jorok", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "licin", "buluk", "mampet", "tersumbat"]
+        "name": "Fasilitas kamar tidak memadai",
+        "nouns": ["fasilitas", "kamar", "tv", "kulkas", "lemari", "cermin", "remote", "remot", "stop kontak", "gorden",
+                  "kasur", "bantal", "selimut", "sprei", "ranjang", "tempat tidur", "bed", "flush", "kunci", "pintu"],
+        "negatives": ["rusak", "tidak memadai", "kurang", "jelek", "tidak fungsi", "tidak nyala", "jebol", "copot",
+                      "lepas", "pecah", "retak", "macet", "error", "mati", "bocor", "tidak berfungsi", "kurang lengkap",
+                      "tidak layak", "buruk", "usang", "tua", "kusam", "lecek"]
     },
     {
-        "name": "Fasilitas Kamar Rusak",
-        "dimension": "Tangibles",
-        "nouns": ["tv", "lampu", "pintu", "kunci", "fasilitas", "flush", "remot", "kulkas", "gorden", "stop kontak", "cermin"],
-        "negatives": ["rusak", "error", "macet", "tidak fungsi", "tidak nyala", "jebol", "copot", "lepas", "pecah", "retak"]
+        "name": "Serangga dan hewan pengganggu",
+        "nouns": ["serangga", "nyamuk", "kecoa", "kecoak", "semut", "lalat", "laba laba", "laba-laba", "tikus",
+                  "cicak", "tokek", "kutu", "rayap", "ulat", "hewan", "binatang", "bug", "kutu busuk"],
+        "negatives": ["banyak", "ada", "masuk", "mengganggu", "terganggu", "berkeliaran", "muncul", "ditemukan",
+                      "gigit", "digigit", "bertebaran", "sarang", "kotor"]
     },
     {
-        "name": "AC Tidak Dingin / Bermasalah",
-        "dimension": "Tangibles",
-        "nouns": ["ac", "pendingin", "kipas", "suhu", "udara"],
-        "negatives": ["tidak dingin", "panas", "rusak", "mati", "bocor", "berisik", "bau", "tidak berfungsi", "kurang dingin", "bunyi"]
+        "name": "Variasi dan rasa makanan kurang",
+        "nouns": ["makanan", "sarapan", "menu", "rasa", "makan", "breakfast", "buffet", "masakan", "lauk",
+                  "hidangan", "nasi", "roti", "kopi", "teh", "snack"],
+        "negatives": ["hambar", "kurang variasi", "kurang enak", "tidak enak", "sedikit", "monoton", "itu-itu saja",
+                      "sama", "kurang", "basi", "dingin", "asin", "keras", "standar", "biasa", "habis", "kurang rasa",
+                      "tidak variatif", "membosankan", "kurang bumbu"]
     },
     {
-        "name": "Air Panas Tidak Tersedia / Bermasalah",
-        "dimension": "Tangibles",
-        "nouns": ["air panas", "air hangat", "shower", "water heater", "kran"],
-        "negatives": ["dingin", "mati", "tidak ada", "tidak keluar", "rusak", "bocor", "tidak berfungsi", "kecil"]
+        "name": "Kamar mandi/toilet kurang bersih",
+        "nouns": ["toilet", "wc", "kamar mandi", "wastafel", "shower", "closet", "kloset", "bathub", "bathtub",
+                  "kran", "lantai kamar mandi"],
+        "negatives": ["kotor", "bau", "jorok", "apek", "noda", "bercak", "lembab", "jamur", "kusam", "licin",
+                      "buluk", "mampet", "tersumbat", "kurang bersih", "tidak bersih", "berkerak", "lumut"]
     },
     {
-        "name": "Kolam / Area Publik Kurang Terawat",
-        "dimension": "Tangibles",
-        "nouns": ["kolam", "pool", "renang", "taman", "lobby", "lobi", "parkir", "area", "playground", "gazebo"],
-        "negatives": ["kotor", "keruh", "sampah", "bau", "jorok", "kusam", "rusak", "kurang terawat", "tidak terawat", "becek", "licin"]
+        "name": "Kebersihan kamar kurang",
+        "nouns": ["kamar", "lantai", "kasur", "sprei", "selimut", "bantal", "ruangan", "kaca", "dinding",
+                  "karpet", "meja", "lemari", "debu"],
+        "negatives": ["kotor", "bau", "jorok", "debu", "berdebu", "apek", "noda", "bercak", "lembab", "jamur",
+                      "kusam", "berantakan", "buluk", "kurang bersih", "tidak bersih", "dekil"]
     },
     {
-        "name": "Kualitas Makanan / Sarapan Kurang",
-        "dimension": "Tangibles",
-        "nouns": ["makanan", "sarapan", "menu", "rasa", "makan", "kentang", "nasi", "kopi", "teh", "roti", "resto", "restoran", "breakfast", "buffet"],
-        "negatives": ["hambar", "dingin", "kurang", "sedikit", "asin", "basi", "keras", "tidak enak", "kurang enak", "standar", "biasa", "habis", "kurang variasi"]
-    },
-    # --- RELIABILITY ---
-    {
-        "name": "Koneksi WiFi Buruk",
-        "dimension": "Reliability",
-        "nouns": ["wifi", "internet", "koneksi", "sinyal", "jaringan"],
-        "negatives": ["lemot", "lambat", "putus", "hilang", "susah", "jelek", "kurang", "tidak konek", "mati", "error"]
+        "name": "Sanitasi kolam ikan kurang terjaga",
+        "nouns": ["kolam ikan", "ikan", "kolam", "air kolam"],
+        "negatives": ["kotor", "keruh", "bau", "jorok", "lumut", "tidak terawat", "kurang terawat", "hijau",
+                      "berlumut", "mati", "sampah", "kurang terjaga", "tidak terjaga"]
     },
     {
-        "name": "Check-in / Check-out Lambat",
-        "dimension": "Reliability",
-        "nouns": ["check in", "checkin", "check out", "checkout", "registrasi", "antrian", "antri", "antre", "resepsionis", "front desk", "lobby"],
-        "negatives": ["lama", "lambat", "antri", "antre", "tunggu", "menunggu", "nunggu", "ribet", "rumit", "berbelit"]
+        "name": "Kualitas pelayanan staf kurang",
+        "nouns": ["staf", "staff", "pelayanan", "resepsionis", "layanan", "karyawan", "petugas", "security",
+                  "satpam", "receptionist", "pegawai", "servis", "service"],
+        "negatives": ["lambat", "lama", "ketus", "jutek", "kurang ramah", "tidak ramah", "kasar", "judes",
+                      "sombong", "buruk", "mengecewakan", "lelet", "cuek", "tidak peduli", "mengabaikan",
+                      "masa bodoh", "tidak membantu", "abai", "acuh", "tidak tanggap", "kurang", "galak"]
     },
     {
-        "name": "Harga Tidak Sebanding",
-        "dimension": "Reliability",
-        "nouns": ["harga", "tarif", "rate", "biaya", "bayar", "mahal", "nilai", "value", "worth"],
-        "negatives": ["mahal", "kemahalan", "tidak sebanding", "tidak worth", "overpriced", "tidak sesuai", "kecewa", "rugi", "menyesal"]
-    },
-    # --- RELIABILITY ---
-    {
-        "name": "Deskripsi / Promosi Tidak Sesuai Kenyataan",
-        "dimension": "Reliability",
-        "nouns": ["foto", "gambar", "deskripsi", "iklan", "promosi", "promo", "website", "aplikasi", "brosur", "ekspektasi", "harapan", "kenyataan"],
-        "negatives": ["tidak sesuai", "beda", "berbeda", "bohong", "tipu", "menipu", "palsu", "zonk", "kecewa", "mengecewakan", "jauh", "menyesatkan"]
+        "name": "Kebersihan lingkungan resort kurang",
+        "nouns": ["lingkungan", "halaman", "taman", "area", "jalan", "lorong", "koridor", "lobby", "lobi",
+                  "resort", "sekitar", "luar", "outdoor"],
+        "negatives": ["kotor", "sampah", "bau", "jorok", "kusam", "becek", "kurang bersih", "tidak bersih",
+                      "tidak terawat", "kurang terawat", "berantakan", "kumuh", "berserakan"]
     },
     {
-        "name": "Jam Operasional Fasilitas Tidak Jelas",
-        "dimension": "Reliability",
-        "nouns": ["jam", "jadwal", "operasional", "buka", "tutup", "waktu", "kolam", "sarapan", "spa", "gym", "fitness", "renang"],
-        "negatives": ["tidak jelas", "bingung", "berubah", "tidak konsisten", "tutup", "sudah tutup", "belum buka", "terlambat buka", "tidak ada informasi", "tidak ada info"]
-    },
-    # --- RESPONSIVENESS ---
-    {
-        "name": "Pelayanan Staf Kurang Memuaskan",
-        "dimension": "Responsiveness",
-        "nouns": ["staf", "staff", "pelayanan", "resepsionis", "layanan", "karyawan", "petugas", "security", "satpam", "receptionist"],
-        "negatives": ["lambat", "lama", "ketus", "jutek", "kurang ramah", "tidak ramah", "kasar", "judes", "sombong", "buruk", "mengecewakan", "lelet"]
+        "name": "Penerangan kamar dan lingkungan kurang",
+        "nouns": ["lampu", "penerangan", "cahaya", "kamar", "lingkungan", "lorong", "koridor", "jalan",
+                  "area", "teras", "balkon"],
+        "negatives": ["gelap", "remang", "redup", "kurang", "mati", "rusak", "tidak nyala", "suram",
+                      "kurang terang", "tidak terang", "temaram"]
     },
     {
-        "name": "Room Service / Housekeeping Lambat",
-        "dimension": "Responsiveness",
-        "nouns": ["room service", "housekeeping", "cleaning", "handuk", "sprei", "perlengkapan", "amenities", "air minum", "extra bed", "bantal"],
-        "negatives": ["lambat", "lama", "tidak datang", "tidak ada", "menunggu", "nunggu", "tunggu", "belum", "tidak diganti", "tidak dibersihkan"]
+        "name": "Gangguan lingkungan",
+        "nouns": ["suasana", "lingkungan", "suara", "kamar", "tidur", "malam", "jalan", "kendaraan",
+                  "pintu", "dinding", "tetangga", "musik", "konstruksi", "ayam", "hewan"],
+        "negatives": ["berisik", "bising", "ribut", "gaduh", "ramai", "tidak nyaman", "kurang nyaman",
+                      "terganggu", "kedengaran", "tembus", "keras", "mengganggu", "gangguan"]
     },
     {
-        "name": "Keluhan Tidak Ditindaklanjuti",
-        "dimension": "Responsiveness",
-        "nouns": ["keluhan", "komplain", "aduan", "laporan", "masalah", "permintaan", "request", "lapor"],
-        "negatives": ["diabaikan", "tidak ditindak", "tidak diproses", "tidak ada tindakan", "tidak ada solusi", "tidak ada respon", "lama", "berulang", "masih", "tetap"]
+        "name": "Koneksi WiFi tidak stabil",
+        "nouns": ["wifi", "internet", "koneksi", "sinyal", "jaringan", "wi-fi", "wi fi"],
+        "negatives": ["lemot", "lambat", "putus", "hilang", "susah", "jelek", "kurang", "tidak konek",
+                      "mati", "error", "tidak stabil", "sering putus", "tidak ada", "sulit"]
     },
     {
-        "name": "Waktu Tunggu Pelayanan Lama",
-        "dimension": "Responsiveness",
-        "nouns": ["antrian", "antri", "antre", "tunggu", "menunggu", "pesanan", "order", "makanan", "minuman"],
-        "negatives": ["lama", "lambat", "berjam", "terlalu lama", "tidak kunjung", "berkali kali", "berulang kali"]
-    },
-    # --- ASSURANCE ---
-    {
-        "name": "Suasana Berisik / Kurang Nyaman",
-        "dimension": "Assurance",
-        "nouns": ["suasana", "lingkungan", "suara", "berisik", "kamar", "tidur", "malam", "jalan", "kendaraan", "pintu", "dinding"],
-        "negatives": ["berisik", "bising", "ribut", "gaduh", "ramai", "tidak nyaman", "kurang nyaman", "terganggu", "kedengaran", "tembus"]
+        "name": "Kolam rendam kurang panas",
+        "nouns": ["kolam rendam", "kolam air panas", "pemandian", "air panas", "air hangat", "hot spring",
+                  "water heater", "kolam panas", "rendam"],
+        "negatives": ["kurang panas", "tidak panas", "dingin", "kurang hangat", "tidak hangat", "suam",
+                      "suam-suam", "biasa saja", "kurang", "tidak terasa"]
     },
     {
-        "name": "Keamanan Kurang Terjamin",
-        "dimension": "Assurance",
-        "nouns": ["keamanan", "aman", "security", "satpam", "kunci", "cctv", "brankas", "parkir", "kendaraan", "motor", "mobil"],
-        "negatives": ["hilang", "kehilangan", "dicuri", "tidak aman", "kurang aman", "bobol", "rawan", "khawatir", "was-was", "takut"]
+        "name": "Lantai kamar berbunyi saat dipijak",
+        "nouns": ["lantai", "lantai kamar", "lantai kayu", "papan", "kayu"],
+        "negatives": ["bunyi", "berbunyi", "berderit", "derit", "goyang", "gerak", "bergoyang",
+                      "tidak kokoh", "keropos", "lapuk", "berisik", "berdecit", "bersuara"]
     },
     {
-        "name": "Parkir Kurang Memadai",
-        "dimension": "Assurance",
-        "nouns": ["parkir", "lahan parkir", "tempat parkir", "garasi", "motor", "mobil", "kendaraan"],
-        "negatives": ["sempit", "kurang", "penuh", "susah", "sulit", "jauh", "tidak ada", "terbatas", "panas"]
+        "name": "Jarak akses pintu masuk ke unit jauh",
+        "nouns": ["akses", "pintu masuk", "jalan masuk", "gerbang", "pintu", "jarak", "unit", "kamar",
+                  "lokasi", "area"],
+        "negatives": ["jauh", "terlalu jauh", "susah", "sulit", "panjang", "capek", "capai", "lelah",
+                      "tidak mudah", "ribet", "memutar", "jalan kaki"]
     },
     {
-        "name": "Akses Lokasi Sulit / Petunjuk Kurang",
-        "dimension": "Assurance",
-        "nouns": ["lokasi", "akses", "jalan", "arah", "petunjuk", "papan nama", "signage", "maps", "google maps", "alamat", "rute"],
-        "negatives": ["sulit", "susah", "jauh", "bingung", "tidak jelas", "nyasar", "tersesat", "gelap", "rusak", "berlubang", "sempit"]
+        "name": "Desain kamar kurang ergonomis",
+        "nouns": ["desain", "kamar", "layout", "tata letak", "ruangan", "interior", "ukuran"],
+        "negatives": ["sempit", "kecil", "sesak", "sumpek", "tidak ergonomis", "kurang ergonomis",
+                      "tidak nyaman", "aneh", "kurang pas", "tidak praktis", "kurang luas"]
     },
     {
-        "name": "Privasi Tamu Kurang Terjaga",
-        "dimension": "Assurance",
-        "nouns": ["privasi", "kamar", "pintu", "jendela", "gorden", "tirai", "dinding", "kaca", "sekat"],
-        "negatives": ["kurang", "tidak ada", "tembus", "terlihat", "terbuka", "transparan", "tipis", "bolong", "terganggu"]
-    },
-    # --- EMPATHY ---
-    {
-        "name": "Staf Kurang Peduli / Cuek",
-        "dimension": "Empathy",
-        "nouns": ["staf", "karyawan", "pelayanan", "resepsionis", "petugas", "perhatian", "bantuan", "keluhan", "tamu"],
-        "negatives": ["cuek", "tidak peduli", "mengabaikan", "masa bodoh", "tidak membantu", "abai", "acuh", "tidak tanggap"]
+        "name": "Sirkulasi udara kamar kurang",
+        "nouns": ["udara", "sirkulasi", "ventilasi", "jendela", "kamar", "ruangan", "angin"],
+        "negatives": ["pengap", "sumpek", "tidak ada", "kurang", "sesak", "panas", "gerah", "lembab",
+                      "tertutup", "tidak ada ventilasi", "kurang sirkulasi", "душно"]
     },
     {
-        "name": "Komunikasi / Informasi Kurang Jelas",
-        "dimension": "Empathy",
-        "nouns": ["informasi", "info", "komunikasi", "penjelasan", "arahan", "panduan", "petunjuk", "aturan", "prosedur", "pemberitahuan"],
-        "negatives": ["kurang jelas", "tidak jelas", "bingung", "membingungkan", "salah informasi", "tidak ada", "tidak diberitahu", "tidak dikasih tahu", "misinformasi"]
+        "name": "Keamanan kolam kurang terjamin",
+        "nouns": ["kolam", "kolam renang", "pool", "renang", "kolam anak", "kolam rendam", "air"],
+        "negatives": ["bahaya", "berbahaya", "tidak aman", "kurang aman", "licin", "dalam", "terlalu dalam",
+                      "tidak ada pagar", "tidak ada pengawas", "rawan", "khawatir", "takut"]
     },
     {
-        "name": "Kurang Ramah Terhadap Anak / Keluarga",
-        "dimension": "Empathy",
-        "nouns": ["anak", "bayi", "balita", "keluarga", "family", "anak kecil", "anak anak", "baby", "kids", "stroller"],
-        "negatives": ["tidak ramah", "kurang", "tidak ada", "susah", "sulit", "berbahaya", "bahaya", "tidak aman", "sempit", "repot", "ribet"]
+        "name": "Kebersihan tempat makan/restoran kurang",
+        "nouns": ["restoran", "restaurant", "resto", "tempat makan", "meja makan", "ruang makan", "cafe",
+                  "kafe", "kantin", "dining"],
+        "negatives": ["kotor", "bau", "jorok", "kurang bersih", "tidak bersih", "berantakan", "kumuh",
+                      "berserakan", "lengket", "noda", "debu", "lalat"]
     },
     {
-        "name": "Kebutuhan Khusus Tidak Diakomodasi",
-        "dimension": "Empathy",
-        "nouns": ["disabilitas", "difabel", "kursi roda", "lansia", "alergi", "halal", "vegetarian", "vegan", "diet", "khusus", "spesial"],
-        "negatives": ["tidak ada", "tidak tersedia", "tidak bisa", "sulit", "susah", "tidak diakomodasi", "tidak disediakan", "kurang", "tidak ramah"]
-    }
+        "name": "Restoran terlalu kecil",
+        "nouns": ["restoran", "restaurant", "resto", "tempat makan", "ruang makan", "cafe", "kafe",
+                  "dining", "area makan"],
+        "negatives": ["kecil", "sempit", "sesak", "penuh", "padat", "tidak cukup", "kurang luas",
+                      "terbatas", "tidak muat", "antri", "antre"]
+    },
+    {
+        "name": "Parkir kurang memadai",
+        "nouns": ["parkir", "lahan parkir", "tempat parkir", "garasi", "motor", "mobil", "kendaraan",
+                  "area parkir"],
+        "negatives": ["sempit", "kurang", "penuh", "susah", "sulit", "jauh", "tidak ada", "terbatas",
+                      "panas", "tidak memadai", "kurang luas", "kurang memadai"]
+    },
+    {
+        "name": "Informasi fasilitas kurang jelas",
+        "nouns": ["informasi", "info", "komunikasi", "penjelasan", "arahan", "panduan", "petunjuk",
+                  "aturan", "prosedur", "pemberitahuan", "fasilitas", "jam", "jadwal", "operasional"],
+        "negatives": ["kurang jelas", "tidak jelas", "bingung", "membingungkan", "salah informasi",
+                      "tidak ada", "tidak diberitahu", "tidak dikasih tahu", "misinformasi", "kurang",
+                      "tidak ada info", "tidak ada informasi"]
+    },
+    {
+        "name": "Perlengkapan kamar (toiletries) kurang lengkap",
+        "nouns": ["toiletries", "perlengkapan", "amenities", "handuk", "sabun", "sampo", "shampoo",
+                  "sikat gigi", "pasta gigi", "sandal", "tisu", "tissue", "hairdryer", "hair dryer"],
+        "negatives": ["kurang", "tidak ada", "habis", "tidak lengkap", "kurang lengkap", "tidak disediakan",
+                      "tidak tersedia", "sedikit", "kosong", "belum diisi"]
+    },
+    {
+        "name": "Fasilitas belanja sekitar resort tidak tersedia",
+        "nouns": ["belanja", "toko", "warung", "minimarket", "indomaret", "alfamart", "oleh oleh",
+                  "oleh-oleh", "souvenir", "jajanan", "sekitar", "luar"],
+        "negatives": ["tidak ada", "tidak tersedia", "jauh", "susah", "sulit", "tidak ditemukan", "kosong",
+                      "sepi", "tutup", "kurang", "terbatas"]
+    },
+    {
+        "name": "Kamar panas",
+        "nouns": ["kamar", "ruangan", "udara", "suhu", "temperatur"],
+        "negatives": ["panas", "gerah", "sumuk", "kepanasan", "tidak sejuk", "kurang sejuk",
+                      "tidak dingin", "душно", "terik", "menyengat"]
+    },
 ]
 
 def _extract_category_from_fragment(fragment: str) -> str | None:
@@ -540,51 +555,59 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
         has_negative = any(neg in token_phrases for neg in category["negatives"])
         if has_negative:
             # Jika keluhannya "hambar", "basi", pasti tentang makanan
-            if any(neg in ["hambar", "basi", "asin"] for neg in token_phrases):
-                return "Kualitas Makanan / Sarapan Kurang"
-            # Jika keluhannya "bocor", "rusak", "tidak dingin", pasti fasilitas
+            if any(neg in ["hambar", "basi", "asin", "kurang bumbu", "kurang rasa"] for neg in token_phrases):
+                return "Variasi dan rasa makanan kurang"
+            # Jika keluhannya "bocor", "rusak", "macet", pasti fasilitas kamar
             if any(neg in ["bocor", "rusak", "macet", "jebol", "copot"] for neg in token_phrases):
-                return "Fasilitas Kamar Rusak"
-            # Jika keluhannya "tidak dingin", "panas" (konteks AC)
-            if any(neg in ["tidak dingin", "kurang dingin"] for neg in token_phrases):
-                return "AC Tidak Dingin / Bermasalah"
+                return "Fasilitas kamar tidak memadai"
+            # Jika keluhannya "panas", "gerah" + konteks kamar
+            if any(neg in ["panas", "gerah", "sumuk", "kepanasan"] for neg in token_phrases):
+                if any(noun in token_phrases for noun in ["ac", "pendingin"]):
+                    return "Tidak ada AC"
+                return "Kamar panas"
             # Jika keluhannya "ketus", "jutek", pasti staf
-            if any(neg in ["ketus", "jutek", "judes", "tidak ramah", "kasar", "sombong"] for neg in token_phrases):
-                return "Pelayanan Staf Kurang Memuaskan"
-            # Jika keluhannya "berisik", "bising", pasti suasana
-            if any(neg in ["berisik", "bising", "gaduh", "ribut"] for neg in token_phrases):
-                return "Suasana Berisik / Kurang Nyaman"
+            if any(neg in ["ketus", "jutek", "judes", "tidak ramah", "kasar", "sombong", "galak"] for neg in token_phrases):
+                return "Kualitas pelayanan staf kurang"
+            # Jika keluhannya "berisik", "bising", pasti gangguan lingkungan
+            if any(neg in ["berisik", "bising", "gaduh", "ribut", "mengganggu"] for neg in token_phrases):
+                return "Gangguan lingkungan"
             # Jika keluhannya "kotor", "bau", "jorok" + cek konteks
             if any(neg in ["kotor", "bau", "jorok", "apek", "buluk", "mampet"] for neg in token_phrases):
                 if any(noun in token_phrases for noun in ["toilet", "wc", "kamar mandi", "wastafel", "closet", "kloset"]):
-                    return "Kamar Mandi / Toilet Kotor"
-                if any(noun in token_phrases for noun in ["kolam", "pool", "taman", "lobby"]):
-                    return "Kolam / Area Publik Kurang Terawat"
-                return "Kebersihan Kamar Kurang"
+                    return "Kamar mandi/toilet kurang bersih"
+                if any(noun in token_phrases for noun in ["restoran", "resto", "tempat makan", "meja makan"]):
+                    return "Kebersihan tempat makan/restoran kurang"
+                if any(noun in token_phrases for noun in ["kolam", "pool", "taman", "lobby", "lingkungan"]):
+                    return "Kebersihan lingkungan resort kurang"
+                return "Kebersihan kamar kurang"
             # Jika keluhannya "lemot", "putus", pasti wifi
-            if any(neg in ["lemot", "putus", "tidak konek"] for neg in token_phrases):
-                return "Koneksi WiFi Buruk"
-            # Jika keluhannya "cuek", "tidak peduli", pasti empati
+            if any(neg in ["lemot", "putus", "tidak konek", "tidak stabil", "sering putus"] for neg in token_phrases):
+                return "Koneksi WiFi tidak stabil"
+            # Jika keluhannya "cuek", "tidak peduli", pasti staf
             if any(neg in ["cuek", "tidak peduli", "mengabaikan", "acuh", "abai"] for neg in token_phrases):
-                return "Staf Kurang Peduli / Cuek"
-            # Jika keluhannya "mahal", "kemahalan", pasti harga
-            if any(neg in ["mahal", "kemahalan", "overpriced", "rugi"] for neg in token_phrases):
-                return "Harga Tidak Sebanding"
-            # Jika keluhannya "hilang", "dicuri", pasti keamanan
-            if any(neg in ["hilang", "kehilangan", "dicuri", "bobol"] for neg in token_phrases):
-                return "Keamanan Kurang Terjamin"
-            # Jika keluhannya "tidak sesuai", "beda", pasti deskripsi
-            if any(neg in ["tidak sesuai", "beda", "berbeda", "bohong", "tipu", "zonk"] for neg in token_phrases):
-                return "Deskripsi / Promosi Tidak Sesuai Kenyataan"
-            # Jika keluhannya "diabaikan", "tidak ditindak", pasti keluhan
-            if any(neg in ["diabaikan", "tidak ditindak", "tidak diproses", "tidak ada solusi"] for neg in token_phrases):
-                return "Keluhan Tidak Ditindaklanjuti"
-            # Jika keluhannya "nyasar", "tersesat", pasti akses
-            if any(neg in ["nyasar", "tersesat", "berlubang"] for neg in token_phrases):
-                return "Akses Lokasi Sulit / Petunjuk Kurang"
+                return "Kualitas pelayanan staf kurang"
+            # Jika keluhannya "gelap", "remang", pasti penerangan
+            if any(neg in ["gelap", "remang", "redup", "suram", "temaram"] for neg in token_phrases):
+                return "Penerangan kamar dan lingkungan kurang"
+            # Jika keluhannya "nyamuk", "kecoa", pasti serangga
+            if any(neg in ["nyamuk", "kecoa", "kecoak", "semut", "lalat", "tikus"] for neg in token_phrases):
+                return "Serangga dan hewan pengganggu"
+            # Jika keluhannya "pengap", "sumpek", pasti sirkulasi
+            if any(neg in ["pengap", "sumpek"] for neg in token_phrases):
+                return "Sirkulasi udara kamar kurang"
+            # Jika keluhannya "bunyi", "berderit", pasti lantai
+            if any(neg in ["bunyi", "berbunyi", "berderit", "berdecit"] for neg in token_phrases):
+                return "Lantai kamar berbunyi saat dipijak"
             # Jika keluhannya "tidak jelas", "bingung" + konteks info
             if any(neg in ["tidak jelas", "membingungkan", "salah informasi", "misinformasi"] for neg in token_phrases):
-                return "Komunikasi / Informasi Kurang Jelas"
+                return "Informasi fasilitas kurang jelas"
+            # Jika keluhannya "sempit" + konteks kamar
+            if any(neg in ["sempit", "kecil", "sesak", "sumpek"] for neg in token_phrases):
+                if any(noun in token_phrases for noun in ["restoran", "resto", "tempat makan"]):
+                    return "Restoran terlalu kecil"
+                if any(noun in token_phrases for noun in ["parkir", "lahan parkir"]):
+                    return "Parkir kurang memadai"
+                return "Desain kamar kurang ergonomis"
 
     # Jika tidak cocok dengan kategori mana pun, abaikan
     return None
@@ -620,18 +643,16 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
     if total_findings == 0:
         return []
 
-    CATEGORY_DIMENSION_MAP = {c["name"]: c.get("dimension", "Unknown") for c in ABSA_CATEGORIES}
-
     results = []
     for kategori, freq in category_counter.most_common(top_n):
         results.append({
             "frasa": kategori,  # Tetap pakai key "frasa" agar tidak perlu ubah dashboard UI
-            "dimensi": CATEGORY_DIMENSION_MAP.get(kategori, "Unknown"),
             "frekuensi": freq,
             "persentase": round(freq / total_findings * 100, 1),
             "ulasan": category_reviews.get(kategori, []),
         })
 
     return results
+
 
 

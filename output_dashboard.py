@@ -34,286 +34,367 @@ DIMENSION_LABEL_MAP = {
 }
 
 # ============================================================
-# KNOWLEDGE BASE DSS RULE-BASED — ANALISIS 5 WHY (FITUR 4)
+# KNOWLEDGE BASE DSS RULE-BASED — ANALISIS FISHBONE / 6M (FITUR 4)
 # ============================================================
 # Key harus PERSIS sama dengan field "name" di ABSA_CATEGORIES (process_nlp.py)
+# Setiap entry = list of dict {"faktor", "penyebab", "rekomendasi"}
+# Faktor mengacu pada Fishbone 6M: Man, Method, Machine/Tool, Material, Mother Nature, Measurement
 DSS_KNOWLEDGE_BASE = {
-    # --- TANGIBLES ---
-    "Kebersihan Kamar Kurang": {
-        "akar_masalah": (
-            "Kemungkinan standar kebersihan kamar belum terjaga secara konsisten, "
-            "bisa disebabkan oleh beban kerja housekeeping yang tinggi atau kurangnya pengawasan."
-        ),
-        "rekomendasi": (
-            "Terapkan inspeksi silang (cross-check) oleh supervisor sebelum status kamar "
-            "diubah menjadi siap huni, serta evaluasi beban kerja staf housekeeping."
-        ),
-    },
-    "Kamar Mandi / Toilet Kotor": {
-        "akar_masalah": (
-            "Kemungkinan pembersihan area basah (toilet, wastafel, shower) belum dilakukan "
-            "secara menyeluruh atau belum ada checklist khusus untuk area kamar mandi."
-        ),
-        "rekomendasi": (
-            "Terapkan checklist deep cleaning kamar mandi yang wajib diisi setiap pembersihan "
-            "dan diverifikasi oleh supervisor sebelum kamar diserahkan ke tamu."
-        ),
-    },
-    "Fasilitas Kamar Rusak": {
-        "akar_masalah": (
-            "Kemungkinan belum ada sistem pemeliharaan preventif yang teratur, "
-            "sehingga kerusakan baru terdeteksi setelah ada keluhan dari tamu."
-        ),
-        "rekomendasi": (
-            "Buat jadwal pemeliharaan berkala untuk seluruh fasilitas kamar "
-            "dan sediakan logbook pelaporan kerusakan yang mudah diakses staf."
-        ),
-    },
-    "AC Tidak Dingin / Bermasalah": {
-        "akar_masalah": (
-            "Kemungkinan unit AC kurang mendapat perawatan rutin seperti pembersihan filter "
-            "atau servis berkala, sehingga performanya menurun seiring waktu."
-        ),
-        "rekomendasi": (
-            "Jadwalkan servis AC secara berkala (minimal sebulan sekali), "
-            "dan pastikan ada mekanisme pelaporan cepat dari tamu ke tim engineering."
-        ),
-    },
-    "Air Panas Tidak Tersedia / Bermasalah": {
-        "akar_masalah": (
-            "Kemungkinan kapasitas water heater tidak memadai untuk seluruh kamar "
-            "atau ada kendala teknis pada instalasi pipa air panas."
-        ),
-        "rekomendasi": (
-            "Lakukan pengecekan rutin pada water heater dan instalasi pipa, "
-            "serta pertimbangkan penambahan kapasitas jika sering terjadi keluhan."
-        ),
-    },
-    "Kolam / Area Publik Kurang Terawat": {
-        "akar_masalah": (
-            "Kemungkinan frekuensi pembersihan area publik (kolam, taman, lobby) "
-            "belum memadai atau belum ada jadwal perawatan yang ketat."
-        ),
-        "rekomendasi": (
-            "Terapkan checklist inspeksi harian khusus area publik yang harus diselesaikan "
-            "sebelum jam operasional dimulai, dan evaluasi jadwal perawatan secara berkala."
-        ),
-    },
-    "Kualitas Makanan / Sarapan Kurang": {
-        "akar_masalah": (
-            "Kemungkinan variasi menu terbatas atau kontrol kualitas bahan baku "
-            "dan proses penyajian belum cukup ketat."
-        ),
-        "rekomendasi": (
-            "Evaluasi rotasi menu secara berkala, lakukan uji rasa (taste test) "
-            "sebelum penyajian, dan minta feedback langsung dari tamu terkait menu."
-        ),
-    },
-    # --- RELIABILITY ---
-    "Koneksi WiFi Buruk": {
-        "akar_masalah": (
-            "Kemungkinan kapasitas jaringan belum sebanding dengan jumlah pengguna, "
-            "atau ada kendala teknis pada infrastruktur access point."
-        ),
-        "rekomendasi": (
-            "Evaluasi kapasitas bandwidth dan jumlah access point, "
-            "pertimbangkan upgrade infrastruktur jaringan jika sering terjadi keluhan."
-        ),
-    },
-    "Check-in / Check-out Lambat": {
-        "akar_masalah": (
-            "Kemungkinan proses administrasi check-in/check-out masih manual "
-            "atau jumlah staf front desk belum memadai saat jam sibuk."
-        ),
-        "rekomendasi": (
-            "Evaluasi efisiensi proses registrasi, pertimbangkan sistem express check-in, "
-            "dan tambah personel front desk pada jam-jam puncak kedatangan tamu."
-        ),
-    },
-    "Harga Tidak Sebanding": {
-        "akar_masalah": (
-            "Kemungkinan ekspektasi tamu terhadap kualitas layanan tidak sesuai "
-            "dengan harga yang dibayarkan, atau kurangnya nilai tambah yang dirasakan."
-        ),
-        "rekomendasi": (
-            "Evaluasi value proposition hotel, pertimbangkan penambahan benefit atau amenities "
-            "kecil yang meningkatkan persepsi nilai, dan pastikan deskripsi promosi akurat."
-        ),
-    },
-    "Deskripsi / Promosi Tidak Sesuai Kenyataan": {
-        "akar_masalah": (
-            "Kemungkinan materi promosi (foto, deskripsi di OTA atau website) sudah tidak "
-            "diperbarui sesuai kondisi terkini, atau terdapat perbedaan antara ekspektasi "
-            "yang dibangun oleh promosi dengan pengalaman aktual tamu."
-        ),
-        "rekomendasi": (
-            "Audit seluruh materi promosi di website dan platform OTA, pastikan foto dan "
-            "deskripsi mencerminkan kondisi terkini, dan terapkan kebijakan update konten "
-            "promosi secara berkala setiap ada renovasi atau perubahan fasilitas."
-        ),
-    },
-    "Jam Operasional Fasilitas Tidak Jelas": {
-        "akar_masalah": (
-            "Kemungkinan informasi jam operasional fasilitas (kolam renang, spa, sarapan, dll) "
-            "belum dikomunikasikan secara jelas kepada tamu saat check-in atau melalui media "
-            "informasi di kamar, sehingga tamu datang saat fasilitas sudah tutup."
-        ),
-        "rekomendasi": (
-            "Pasang papan informasi jam operasional yang jelas di setiap fasilitas, "
-            "sertakan informasi tersebut di welcome card kamar dan sampaikan saat check-in, "
-            "serta update informasi di website dan platform OTA."
-        ),
-    },
-    # --- RESPONSIVENESS ---
-    "Pelayanan Staf Kurang Memuaskan": {
-        "akar_masalah": (
-            "Kemungkinan belum ada standar pelayanan yang konsisten "
-            "atau staf memerlukan pelatihan tambahan dalam menangani tamu."
-        ),
-        "rekomendasi": (
-            "Lakukan pelatihan ulang SOP pelayanan dan roleplay penanganan keluhan "
-            "bagi seluruh staf, serta terapkan sistem evaluasi pelayanan berkala."
-        ),
-    },
-    "Room Service / Housekeeping Lambat": {
-        "akar_masalah": (
-            "Kemungkinan jumlah staf housekeeping tidak sebanding dengan jumlah kamar "
-            "yang harus dilayani, atau belum ada sistem prioritas dan tracking permintaan "
-            "tamu yang efisien."
-        ),
-        "rekomendasi": (
-            "Evaluasi rasio staf housekeeping terhadap jumlah kamar, terapkan sistem "
-            "tracking permintaan tamu (digital atau manual), dan tetapkan standar waktu "
-            "respons maksimal untuk setiap jenis permintaan."
-        ),
-    },
-    "Keluhan Tidak Ditindaklanjuti": {
-        "akar_masalah": (
-            "Kemungkinan belum ada prosedur eskalasi keluhan yang jelas atau sistem "
-            "pencatatan keluhan belum terdigitalisasi, sehingga keluhan tamu terlewat "
-            "atau tidak sampai ke pihak yang berwenang menyelesaikannya."
-        ),
-        "rekomendasi": (
-            "Terapkan sistem pencatatan keluhan terpusat dengan mekanisme eskalasi "
-            "berjenjang, tetapkan batas waktu penyelesaian (SLA) untuk setiap jenis "
-            "keluhan, dan pastikan tamu menerima konfirmasi bahwa keluhannya sedang diproses."
-        ),
-    },
-    "Waktu Tunggu Pelayanan Lama": {
-        "akar_masalah": (
-            "Kemungkinan alur kerja pelayanan belum efisien atau jumlah staf yang "
-            "bertugas tidak memadai pada jam-jam sibuk, menyebabkan antrian dan "
-            "waktu tunggu yang lama bagi tamu."
-        ),
-        "rekomendasi": (
-            "Analisis jam-jam puncak pelayanan dan sesuaikan penjadwalan staf, "
-            "optimalkan alur kerja pelayanan, dan pertimbangkan sistem antrian atau "
-            "notifikasi agar tamu tidak perlu menunggu di tempat."
-        ),
-    },
-    # --- ASSURANCE ---
-    "Suasana Berisik / Kurang Nyaman": {
-        "akar_masalah": (
-            "Kemungkinan isolasi suara antar-kamar atau dari area publik "
-            "belum memadai, atau belum ada aturan ketenangan yang jelas."
-        ),
-        "rekomendasi": (
-            "Pertimbangkan pemasangan peredam suara, terapkan kebijakan quiet hours "
-            "yang dikomunikasikan kepada tamu saat check-in."
-        ),
-    },
-    "Keamanan Kurang Terjamin": {
-        "akar_masalah": (
-            "Kemungkinan sistem keamanan (CCTV, kunci, petugas) belum optimal "
-            "atau tamu merasa kurang aman karena minimnya visibilitas petugas keamanan."
-        ),
-        "rekomendasi": (
-            "Evaluasi dan tingkatkan sistem keamanan area hotel, pastikan CCTV berfungsi, "
-            "dan tambah frekuensi patroli keamanan terutama pada malam hari."
-        ),
-    },
-    "Parkir Kurang Memadai": {
-        "akar_masalah": (
-            "Kemungkinan kapasitas lahan parkir terbatas dibandingkan jumlah tamu, "
-            "atau tata letak parkir belum optimal."
-        ),
-        "rekomendasi": (
-            "Evaluasi kapasitas dan tata letak area parkir, pertimbangkan penggunaan "
-            "valet parking atau kerjasama dengan lahan parkir terdekat sebagai solusi alternatif."
-        ),
-    },
-    "Akses Lokasi Sulit / Petunjuk Kurang": {
-        "akar_masalah": (
-            "Kemungkinan petunjuk arah menuju resor belum memadai, titik lokasi di "
-            "Google Maps belum akurat, atau kondisi jalan akses kurang terawat, "
-            "sehingga tamu kesulitan menemukan atau menjangkau lokasi."
-        ),
-        "rekomendasi": (
-            "Pastikan titik lokasi di Google Maps akurat dan terkini, pasang papan "
-            "petunjuk arah di persimpangan kunci, sediakan panduan arah di konfirmasi "
-            "booking, dan koordinasi dengan pemerintah daerah untuk perbaikan jalan akses."
-        ),
-    },
-    "Privasi Tamu Kurang Terjaga": {
-        "akar_masalah": (
-            "Kemungkinan desain kamar atau area penginapan kurang memperhatikan aspek "
-            "privasi, seperti sekat yang tipis, gorden yang tidak rapat, atau jarak "
-            "antar-kamar yang terlalu dekat."
-        ),
-        "rekomendasi": (
-            "Evaluasi dan perbaiki elemen privasi kamar (gorden, sekat, kunci), pastikan "
-            "jendela dan pintu tertutup rapat, dan pertimbangkan pemasangan kaca film "
-            "atau tirai tambahan pada kamar yang menghadap area publik."
-        ),
-    },
-    # --- EMPATHY ---
-    "Staf Kurang Peduli / Cuek": {
-        "akar_masalah": (
-            "Kemungkinan belum ada budaya pelayanan yang menekankan empati, "
-            "atau staf kurang termotivasi untuk memberikan perhatian personal kepada tamu."
-        ),
-        "rekomendasi": (
-            "Adakan pelatihan komunikasi empatik secara berkala dan pertimbangkan "
-            "program apresiasi staf berbasis kepuasan tamu untuk meningkatkan motivasi."
-        ),
-    },
-    "Komunikasi / Informasi Kurang Jelas": {
-        "akar_masalah": (
-            "Kemungkinan staf belum terbiasa menyampaikan informasi secara proaktif "
-            "dan jelas kepada tamu, atau belum ada standar komunikasi yang baku "
-            "untuk informasi penting seperti aturan, prosedur, dan fasilitas."
-        ),
-        "rekomendasi": (
-            "Buat panduan komunikasi standar (script) untuk informasi yang sering "
-            "ditanyakan tamu, sediakan brosur atau kartu informasi di kamar, dan "
-            "latih staf untuk menyampaikan informasi penting secara proaktif saat check-in."
-        ),
-    },
-    "Kurang Ramah Terhadap Anak / Keluarga": {
-        "akar_masalah": (
-            "Kemungkinan fasilitas dan layanan resor belum dirancang dengan "
-            "mempertimbangkan kebutuhan keluarga dengan anak kecil, seperti area bermain "
-            "yang aman, menu anak, atau perlengkapan bayi."
-        ),
-        "rekomendasi": (
-            "Sediakan fasilitas ramah anak (playground aman, kids corner, menu anak), "
-            "tawarkan perlengkapan bayi (baby cot, high chair) sebagai layanan tambahan, "
-            "dan latih staf untuk memberikan perhatian khusus kepada tamu keluarga."
-        ),
-    },
-    "Kebutuhan Khusus Tidak Diakomodasi": {
-        "akar_masalah": (
-            "Kemungkinan resor belum memiliki fasilitas aksesibilitas yang memadai "
-            "untuk tamu berkebutuhan khusus (disabilitas, lansia, alergi makanan), "
-            "atau staf belum terlatih menangani permintaan khusus."
-        ),
-        "rekomendasi": (
-            "Evaluasi aksesibilitas fasilitas untuk tamu disabilitas dan lansia, "
-            "sediakan opsi menu untuk alergi dan diet khusus, latih staf mengenali "
-            "dan merespons kebutuhan khusus tamu, dan komunikasikan ketersediaan "
-            "layanan ini di platform booking."
-        ),
-    },
+    "Tidak ada AC": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada target kuantitatif & timeline pemerataan instalasi AC",
+            "rekomendasi": "Susun Master Schedule & target anggaran kuantitatif bulanan yang mengikat",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Unit AC belum tersedia merata di seluruh kamar",
+            "rekomendasi": "Prioritaskan pengadaan bertahap berdasarkan keluhan tertinggi",
+        },
+        {
+            "faktor": "Measurement",
+            "penyebab": "Belum ada pemetaan data prioritas kamar dengan keluhan suhu tertinggi",
+            "rekomendasi": "Susun peta prioritas kamar berdasarkan frekuensi keluhan panas dari data DFS",
+        },
+    ],
+    "Fasilitas kamar tidak memadai": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada jadwal peremajaan aset (preventive replacement)",
+            "rekomendasi": "Buat logbook umur ekonomis aset & jadwal peremajaan sebelum aset aus",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Tidak ada logbook pelaporan kerusakan fasilitas",
+            "rekomendasi": "Sediakan logbook digital pelaporan kerusakan terintegrasi dengan tim Engineering",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Staf tidak terbiasa melaporkan kerusakan kecil sebelum menjadi besar",
+            "rekomendasi": "Bangun budaya pelaporan dini melalui briefing rutin dan insentif kepatuhan",
+        },
+    ],
+    "Serangga dan hewan pengganggu": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada jadwal pest control rutin",
+            "rekomendasi": "Terapkan jadwal fumigasi/pest control berkala",
+        },
+        {
+            "faktor": "Mother Nature",
+            "penyebab": "Lokasi resor berada di area terbuka dekat vegetasi alami",
+            "rekomendasi": "Pasang penghalang fisik (kasa nyamuk, penutup celah) pada unit kamar",
+        },
+        {
+            "faktor": "Material",
+            "penyebab": "Celah pada material bangunan (bilik bambu/kayu) memudahkan serangga masuk",
+            "rekomendasi": "Tutup celah struktural pada dinding bilik bambu/kayu secara berkala",
+        },
+    ],
+    "Variasi dan rasa makanan kurang": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada kontrol kualitas rasa dan rotasi menu berkala",
+            "rekomendasi": "Terapkan uji rasa (taste test) rutin dan evaluasi menu berkala",
+        },
+        {
+            "faktor": "Material",
+            "penyebab": "Variasi bahan baku terbatas",
+            "rekomendasi": "Evaluasi pemasok dan tambah variasi bahan baku musiman",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Keterbatasan keterampilan juru masak dalam variasi resep",
+            "rekomendasi": "Adakan pelatihan kuliner/upskilling bagi staf dapur secara berkala",
+        },
+    ],
+    "Kamar mandi/toilet kurang bersih": [
+        {
+            "faktor": "Method",
+            "penyebab": "Lemahnya prosedur deep cleaning & cross-check supervisor",
+            "rekomendasi": "Perbarui SOP deep cleaning & wajibkan cross-check kebersihan",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Kurangnya supervisi pada titik yang sering terlewat (sudut, celah)",
+            "rekomendasi": "Latih staf pada titik kritis kebersihan, spot-check berkala",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Peralatan pembersih saluran air tidak memadai",
+            "rekomendasi": "Sediakan alat pembersih saluran (drain snake/vacuum saluran) khusus",
+        },
+    ],
+    "Kebersihan kamar kurang": [
+        {
+            "faktor": "Man",
+            "penyebab": "Staf housekeeping terburu-buru saat jam sibuk",
+            "rekomendasi": "Evaluasi beban kerja staf, tambah personel saat peak hours",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada SOP inspeksi silang sebelum status kamar \"Ready\"",
+            "rekomendasi": "Terapkan cross-check wajib oleh supervisor sebelum kamar dijual",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Update status kamar hanya via radio (HT), tanpa verifikasi digital",
+            "rekomendasi": "Bangun sistem checklist digital terhubung status kamar",
+        },
+    ],
+    "Sanitasi kolam ikan kurang terjaga": [
+        {
+            "faktor": "Method",
+            "penyebab": "Tidak ada checklist & jadwal rutin pembersihan area air",
+            "rekomendasi": "Terapkan checklist inspeksi harian area air sebelum jam operasional",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Kurang jelasnya PIC kebersihan area kolam",
+            "rekomendasi": "Tetapkan PIC (Gardening/Public Area) dengan jadwal kerja jelas",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Tidak ada sistem filter/sirkulasi air otomatis",
+            "rekomendasi": "Pasang sistem filtrasi/sirkulasi air untuk menjaga kualitas air secara berkelanjutan",
+        },
+    ],
+    "Kualitas pelayanan staf kurang": [
+        {
+            "faktor": "Man",
+            "penyebab": "Standar pelayanan belum konsisten antarstaf",
+            "rekomendasi": "Pelatihan ulang SOP pelayanan dan roleplay penanganan tamu",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada evaluasi kinerja pelayanan berkala",
+            "rekomendasi": "Terapkan evaluasi kinerja pelayanan secara rutin",
+        },
+        {
+            "faktor": "Measurement",
+            "penyebab": "Belum ada indikator/KPI kinerja layanan yang terukur",
+            "rekomendasi": "Susun KPI pelayanan (mis. skor kepuasan per staf) sebagai dasar evaluasi",
+        },
+    ],
+    "Kebersihan lingkungan resort kurang": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada jadwal kebersihan area luar kamar yang terjadwal jelas",
+            "rekomendasi": "Susun jadwal kebersihan area publik dengan PIC yang jelas",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Jumlah tenaga kebersihan area publik tidak memadai",
+            "rekomendasi": "Evaluasi rasio staf kebersihan terhadap luas area publik, tambah personel bila perlu",
+        },
+    ],
+    "Penerangan kamar dan lingkungan kurang": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Titik lampu belum memadai di beberapa area",
+            "rekomendasi": "Audit titik penerangan dan tambah lampu di area minim cahaya",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada jadwal penggantian lampu berkala",
+            "rekomendasi": "Terapkan jadwal pemeriksaan & penggantian lampu rutin",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Tidak ada petugas patroli rutin yang mengecek lampu mati",
+            "rekomendasi": "Tugaskan petugas maintenance untuk patroli & pelaporan lampu mati harian",
+        },
+    ],
+    "Gangguan lingkungan": [
+        {
+            "faktor": "Material",
+            "penyebab": "Material bangunan (bilik bambu/kayu) tidak kedap suara tinggi",
+            "rekomendasi": "Pertimbangkan peredam suara tambahan pada unit bungalow",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada kebijakan jam tenang (quiet hours) yang dikomunikasikan",
+            "rekomendasi": "Tetapkan dan komunikasikan aturan quiet hours saat check-in",
+        },
+        {
+            "faktor": "Mother Nature",
+            "penyebab": "Lokasi terbuka dekat vegetasi memungkinkan gangguan alami",
+            "rekomendasi": "Pasang jaring/pelindung atap pada titik rawan gangguan alam",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Kurangnya pengawasan aktif petugas keamanan pada malam hari",
+            "rekomendasi": "Tingkatkan intensitas patroli keamanan malam di area bungalow",
+        },
+    ],
+    "Koneksi WiFi tidak stabil": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Kapasitas bandwidth/titik akses tidak memadai",
+            "rekomendasi": "Evaluasi kapasitas dan tambah access point di titik lemah sinyal",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Tidak ada monitoring rutin kualitas jaringan",
+            "rekomendasi": "Terapkan pemantauan kualitas sinyal berkala sebelum tamu mengeluh",
+        },
+    ],
+    "Kolam rendam kurang panas": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Sistem pemanas air kolam tidak optimal",
+            "rekomendasi": "Evaluasi kapasitas pemanas dan lakukan perawatan berkala",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada pengecekan suhu rutin sebelum jam operasional",
+            "rekomendasi": "Terapkan pengecekan suhu kolam terjadwal setiap pagi",
+        },
+    ],
+    "Lantai kamar berbunyi saat dipijak": [
+        {
+            "faktor": "Material",
+            "penyebab": "Struktur lantai kayu/panggung sudah mulai longgar",
+            "rekomendasi": "Lakukan pemeriksaan dan perbaikan struktur lantai secara berkala",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Tidak ada jadwal inspeksi struktur bangunan berkala",
+            "rekomendasi": "Masukkan pemeriksaan struktur lantai ke jadwal preventive maintenance bangunan",
+        },
+    ],
+    "Jarak akses pintu masuk ke unit jauh": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Belum tersedia sarana transportasi internal (buggy/shuttle)",
+            "rekomendasi": "Sediakan layanan antar-jemput/buggy internal untuk unit yang jauh",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Tata letak unit belum mempertimbangkan kemudahan akses sejak perencanaan",
+            "rekomendasi": "Evaluasi tata letak unit pada perencanaan pembangunan berikutnya",
+        },
+    ],
+    "Desain kamar kurang ergonomis": [
+        {
+            "faktor": "Method",
+            "penyebab": "Tata letak furnitur belum mempertimbangkan kenyamanan pengguna",
+            "rekomendasi": "Evaluasi ulang tata letak furnitur kamar berdasarkan masukan tamu",
+        },
+        {
+            "faktor": "Measurement",
+            "penyebab": "Belum ada survei ergonomi/kenyamanan tamu terhadap tata letak furnitur",
+            "rekomendasi": "Lakukan survei kenyamanan ergonomis sebagai dasar evaluasi ulang",
+        },
+    ],
+    "Sirkulasi udara kamar kurang": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Ventilasi/exhaust fan tidak memadai",
+            "rekomendasi": "Evaluasi dan tambah ventilasi/exhaust pada kamar bermasalah",
+        },
+        {
+            "faktor": "Material",
+            "penyebab": "Desain bangunan/material menghambat sirkulasi udara alami",
+            "rekomendasi": "Evaluasi desain bukaan/material dinding untuk mendukung sirkulasi alami",
+        },
+    ],
+    "Keamanan kolam kurang terjamin": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Tidak ada pagar pembatas di area kolam",
+            "rekomendasi": "Pasang pagar pengaman di sekitar area kolam",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada rambu peringatan keselamatan",
+            "rekomendasi": "Pasang rambu peringatan dan papan kedalaman kolam",
+        },
+    ],
+    "Kebersihan tempat makan/restoran kurang": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada checklist kebersihan area makan",
+            "rekomendasi": "Terapkan checklist kebersihan restoran sebelum jam operasional",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Kurangnya pengawasan konsisten terhadap kebersihan area makan",
+            "rekomendasi": "Tugaskan PIC kebersihan restoran dengan jadwal spot-check rutin",
+        },
+    ],
+    "Restoran terlalu kecil": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Kapasitas fisik restoran tidak dirancang untuk kondisi ramai/peak season",
+            "rekomendasi": "Terapkan sistem reservasi meja/jam makan bergilir saat ramai",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada sistem manajemen kapasitas/reservasi meja",
+            "rekomendasi": "Bangun sistem reservasi meja digital untuk mengatur alur tamu",
+        },
+    ],
+    "Parkir kurang memadai": [
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Kapasitas lahan parkir terbatas",
+            "rekomendasi": "Evaluasi tata letak parkir dan pertimbangkan kerja sama lahan tambahan",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada sistem pengaturan/pengarahan parkir saat ramai",
+            "rekomendasi": "Tugaskan petugas pengatur parkir pada jam kunjungan tinggi",
+        },
+    ],
+    "Informasi fasilitas kurang jelas": [
+        {
+            "faktor": "Method",
+            "penyebab": "Informasi fasilitas tidak disampaikan saat check-in",
+            "rekomendasi": "Sampaikan info fasilitas secara lisan & tercetak di welcome card",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Staf tidak proaktif menyampaikan informasi fasilitas ke tamu",
+            "rekomendasi": "Latih staf Front Office untuk selalu menyampaikan info fasilitas saat registrasi",
+        },
+    ],
+    "Perlengkapan kamar (toiletries) kurang lengkap": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada standar baku kelengkapan toiletries per kamar",
+            "rekomendasi": "Tetapkan checklist kelengkapan toiletries standar per kamar",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Staf housekeeping tidak mengecek kelengkapan sebelum kamar dijual",
+            "rekomendasi": "Integrasikan pengecekan toiletries ke dalam checklist cross-check kamar (terkait Temuan #6)",
+        },
+    ],
+    "Fasilitas belanja sekitar resort tidak tersedia": [
+        {
+            "faktor": "Mother Nature",
+            "penyebab": "Lokasi resor yang relatif terpencil dari pusat perbelanjaan",
+            "rekomendasi": "Jalin kerja sama dengan UMKM lokal untuk sediakan area/etalase belanja kecil",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada kerja sama formal dengan pelaku usaha lokal sekitar",
+            "rekomendasi": "Susun perjanjian kerja sama resmi dengan UMKM sekitar sebagai mitra resor",
+        },
+    ],
+    "Kamar panas": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada target kuantitatif & timeline pemerataan instalasi AC",
+            "rekomendasi": "Prioritaskan kamar dengan keluhan \"panas\" pada tahap awal pengadaan AC",
+        },
+        {
+            "faktor": "Material",
+            "penyebab": "Insulasi atap/dinding kamar kurang optimal menahan panas",
+            "rekomendasi": "Evaluasi material atap/dinding untuk kamar dengan keluhan berulang",
+        },
+    ],
 }
 
 
@@ -635,34 +716,55 @@ def page_dashboard_monitoring():
                 if top_findings:
                     top = top_findings[0]
                     top_kategori = top["frasa"]          # nama kategori ABSA
-                    top_dimensi = top.get("dimensi", "")
                     top_freq = top["frekuensi"]
 
                     # Lookup Knowledge Base (case-insensitive key matching)
-                    kb_entry = DSS_KNOWLEDGE_BASE.get(top_kategori)
-                    if not kb_entry:
+                    kb_entries = DSS_KNOWLEDGE_BASE.get(top_kategori)
+                    if not kb_entries:
                         # Coba case-insensitive fallback
                         kb_lower = {k.lower(): v for k, v in DSS_KNOWLEDGE_BASE.items()}
-                        kb_entry = kb_lower.get(top_kategori.lower(), {
-                            "akar_masalah": "Belum tersedia analisis akar masalah untuk kategori ini.",
-                            "rekomendasi": "Lakukan investigasi lanjutan terhadap keluhan ini.",
-                        })
+                        kb_entries = kb_lower.get(top_kategori.lower(), [
+                            {
+                                "faktor": "Unknown",
+                                "penyebab": "Belum tersedia analisis akar masalah untuk kategori ini.",
+                                "rekomendasi": "Lakukan investigasi lanjutan terhadap keluhan ini."
+                            }
+                        ])
 
-                    akar = kb_entry["akar_masalah"]
-                    rekom = kb_entry["rekomendasi"]
-                    dim_label = DIMENSION_LABEL_MAP.get(top_dimensi, top_dimensi)
+                    # Build table HTML for Fishbone
+                    table_html = """
+                    <table style="width:100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Faktor (6M)</th>
+                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Kemungkinan Penyebab</th>
+                                <th style="padding: 8px 4px; color: #94a3b8; font-weight: 600;">Rekomendasi Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    """
+                    for entry in kb_entries:
+                        table_html += f"""
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 8px 4px; color: #38bdf8; font-weight: 500; vertical-align: top;">{entry['faktor']}</td>
+                                <td style="padding: 8px 4px; color: #e2e8f0; vertical-align: top;">{entry['penyebab']}</td>
+                                <td style="padding: 8px 4px; color: #34d399; vertical-align: top;">{entry['rekomendasi']}</td>
+                            </tr>
+                        """
+                    table_html += """
+                        </tbody>
+                    </table>
+                    """
 
                     # DSS Recommendation Card — premium styling
                     st.markdown(f"""
                     <div class="dss-card">
                         <span class="dss-badge">⚡ PRIORITAS UTAMA</span>
                         <div class="dss-dim-name">📌 {top_kategori}</div>
-                        <div class="dss-score">Dimensi: <strong>{dim_label}</strong> · Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>
+                        <div class="dss-score">Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>
                         <div class="dss-separator"></div>
-                        <div class="dss-label">🔍 Akar Masalah Historis:</div>
-                        <div class="dss-text">{akar}</div>
-                        <div class="dss-label">💊 Rekomendasi Tindakan (DSS):</div>
-                        <div class="dss-text">{rekom}</div>
+                        <div class="dss-label">🔍 Analisis Fishbone & Rekomendasi Tindakan (DSS):</div>
+                        {table_html}
                     </div>
                     """, unsafe_allow_html=True)
                 else:
@@ -695,29 +797,24 @@ def page_dashboard_monitoring():
                 df_findings = pd.DataFrame(findings)
                 # Capitalize frasa untuk tampilan
                 df_findings["frasa"] = df_findings["frasa"].str.capitalize()
-                # Tambahkan label dimensi
-                df_findings["frasa_display"] = "[" + df_findings["dimensi"] + "] " + df_findings["frasa"]
                 # Urutkan ascending agar bar terbesar di atas
                 df_findings = df_findings.sort_values("frekuensi", ascending=True)
 
                 fig_findings = px.bar(
                     df_findings,
                     x="frekuensi",
-                    y="frasa_display",
+                    y="frasa",
                     orientation="h",
                     text=df_findings.apply(
                         lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
                     ),
-                    color="dimensi",
-                    color_discrete_sequence=px.colors.qualitative.Pastel,
+                    color_discrete_sequence=["#34d399"],
                 )
                 fig_findings.update_layout(
-                    height=max(300, len(df_findings) * 45),
+                    height=max(300, len(df_findings) * 50),
                     xaxis_title="Frekuensi Kemunculan",
                     yaxis_title="",
-                    showlegend=True,
-                    legend_title="Dimensi SERVPERF",
-                    coloraxis_showscale=False,
+                    showlegend=False,
                     plot_bgcolor="rgba(0,0,0,0)",
                     paper_bgcolor="rgba(0,0,0,0)",
                     font=dict(family="Inter", size=13, color="#94a3b8"),
@@ -742,12 +839,11 @@ def page_dashboard_monitoring():
                 # --- Detail ulasan asli per kategori ---
                 for finding in findings:
                     kategori_nama = finding["frasa"].capitalize()
-                    dimensi = finding.get("dimensi", "Unknown")
                     daftar_ulasan = finding.get("ulasan", [])
                     jumlah = finding["frekuensi"]
 
                     with st.expander(
-                        f"📋 [{dimensi}] {kategori_nama} — {jumlah} ulasan",
+                        f"📋 {kategori_nama} — {jumlah} ulasan",
                         expanded=False,
                     ):
                         if daftar_ulasan:
