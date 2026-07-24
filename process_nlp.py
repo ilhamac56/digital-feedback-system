@@ -524,14 +524,15 @@ ABSA_CATEGORIES = [
     },
 ]
 
-def _extract_category_from_fragment(fragment: str) -> str | None:
+def _extract_categories_from_fragment(fragment: str) -> list[str]:
     """
-    Memetakan fragmen kalimat ke dalam salah satu Kategori Keluhan Baku (ABSA_CATEGORIES).
+    Memetakan fragmen kalimat ke dalam Kategori Keluhan Baku (ABSA_CATEGORIES).
+    Dapat mengembalikan lebih dari 1 kategori jika terdapat keluhan ganda (misal: "wifi dan tv rusak").
     """
     clean = re.sub(r"[^a-z\s]", "", fragment)
     tokens = clean.split()
     if not tokens:
-        return None
+        return []
 
     # Bi-grams dan Tri-grams untuk pencocokan multi-kata
     token_phrases = tokens.copy()
@@ -540,6 +541,8 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
     for i in range(len(tokens) - 2):
         token_phrases.append(f"{tokens[i]} {tokens[i+1]} {tokens[i+2]}")
 
+    results = set()
+
     # Prioritaskan Kategori Spesifik
     for category in ABSA_CATEGORIES:
         has_noun = any(noun in token_phrases for noun in category["nouns"])
@@ -547,7 +550,21 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
         
         # Jika ketemu kombinasi kata benda dan keluhan yang cocok
         if has_noun and has_negative:
-            return category["name"]
+            results.add(category["name"])
+
+    # Resolusi Konflik Konteks (Mencegah overlapping kata "kamar" dan "kamar mandi")
+    if "Kamar mandi/toilet kurang bersih" in results:
+        results.discard("Kebersihan kamar kurang")
+        results.discard("Fasilitas kamar tidak memadai")
+        
+    if "Kebersihan tempat makan/restoran kurang" in results or "Variasi dan rasa makanan kurang" in results:
+        results.discard("Fasilitas kamar tidak memadai")
+        
+    if "Sanitasi kolam ikan kurang terjaga" in results or "Keamanan kolam kurang terjamin" in results or "Kolam rendam kurang panas" in results:
+        results.discard("Kebersihan kamar kurang")
+
+    if results:
+        return list(results)
 
     # Fallback: Jika tidak ada noun, tapi ada negative yang sangat spesifik
     # Contoh: "Kotor banget", "Resepsionisnya jutek"
@@ -556,61 +573,61 @@ def _extract_category_from_fragment(fragment: str) -> str | None:
         if has_negative:
             # Jika keluhannya "hambar", "basi", pasti tentang makanan
             if any(neg in ["hambar", "basi", "asin", "kurang bumbu", "kurang rasa"] for neg in token_phrases):
-                return "Variasi dan rasa makanan kurang"
+                return ["Variasi dan rasa makanan kurang"]
             # Jika keluhannya "bocor", "rusak", "macet", pasti fasilitas kamar
             if any(neg in ["bocor", "rusak", "macet", "jebol", "copot"] for neg in token_phrases):
-                return "Fasilitas kamar tidak memadai"
+                return ["Fasilitas kamar tidak memadai"]
             # Jika keluhannya "panas", "gerah" + konteks kamar
             if any(neg in ["panas", "gerah", "sumuk", "kepanasan"] for neg in token_phrases):
                 if any(noun in token_phrases for noun in ["ac", "pendingin"]):
-                    return "Tidak ada AC"
-                return "Kamar panas"
+                    return ["Tidak ada AC"]
+                return ["Kamar panas"]
             # Jika keluhannya "ketus", "jutek", pasti staf
             if any(neg in ["ketus", "jutek", "judes", "tidak ramah", "kasar", "sombong", "galak"] for neg in token_phrases):
-                return "Kualitas pelayanan staf kurang"
+                return ["Kualitas pelayanan staf kurang"]
             # Jika keluhannya "berisik", "bising", pasti gangguan lingkungan
             if any(neg in ["berisik", "bising", "gaduh", "ribut", "mengganggu"] for neg in token_phrases):
-                return "Gangguan lingkungan"
+                return ["Gangguan lingkungan"]
             # Jika keluhannya "kotor", "bau", "jorok" + cek konteks
             if any(neg in ["kotor", "bau", "jorok", "apek", "buluk", "mampet"] for neg in token_phrases):
                 if any(noun in token_phrases for noun in ["toilet", "wc", "kamar mandi", "wastafel", "closet", "kloset"]):
-                    return "Kamar mandi/toilet kurang bersih"
+                    return ["Kamar mandi/toilet kurang bersih"]
                 if any(noun in token_phrases for noun in ["restoran", "resto", "tempat makan", "meja makan"]):
-                    return "Kebersihan tempat makan/restoran kurang"
+                    return ["Kebersihan tempat makan/restoran kurang"]
                 if any(noun in token_phrases for noun in ["kolam", "pool", "taman", "lobby", "lingkungan"]):
-                    return "Kebersihan lingkungan resort kurang"
-                return "Kebersihan kamar kurang"
+                    return ["Kebersihan lingkungan resort kurang"]
+                return ["Kebersihan kamar kurang"]
             # Jika keluhannya "lemot", "putus", pasti wifi
             if any(neg in ["lemot", "putus", "tidak konek", "tidak stabil", "sering putus"] for neg in token_phrases):
-                return "Koneksi WiFi tidak stabil"
+                return ["Koneksi WiFi tidak stabil"]
             # Jika keluhannya "cuek", "tidak peduli", pasti staf
             if any(neg in ["cuek", "tidak peduli", "mengabaikan", "acuh", "abai"] for neg in token_phrases):
-                return "Kualitas pelayanan staf kurang"
+                return ["Kualitas pelayanan staf kurang"]
             # Jika keluhannya "gelap", "remang", pasti penerangan
             if any(neg in ["gelap", "remang", "redup", "suram", "temaram"] for neg in token_phrases):
-                return "Penerangan kamar dan lingkungan kurang"
+                return ["Penerangan kamar dan lingkungan kurang"]
             # Jika keluhannya "nyamuk", "kecoa", pasti serangga
             if any(neg in ["nyamuk", "kecoa", "kecoak", "semut", "lalat", "tikus"] for neg in token_phrases):
-                return "Serangga dan hewan pengganggu"
+                return ["Serangga dan hewan pengganggu"]
             # Jika keluhannya "pengap", "sumpek", pasti sirkulasi
             if any(neg in ["pengap", "sumpek"] for neg in token_phrases):
-                return "Sirkulasi udara kamar kurang"
+                return ["Sirkulasi udara kamar kurang"]
             # Jika keluhannya "bunyi", "berderit", pasti lantai
             if any(neg in ["bunyi", "berbunyi", "berderit", "berdecit"] for neg in token_phrases):
-                return "Lantai kamar berbunyi saat dipijak"
+                return ["Lantai kamar berbunyi saat dipijak"]
             # Jika keluhannya "tidak jelas", "bingung" + konteks info
             if any(neg in ["tidak jelas", "membingungkan", "salah informasi", "misinformasi"] for neg in token_phrases):
-                return "Informasi fasilitas kurang jelas"
+                return ["Informasi fasilitas kurang jelas"]
             # Jika keluhannya "sempit" + konteks kamar
             if any(neg in ["sempit", "kecil", "sesak", "sumpek"] for neg in token_phrases):
                 if any(noun in token_phrases for noun in ["restoran", "resto", "tempat makan"]):
-                    return "Restoran terlalu kecil"
+                    return ["Restoran terlalu kecil"]
                 if any(noun in token_phrases for noun in ["parkir", "lahan parkir"]):
-                    return "Parkir kurang memadai"
-                return "Desain kamar kurang ergonomis"
+                    return ["Parkir kurang memadai"]
+                return ["Desain kamar kurang ergonomis"]
 
     # Jika tidak cocok dengan kategori mana pun, abaikan
-    return None
+    return []
 
 
 def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> list[dict]:
@@ -628,10 +645,11 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
         seen_in_review = set()
 
         for fragment in fragments:
-            category = _extract_category_from_fragment(fragment)
-            if category and category not in seen_in_review:
-                category_counter[category] += 1
-                seen_in_review.add(category)
+            categories = _extract_categories_from_fragment(fragment)
+            for category in categories:
+                if category not in seen_in_review:
+                    category_counter[category] += 1
+                    seen_in_review.add(category)
 
                 # Simpan ulasan asli (hindari duplikat teks yang sama)
                 if category not in category_reviews:
