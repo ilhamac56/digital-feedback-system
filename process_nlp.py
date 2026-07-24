@@ -529,7 +529,10 @@ def _extract_categories_from_fragment(fragment: str) -> list[str]:
     Memetakan fragmen kalimat ke dalam Kategori Keluhan Baku (ABSA_CATEGORIES).
     Dapat mengembalikan lebih dari 1 kategori jika terdapat keluhan ganda (misal: "wifi dan tv rusak").
     """
-    clean = re.sub(r"[^a-z\s]", "", fragment)
+    clean = fragment.lower()
+    # Hapus suffix "-nya" agar kata seperti "mandinya" cocok dengan "mandi"
+    clean = re.sub(r"nya\b", "", clean)
+    clean = re.sub(r"[^a-z\s]", "", clean)
     tokens = clean.split()
     if not tokens:
         return []
