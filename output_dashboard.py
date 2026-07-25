@@ -710,11 +710,17 @@ def page_dashboard_monitoring():
             ulasan_neg_dss = df_neg_dss["teks_ulasan"].dropna().tolist()
 
             if ulasan_neg_dss:
-                # Hitung Top 1 kategori keluhan ABSA
-                top_findings = extract_negative_findings(ulasan_neg_dss, top_n=1)
+                # Hitung Top 3 kategori keluhan ABSA
+                top_findings = extract_negative_findings(ulasan_neg_dss, top_n=3)
 
                 if top_findings:
-                    top = top_findings[0]
+                    # Pilihan temuan untuk dilihat rekomendasinya
+                    options = [f"{item['frasa']} ({item['frekuensi']} keluhan)" for item in top_findings]
+                    selected_option = st.selectbox("Pilih Temuan untuk Rekomendasi:", options, key="dss_selectbox")
+                    
+                    selected_index = options.index(selected_option)
+                    top = top_findings[selected_index]
+                    
                     top_kategori = top["frasa"]          # nama kategori ABSA
                     top_freq = top["frekuensi"]
 
@@ -754,11 +760,12 @@ def page_dashboard_monitoring():
                     table_html += "</tbody></table>"
 
                     # DSS Recommendation Card — premium styling
+                    badge_text = "⚡ PRIORITAS UTAMA" if selected_index == 0 else "⚡ ALTERNATIF PRIORITAS"
                     html_card = (
                         f"<div class='dss-card'>"
-                        f"<span class='dss-badge'>⚡ PRIORITAS UTAMA</span>"
+                        f"<span class='dss-badge'>{badge_text}</span>"
                         f"<div class='dss-dim-name'>📌 {top_kategori}</div>"
-                        f"<div class='dss-score'>Temuan Terbanyak: <strong>{top_freq}</strong> keluhan</div>"
+                        f"<div class='dss-score'>Jumlah Keluhan: <strong>{top_freq}</strong> keluhan</div>"
                         f"<div class='dss-separator'></div>"
                         f"<div class='dss-label'>🔍 Analisis Fishbone & Rekomendasi Tindakan (DSS):</div>"
                         f"{table_html}"
