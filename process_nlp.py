@@ -446,11 +446,9 @@ ABSA_CATEGORIES = [
                       "tidak kokoh", "keropos", "lapuk", "berisik", "berdecit", "bersuara"]
     },
     {
-        "name": "Jarak akses pintu masuk ke unit jauh",
-        "nouns": ["akses", "pintu masuk", "jalan masuk", "gerbang", "pintu", "jarak", "unit",
-                  "lokasi", "area"],
-        "negatives": ["jauh", "terlalu jauh", "susah", "sulit", "panjang", "capek", "capai", "lelah",
-                      "tidak mudah", "ribet", "memutar", "jalan kaki"]
+        "name": "Kamar berbau tidak sedap",
+        "nouns": ["kamar", "ruangan", "bau", "aroma", "udara"],
+        "negatives": ["bau", "tidak sedap", "busuk", "pesing", "apek", "menyengat", "kurang sedap", "lembap"]
     },
     {
         "name": "Desain kamar kurang ergonomis",
@@ -459,16 +457,14 @@ ABSA_CATEGORIES = [
                       "tidak nyaman", "aneh", "kurang pas", "tidak praktis", "kurang luas"]
     },
     {
-        "name": "Sirkulasi udara kamar kurang",
-        "nouns": ["sirkulasi", "ventilasi", "jendela", "angin"],
-        "negatives": ["pengap", "sumpek", "tidak ada", "kurang", "sesak", "panas", "gerah", "lembab",
-                      "tertutup", "tidak ada ventilasi", "kurang sirkulasi", "душно"]
+        "name": "Kenyamanan kasur/tempat tidur kurang",
+        "nouns": ["kasur", "tempat tidur", "bed", "springbed", "bantal", "guling"],
+        "negatives": ["keras", "tidak nyaman", "kempes", "tipis", "sakit", "kurang empuk", "bunyi"]
     },
     {
-        "name": "Keamanan kolam kurang terjamin",
-        "nouns": ["kolam renang", "pool", "renang", "kolam anak", "pengawas", "pagar"],
-        "negatives": ["bahaya", "berbahaya", "tidak aman", "kurang aman", "licin", "dalam", "terlalu dalam",
-                      "tidak ada pagar", "tidak ada pengawas", "rawan", "khawatir", "takut"]
+        "name": "Keamanan jalan menuju unit kurang",
+        "nouns": ["jalan", "akses", "jalur", "penerangan", "lampu", "jalanan"],
+        "negatives": ["gelap", "licin", "berbahaya", "kurang aman", "terjal", "tidak aman", "rawan"]
     },
     {
         "name": "Kebersihan tempat makan/restoran kurang",
@@ -478,11 +474,9 @@ ABSA_CATEGORIES = [
                       "berserakan", "lengket", "noda", "debu", "lalat"]
     },
     {
-        "name": "Restoran terlalu kecil",
-        "nouns": ["restoran", "restaurant", "resto", "tempat makan", "ruang makan", "cafe", "kafe",
-                  "dining", "area makan"],
-        "negatives": ["kecil", "sempit", "sesak", "penuh", "padat", "tidak cukup", "kurang luas",
-                      "terbatas", "tidak muat", "antri", "antre"]
+        "name": "Waktu penyajian makanan lama",
+        "nouns": ["makanan", "pesanan", "hidangan", "minuman", "penyajian", "pelayanan", "order"],
+        "negatives": ["lama", "lambat", "telat", "lelet", "terlalu lama", "nunggu lama"]
     },
     {
         "name": "Parkir kurang memadai",
@@ -506,11 +500,9 @@ ABSA_CATEGORIES = [
                       "tidak tersedia", "sedikit", "kosong", "belum diisi"]
     },
     {
-        "name": "Fasilitas belanja sekitar resort tidak tersedia",
-        "nouns": ["belanja", "toko", "warung", "minimarket", "indomaret", "alfamart", "oleh oleh",
-                  "oleh-oleh", "souvenir", "jajanan"],
-        "negatives": ["tidak ada", "tidak tersedia", "jauh", "susah", "sulit", "tidak ditemukan", "kosong",
-                      "sepi", "tutup", "kurang", "terbatas"]
+        "name": "Ketersediaan stop kontak/colokan listrik terbatas di kamar",
+        "nouns": ["stop kontak", "colokan", "listrik", "saklar", "steker", "colokkan"],
+        "negatives": ["kurang", "sedikit", "terbatas", "tidak ada", "susah", "jauh"]
     },
     {
         "name": "Kamar panas",
@@ -559,7 +551,7 @@ def _extract_categories_from_fragment(fragment: str) -> list[str]:
     if "Kebersihan tempat makan/restoran kurang" in results or "Variasi dan rasa makanan kurang" in results:
         results.discard("Fasilitas kamar tidak memadai")
         
-    if "Sanitasi kolam ikan kurang terjaga" in results or "Keamanan kolam kurang terjamin" in results or "Kolam rendam kurang panas" in results:
+    if "Sanitasi kolam ikan kurang terjaga" in results or "Kolam rendam kurang panas" in results:
         results.discard("Kebersihan kamar kurang")
 
     if results:
@@ -608,9 +600,10 @@ def _extract_categories_from_fragment(fragment: str) -> list[str]:
             # Jika keluhannya "nyamuk", "kecoa", pasti serangga
             if any(neg in ["nyamuk", "kecoa", "kecoak", "semut", "lalat", "tikus"] for neg in token_phrases):
                 return ["Serangga dan hewan pengganggu"]
-            # Jika keluhannya "pengap", "sumpek", pasti sirkulasi
-            if any(neg in ["pengap", "sumpek"] for neg in token_phrases):
-                return ["Sirkulasi udara kamar kurang"]
+            # Jika keluhannya "keras", "kempes", pasti kasur
+            if any(neg in ["keras", "kempes", "tipis", "sakit"] for neg in token_phrases):
+                if any(noun in token_phrases for noun in ["kasur", "bed", "bantal"]):
+                    return ["Kenyamanan kasur/tempat tidur kurang"]
             # Jika keluhannya "bunyi", "berderit", pasti lantai
             if any(neg in ["bunyi", "berbunyi", "berderit", "berdecit"] for neg in token_phrases):
                 return ["Lantai kamar berbunyi saat dipijak"]
@@ -619,8 +612,6 @@ def _extract_categories_from_fragment(fragment: str) -> list[str]:
                 return ["Informasi fasilitas kurang jelas"]
             # Jika keluhannya "sempit" + konteks kamar
             if any(neg in ["sempit", "kecil", "sesak", "sumpek"] for neg in token_phrases):
-                if any(noun in token_phrases for noun in ["restoran", "resto", "tempat makan"]):
-                    return ["Restoran terlalu kecil"]
                 if any(noun in token_phrases for noun in ["parkir", "lahan parkir"]):
                     return ["Parkir kurang memadai"]
                 return ["Desain kamar kurang ergonomis"]

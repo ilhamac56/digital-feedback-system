@@ -263,16 +263,21 @@ DSS_KNOWLEDGE_BASE = {
             "rekomendasi": "Masukkan pemeriksaan struktur lantai ke jadwal preventive maintenance bangunan",
         },
     ],
-    "Jarak akses pintu masuk ke unit jauh": [
-        {
-            "faktor": "Machine/Tool",
-            "penyebab": "Belum tersedia sarana transportasi internal (buggy/shuttle)",
-            "rekomendasi": "Sediakan layanan antar-jemput/buggy internal untuk unit yang jauh",
-        },
+    "Kamar berbau tidak sedap": [
         {
             "faktor": "Method",
-            "penyebab": "Tata letak unit belum mempertimbangkan kemudahan akses sejak perencanaan",
-            "rekomendasi": "Evaluasi tata letak unit pada perencanaan pembangunan berikutnya",
+            "penyebab": "Belum ada prosedur pengeringan/ventilasi kamar setelah dibersihkan sebelum ditempati tamu berikutnya",
+            "rekomendasi": "Terapkan SOP membuka jendela/ventilasi kamar minimal 30 menit sebelum status \"Ready\"",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Sirkulasi udara kamar kurang baik sehingga bau lembap terperangkap",
+            "rekomendasi": "Sediakan air purifier/pengharum ruangan otomatis pada kamar yang jarang terpakai",
+        },
+        {
+            "faktor": "Material",
+            "penyebab": "Material kasur/karpet/gorden menyerap kelembapan dan menimbulkan bau seiring waktu",
+            "rekomendasi": "Lakukan pembersihan/penjemuran berkala pada material penyerap (kasur, gorden, karpet)",
         },
     ],
     "Desain kamar kurang ergonomis": [
@@ -287,28 +292,38 @@ DSS_KNOWLEDGE_BASE = {
             "rekomendasi": "Lakukan survei kenyamanan ergonomis sebagai dasar evaluasi ulang",
         },
     ],
-    "Sirkulasi udara kamar kurang": [
+    "Kenyamanan kasur/tempat tidur kurang": [
         {
-            "faktor": "Machine/Tool",
-            "penyebab": "Ventilasi/exhaust fan tidak memadai",
-            "rekomendasi": "Evaluasi dan tambah ventilasi/exhaust pada kamar bermasalah",
+            "faktor": "Method",
+            "penyebab": "Belum ada jadwal peremajaan kasur berkala",
+            "rekomendasi": "Susun jadwal penggantian/peremajaan kasur berdasarkan usia pakai",
         },
         {
             "faktor": "Material",
-            "penyebab": "Desain bangunan/material menghambat sirkulasi udara alami",
-            "rekomendasi": "Evaluasi desain bukaan/material dinding untuk mendukung sirkulasi alami",
+            "penyebab": "Kualitas material kasur/bantal menurun seiring waktu pemakaian",
+            "rekomendasi": "Evaluasi dan ganti material kasur/bantal yang sudah aus",
+        },
+        {
+            "faktor": "Measurement",
+            "penyebab": "Belum ada standar kenyamanan kasur yang diukur berkala",
+            "rekomendasi": "Lakukan survei kenyamanan kasur berkala sebagai dasar peremajaan",
         },
     ],
-    "Keamanan kolam kurang terjamin": [
-        {
-            "faktor": "Machine/Tool",
-            "penyebab": "Tidak ada pagar pembatas di area kolam",
-            "rekomendasi": "Pasang pagar pengaman di sekitar area kolam",
-        },
+    "Keamanan jalan menuju unit kurang": [
         {
             "faktor": "Method",
-            "penyebab": "Belum ada rambu peringatan keselamatan",
-            "rekomendasi": "Pasang rambu peringatan dan papan kedalaman kolam",
+            "penyebab": "Belum ada pembatas/pagar pengaman di sepanjang jalan yang berdekatan dengan kolam teratai",
+            "rekomendasi": "Pasang pagar/pembatas fisik di sepanjang jalan setapak dekat kolam",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Penerangan jalan menuju unit kurang memadai pada malam hari",
+            "rekomendasi": "Tambah titik lampu penerangan di sepanjang jalur rawan",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Tidak ada rambu peringatan bahaya di titik rawan",
+            "rekomendasi": "Pasang rambu peringatan \"hati-hati kolam\" di titik rawan",
         },
     ],
     "Kebersihan tempat makan/restoran kurang": [
@@ -323,16 +338,21 @@ DSS_KNOWLEDGE_BASE = {
             "rekomendasi": "Tugaskan PIC kebersihan restoran dengan jadwal spot-check rutin",
         },
     ],
-    "Restoran terlalu kecil": [
+    "Waktu penyajian makanan lama": [
         {
-            "faktor": "Machine/Tool",
-            "penyebab": "Kapasitas fisik restoran tidak dirancang untuk kondisi ramai/peak season",
-            "rekomendasi": "Terapkan sistem reservasi meja/jam makan bergilir saat ramai",
+            "faktor": "Method",
+            "penyebab": "Alur kerja dapur belum efisien saat pesanan menumpuk",
+            "rekomendasi": "Optimalkan alur kerja dapur dan pembagian tugas saat jam sibuk",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Jumlah staf dapur tidak memadai saat jam makan ramai",
+            "rekomendasi": "Sesuaikan jumlah staf dapur dengan proyeksi jam makan sibuk",
         },
         {
             "faktor": "Method",
-            "penyebab": "Belum ada sistem manajemen kapasitas/reservasi meja",
-            "rekomendasi": "Bangun sistem reservasi meja digital untuk mengatur alur tamu",
+            "penyebab": "Tidak ada estimasi waktu penyajian yang dikomunikasikan ke tamu",
+            "rekomendasi": "Sampaikan estimasi waktu tunggu saat pemesanan",
         },
     ],
     "Parkir kurang memadai": [
@@ -371,16 +391,16 @@ DSS_KNOWLEDGE_BASE = {
             "rekomendasi": "Integrasikan pengecekan toiletries ke dalam checklist cross-check kamar (terkait Temuan #6)",
         },
     ],
-    "Fasilitas belanja sekitar resort tidak tersedia": [
+    "Ketersediaan stop kontak/colokan listrik terbatas di kamar": [
         {
-            "faktor": "Mother Nature",
-            "penyebab": "Lokasi resor yang relatif terpencil dari pusat perbelanjaan",
-            "rekomendasi": "Jalin kerja sama dengan UMKM lokal untuk sediakan area/etalase belanja kecil",
+            "faktor": "Machine/Tool",
+            "penyebab": "Jumlah titik stop kontak di kamar tidak memadai untuk kebutuhan tamu modern",
+            "rekomendasi": "Tambah titik stop kontak di lokasi strategis kamar (dekat tempat tidur, meja kerja)",
         },
         {
             "faktor": "Method",
-            "penyebab": "Belum ada kerja sama formal dengan pelaku usaha lokal sekitar",
-            "rekomendasi": "Susun perjanjian kerja sama resmi dengan UMKM sekitar sebagai mitra resor",
+            "penyebab": "Belum ada evaluasi kebutuhan kelistrikan kamar sesuai standar terkini",
+            "rekomendasi": "Lakukan audit kelistrikan kamar dan sesuaikan dengan kebutuhan tamu masa kini",
         },
     ],
     "Kamar panas": [
