@@ -703,10 +703,10 @@ def page_dashboard_monitoring():
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # ----------------------------------------------------------------
-    # GRAFIK — berdampingan [3, 2] agar bar chart lebih lebar
+    # GRAFIK — berdampingan [2.4, 1.3, 1.3] agar bar chart lebih lebar
     # ----------------------------------------------------------------
     with st.container(border=True):
-        chart_col1, chart_col2 = st.columns([3, 2], gap="large")
+        chart_col1, chart_col2, chart_col3 = st.columns([2.4, 1.3, 1.3], gap="medium")
 
         # --- Bar Chart: Rata-rata Skor Dimensi (FITUR 2 — label manajerial) ---
         with chart_col1:
@@ -741,24 +741,15 @@ def page_dashboard_monitoring():
                 text_auto=".2f",
             )
             fig_bar.update_layout(
-                height=450,
+                height=350,
                 yaxis_range=[0, 5.5],
                 yaxis_title="Skor Rata-rata (1–5)",
                 xaxis_title="",
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=13, color="#94a3b8"),
-                margin=dict(t=30, b=60, l=50, r=30),
-                bargap=0.3,
-                xaxis=dict(gridcolor="rgba(255,255,255,0.05)", linecolor="rgba(255,255,255,0.1)"),
-                yaxis=dict(gridcolor="rgba(255,255,255,0.05)", linecolor="rgba(255,255,255,0.1)"),
-            )
-            fig_bar.update_traces(
-                textposition="outside",
-                textfont=dict(color="#e2e8f0", size=13),
-                marker_line_width=0,
-                marker_cornerradius=10,
+                font=dict(family="Inter", size=11, color="#94a3b8"),
+                margin=dict(t=30, b=50, l=40, r=20),
             )
             st.plotly_chart(fig_bar, use_container_width=True)
 
@@ -781,27 +772,72 @@ def page_dashboard_monitoring():
             fig_donut.update_traces(
                 textinfo="label+percent",
                 textposition="outside",
-                textfont_size=12,
+                textfont_size=11,
                 pull=[0.03] * len(sentimen_counts),
             )
             fig_donut.update_layout(
-                height=450,
+                height=350,
                 showlegend=False,
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=12, color="#94a3b8"),
-                margin=dict(t=30, b=30, l=60, r=40),
+                font=dict(family="Inter", size=11, color="#94a3b8"),
+                margin=dict(t=30, b=30, l=10, r=10),
                 annotations=[
                     dict(
                         text=f"<b>{total_ulasan}</b><br>Ulasan",
                         x=0.5, y=0.5,
-                        font_size=15,
+                        font_size=12,
                         showarrow=False,
                         font=dict(family="Inter", color="#e2e8f0"),
                     )
                 ],
             )
             st.plotly_chart(fig_donut, use_container_width=True)
+
+        # --- Donut Chart: Proporsi Metode Reservasi (FITUR 3) ---
+        with chart_col3:
+            st.markdown('<p class="section-header">🏷️ Metode Reservasi</p>', unsafe_allow_html=True)
+
+            reservasi_counts = df_filtered["jenis_reservasi"].value_counts().reset_index()
+            reservasi_counts.columns = ["Metode", "Jumlah"]
+
+            reservasi_color_map = {
+                "Aplikasi Online (OTA)": "#3b82f6",
+                "Walk-in": "#f59e0b",
+                "Tidak Diketahui": "#6b7280",
+            }
+            fig_reservasi = px.pie(
+                reservasi_counts,
+                names="Metode",
+                values="Jumlah",
+                hole=0.55,
+                color="Metode",
+                color_discrete_map=reservasi_color_map,
+            )
+            fig_reservasi.update_traces(
+                textinfo="label+percent",
+                textposition="outside",
+                textfont_size=11,
+                pull=[0.03] * len(reservasi_counts),
+            )
+            fig_reservasi.update_layout(
+                height=350,
+                showlegend=False,
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter", size=11, color="#94a3b8"),
+                margin=dict(t=30, b=30, l=10, r=10),
+                annotations=[
+                    dict(
+                        text=f"<b>{total_ulasan}</b><br>Tamu",
+                        x=0.5, y=0.5,
+                        font_size=12,
+                        showarrow=False,
+                        font=dict(family="Inter", color="#e2e8f0"),
+                    )
+                ],
+            )
+            st.plotly_chart(fig_reservasi, use_container_width=True)
 
     # ----------------------------------------------------------------
     # ANALISIS DSS BERBASIS DIMENSI SERVPERF (FITUR BARU)
@@ -962,59 +998,10 @@ def page_dashboard_monitoring():
             st.info("📭 Belum ada data untuk analisis dimensi.")
 
     # ----------------------------------------------------------------
-    # BARIS BARU: Donut Reservasi + Rekomendasi DSS (FITUR 3 & 4)
+    # BARIS BARU: Rekomendasi DSS (FITUR 4)
     # ----------------------------------------------------------------
     with st.container(border=True):
-        dss_col1, dss_col2 = st.columns([2, 3], gap="large")
-
-        # --- Donut Chart: Proporsi Metode Reservasi (FITUR 3) ---
-        with dss_col1:
-            st.markdown('<p class="section-header">🏷️ Proporsi Metode Reservasi</p>',
-                        unsafe_allow_html=True)
-
-            reservasi_counts = df_filtered["jenis_reservasi"].value_counts().reset_index()
-            reservasi_counts.columns = ["Metode", "Jumlah"]
-
-            reservasi_color_map = {
-                "Aplikasi Online (OTA)": "#3b82f6",
-                "Walk-in": "#f59e0b",
-                "Tidak Diketahui": "#6b7280",
-            }
-            fig_reservasi = px.pie(
-                reservasi_counts,
-                names="Metode",
-                values="Jumlah",
-                hole=0.55,
-                color="Metode",
-                color_discrete_map=reservasi_color_map,
-            )
-            fig_reservasi.update_traces(
-                textinfo="label+percent",
-                textposition="outside",
-                textfont_size=12,
-                pull=[0.03] * len(reservasi_counts),
-            )
-            fig_reservasi.update_layout(
-                height=260,
-                showlegend=False,
-                plot_bgcolor="rgba(0,0,0,0)",
-                paper_bgcolor="rgba(0,0,0,0)",
-                font=dict(family="Inter", size=12, color="#94a3b8"),
-                margin=dict(t=10, b=10, l=10, r=10),
-                annotations=[
-                    dict(
-                        text=f"<b>{total_ulasan}</b><br>Tamu",
-                        x=0.5, y=0.5,
-                        font_size=14,
-                        showarrow=False,
-                        font=dict(family="Inter", color="#e2e8f0"),
-                    )
-                ],
-            )
-            st.plotly_chart(fig_reservasi, use_container_width=True)
-
-        # --- Rekomendasi Prioritas DSS (FITUR 4 — Knowledge Base) ---
-        with dss_col2:
+        if True:
             st.markdown('<p class="section-header">💡 Rekomendasi Prioritas (DSS)</p>',
                         unsafe_allow_html=True)
 
