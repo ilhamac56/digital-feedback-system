@@ -14,6 +14,7 @@ Berisi halaman dashboard admin untuk menampilkan:
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import html
 from datetime import timedelta, datetime, timezone
 
 from core_utils import load_all_feedback
@@ -906,12 +907,27 @@ def page_dashboard_monitoring():
                     "<tbody>"
                 )
                 for idx, f in enumerate(found_absa_in_dim, 1):
+                    ulasan_asli_html = ""
+                    if "ulasan" in f and f["ulasan"]:
+                        list_li = "".join([f"<li style='margin-bottom:4px; padding-left:4px;'>{html.escape(u)}</li>" for u in f["ulasan"]])
+                        ulasan_asli_html = (
+                            f"<details style='margin-top:6px;'>"
+                            f"<summary style='font-size:0.75rem; color:#38bdf8; cursor:pointer;'>Lihat Ulasan Asli</summary>"
+                            f"<ul style='font-size:0.75rem; color:#cbd5e1; margin-top:4px; padding-left:16px; font-style:italic; list-style-type:disc;'>"
+                            f"{list_li}"
+                            f"</ul>"
+                            f"</details>"
+                        )
+
                     absa_list_html += (
                         f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
-                        f"<td style='padding:6px 4px; color:#94a3b8;'>{idx}</td>"
-                        f"<td style='padding:6px 4px; color:#e2e8f0;'>{f['frasa']}</td>"
-                        f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600;'>{f['frekuensi']}x</td>"
-                        f"<td style='padding:6px 4px; color:#94a3b8;'>{f['persentase']}%</td>"
+                        f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{idx}</td>"
+                        f"<td style='padding:6px 4px; color:#e2e8f0; vertical-align:top;'>"
+                        f"<strong>{f['frasa']}</strong>"
+                        f"{ulasan_asli_html}"
+                        f"</td>"
+                        f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600; vertical-align:top;'>{f['frekuensi']}x</td>"
+                        f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{f['persentase']}%</td>"
                         f"</tr>"
                     )
                 absa_list_html += "</tbody></table></div>"
