@@ -758,6 +758,51 @@ def inject_css():
         margin-top: 10px;
     }
 
+    /* ---------- DSS Dimension Analysis Card ---------- */
+    .dss-dim-analysis-card {
+        background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(2,132,199,0.12));
+        border: 1px solid rgba(56,189,248,0.2);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 8px 0;
+        animation: slide-in-left 0.5s ease-out;
+    }
+    .dss-dim-badge-low {
+        display: inline-block;
+        background: rgba(244,63,94,0.2);
+        color: #fb7185;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 12px;
+        border-radius: 50px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        border: 1px solid rgba(244,63,94,0.3);
+    }
+    .dss-dim-badge-normal {
+        display: inline-block;
+        background: rgba(56,189,248,0.2);
+        color: #7dd3fc;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 12px;
+        border-radius: 50px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .dss-dim-analysis-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #38bdf8;
+        margin-bottom: 6px;
+    }
+    .dss-dim-analysis-score {
+        font-size: 0.85rem;
+        color: #7dd3fc;
+        margin-bottom: 10px;
+    }
 
 
     /* ---------- Divider Decoration ---------- */
