@@ -998,6 +998,87 @@ def page_dashboard_monitoring():
             st.info("📭 Belum ada data untuk analisis dimensi.")
 
     # ----------------------------------------------------------------
+    # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
+    # ----------------------------------------------------------------
+    with st.container(border=True):
+        st.markdown('<p class="section-header">⚠️ Log Temuan Kritis (Aspect-Based)</p>',
+                    unsafe_allow_html=True)
+
+        # Ambil ulasan yang bersentimen Negatif dari data terfilter
+        df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+        ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
+
+        if ulasan_negatif_list:
+            findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
+
+            if findings:
+                # --- Horizontal Bar Chart: Top frasa temuan negatif ---
+                df_findings = pd.DataFrame(findings)
+                # Capitalize frasa untuk tampilan
+                df_findings["frasa"] = df_findings["frasa"].str.capitalize()
+                # Urutkan ascending agar bar terbesar di atas
+                df_findings = df_findings.sort_values("frekuensi", ascending=True)
+
+                fig_findings = px.bar(
+                    df_findings,
+                    x="frekuensi",
+                    y="frasa",
+                    orientation="h",
+                    text=df_findings.apply(
+                        lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
+                    ),
+                    color_discrete_sequence=["#34d399"],
+                )
+                fig_findings.update_layout(
+                    height=max(300, len(df_findings) * 50),
+                    xaxis_title="Frekuensi Kemunculan",
+                    yaxis_title="",
+                    showlegend=False,
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    font=dict(family="Inter", size=13, color="#94a3b8"),
+                    margin=dict(t=20, b=40, l=250, r=30),
+                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
+                )
+                fig_findings.update_traces(
+                    textposition="outside",
+                    textfont=dict(color="#e2e8f0"),
+                    marker_line_width=0,
+                    marker_cornerradius=8,
+                )
+                st.plotly_chart(fig_findings, use_container_width=True)
+
+                st.caption(
+                    f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
+                    f"(dari {total_ulasan} ulasan terfilter). "
+                    f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
+                )
+
+                # --- Detail ulasan asli per kategori ---
+                for finding in findings:
+                    kategori_nama = finding["frasa"].capitalize()
+                    daftar_ulasan = finding.get("ulasan", [])
+                    jumlah = finding["frekuensi"]
+
+                    with st.expander(
+                        f"📋 {kategori_nama} — {jumlah} ulasan",
+                        expanded=False,
+                    ):
+                        if daftar_ulasan:
+                            for idx, ulasan_teks in enumerate(daftar_ulasan, 1):
+                                st.markdown(
+                                    f"**{idx}.** {ulasan_teks}",
+                                )
+                            st.caption(f"Menampilkan {len(daftar_ulasan)} ulasan asli tamu.")
+                        else:
+                            st.info("Tidak ada data ulasan asli yang tersedia.")
+            else:
+                st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
+        else:
+            st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
+
+    # ----------------------------------------------------------------
     # BARIS BARU: Rekomendasi DSS (FITUR 4)
     # ----------------------------------------------------------------
     with st.container(border=True):
@@ -1082,87 +1163,6 @@ def page_dashboard_monitoring():
                     "✅ Tidak ada temuan kritis pada periode ini. "
                     "Pertahankan kualitas pelayanan!"
                 )
-
-    # ----------------------------------------------------------------
-    # LOG TEMUAN KRITIS — EKSTRAKSI FRASA NEGATIF ASPECT-BASED (FITUR 5)
-    # ----------------------------------------------------------------
-    with st.container(border=True):
-        st.markdown('<p class="section-header">⚠️ Log Temuan Kritis (Aspect-Based)</p>',
-                    unsafe_allow_html=True)
-
-        # Ambil ulasan yang bersentimen Negatif dari data terfilter
-        df_negatif = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
-        ulasan_negatif_list = df_negatif["teks_ulasan"].dropna().tolist()
-
-        if ulasan_negatif_list:
-            findings = extract_negative_findings(ulasan_negatif_list, top_n=3)
-
-            if findings:
-                # --- Horizontal Bar Chart: Top frasa temuan negatif ---
-                df_findings = pd.DataFrame(findings)
-                # Capitalize frasa untuk tampilan
-                df_findings["frasa"] = df_findings["frasa"].str.capitalize()
-                # Urutkan ascending agar bar terbesar di atas
-                df_findings = df_findings.sort_values("frekuensi", ascending=True)
-
-                fig_findings = px.bar(
-                    df_findings,
-                    x="frekuensi",
-                    y="frasa",
-                    orientation="h",
-                    text=df_findings.apply(
-                        lambda row: f"{row['frekuensi']}x ({row['persentase']}%)", axis=1
-                    ),
-                    color_discrete_sequence=["#34d399"],
-                )
-                fig_findings.update_layout(
-                    height=max(300, len(df_findings) * 50),
-                    xaxis_title="Frekuensi Kemunculan",
-                    yaxis_title="",
-                    showlegend=False,
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    font=dict(family="Inter", size=13, color="#94a3b8"),
-                    margin=dict(t=20, b=40, l=250, r=30),
-                    xaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                    yaxis=dict(gridcolor="rgba(255,255,255,0.05)"),
-                )
-                fig_findings.update_traces(
-                    textposition="outside",
-                    textfont=dict(color="#e2e8f0"),
-                    marker_line_width=0,
-                    marker_cornerradius=8,
-                )
-                st.plotly_chart(fig_findings, use_container_width=True)
-
-                st.caption(
-                    f"Berdasarkan **{len(ulasan_negatif_list)}** ulasan bersentimen Negatif "
-                    f"(dari {total_ulasan} ulasan terfilter). "
-                    f"Frasa diekstrak secara otomatis dari konteks kalimat (kata benda + kata sifat negatif)."
-                )
-
-                # --- Detail ulasan asli per kategori ---
-                for finding in findings:
-                    kategori_nama = finding["frasa"].capitalize()
-                    daftar_ulasan = finding.get("ulasan", [])
-                    jumlah = finding["frekuensi"]
-
-                    with st.expander(
-                        f"📋 {kategori_nama} — {jumlah} ulasan",
-                        expanded=False,
-                    ):
-                        if daftar_ulasan:
-                            for idx, ulasan_teks in enumerate(daftar_ulasan, 1):
-                                st.markdown(
-                                    f"**{idx}.** {ulasan_teks}",
-                                )
-                            st.caption(f"Menampilkan {len(daftar_ulasan)} ulasan asli tamu.")
-                        else:
-                            st.info("Tidak ada data ulasan asli yang tersedia.")
-            else:
-                st.info("Tidak ditemukan frasa temuan negatif yang cocok dengan kamus leksikon.")
-        else:
-            st.success("🎉 Tidak ada ulasan bersentimen Negatif pada data yang terfilter.")
 
     # ----------------------------------------------------------------
     # TABEL DATA — termasuk kolom X1–X5 dan Jenis Reservasi
