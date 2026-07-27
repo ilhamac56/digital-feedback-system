@@ -26,11 +26,145 @@ _WIB = timezone(timedelta(hours=7))
 # MAPPING LABEL DIMENSI MANAJERIAL (FITUR 2)
 # ============================================================
 DIMENSION_LABEL_MAP = {
-    "Tangibles": "Fasilitas Fisik & Kebersihan",
-    "Reliability": "Keandalan & Ketepatan Layanan",
-    "Responsiveness": "Kecepatan & Kesigapan Staf",
-    "Assurance": "Keamanan & Kompetensi Staf",
+    "Reliability": "Kenyamanan Kamar & Kualitas Tidur",
+    "Assurance": "Kesopanan, Kompetensi & Keamanan",
+    "Tangibles": "Kebersihan & Kelengkapan Fasilitas Fisik",
     "Empathy": "Kepedulian & Perhatian Personal",
+    "Responsiveness": "Kecepatan & Kesiagapan Staf",
+}
+
+# ============================================================
+# MAPPING DIMENSI → KATEGORI ABSA YANG RELEVAN
+# ============================================================
+# Setiap dimensi SERVPERF dipetakan ke kategori keluhan ABSA
+# yang secara logis berkaitan dengan aspek dimensi tersebut.
+DIMENSION_ABSA_MAP = {
+    "Reliability": [
+        "Serangga dan hewan pengganggu",
+        "Lantai kamar berbunyi saat dipijak",
+        "Kamar berbau tidak sedap",
+        "Desain kamar kurang ergonomis",
+        "Kenyamanan kasur/tempat tidur kurang",
+        "Gangguan lingkungan",
+        "Kamar panas",
+    ],
+    "Assurance": [
+        "Kualitas pelayanan staf kurang",
+        "Keamanan jalan menuju unit kurang",
+        "Informasi fasilitas kurang jelas",
+    ],
+    "Tangibles": [
+        "Tidak ada AC",
+        "Fasilitas kamar tidak memadai",
+        "Kamar mandi/toilet kurang bersih",
+        "Kebersihan kamar kurang",
+        "Sanitasi kolam ikan kurang terjaga",
+        "Kebersihan lingkungan resort kurang",
+        "Penerangan kamar dan lingkungan kurang",
+        "Koneksi WiFi tidak stabil",
+        "Kolam rendam kurang panas",
+        "Kebersihan tempat makan/restoran kurang",
+        "Parkir kurang memadai",
+        "Perlengkapan kamar (toiletries) kurang lengkap",
+        "Ketersediaan stop kontak/colokan listrik terbatas di kamar",
+        "Variasi dan rasa makanan kurang",
+    ],
+    "Empathy": [
+        "Kualitas pelayanan staf kurang",
+    ],
+    "Responsiveness": [
+        "Waktu penyajian makanan lama",
+        "Kualitas pelayanan staf kurang",
+    ],
+}
+
+# ============================================================
+# KNOWLEDGE BASE DSS PER DIMENSI — FISHBONE 6M (LEVEL DIMENSI)
+# ============================================================
+# Penyebab & rekomendasi umum pada level dimensi SERVPERF.
+# Digunakan ketika skor dimensi rendah namun belum tentu ada
+# keluhan teks yang terdeteksi ABSA.
+DIMENSION_DSS_KB = {
+    "Reliability": [
+        {
+            "faktor": "Material",
+            "penyebab": "Kualitas material tempat tidur, kasur, atau insulasi ruangan tidak memenuhi standar kenyamanan",
+            "rekomendasi": "Evaluasi dan remajakan material kasur serta tambahkan insulasi/peredam suara pada dinding kamar",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada prosedur pemeliharaan kenyamanan kamar (penghilang bau, kontrol suhu, pest control) sebelum tamu check-in",
+            "rekomendasi": "Terapkan SOP persiapan kamar (termasuk pest control berkala dan sirkulasi udara) sebelum status 'Ready'",
+        },
+        {
+            "faktor": "Mother Nature",
+            "penyebab": "Faktor alam sekitar (serangga, suhu ekstrem, kebisingan hewan) yang mengganggu kenyamanan tidur",
+            "rekomendasi": "Pasang pelindung ekstra seperti kasa nyamuk, dan sediakan fasilitas penunjang kenyamanan (AC/Kipas angin)",
+        },
+    ],
+    "Assurance": [
+        {
+            "faktor": "Man",
+            "penyebab": "Staf belum memiliki kompetensi dan sikap yang cukup untuk memberikan rasa aman dan nyaman kepada tamu",
+            "rekomendasi": "Lakukan pelatihan service excellence & product knowledge secara rutin kepada seluruh staf",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Prosedur penyampaian informasi dan jaminan keamanan belum jelas dan tidak tersosialisasi dengan baik",
+            "rekomendasi": "Standardisasikan script informasi bagi front-line dan perjelas rambu keamanan di seluruh area resort",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Fasilitas keamanan pendukung (penerangan, CCTV, pagar pembatas) belum memadai",
+            "rekomendasi": "Tingkatkan fasilitas keamanan fisik, terutama di area yang rawan atau kurang pencahayaan",
+        },
+    ],
+    "Tangibles": [
+        {
+            "faktor": "Method",
+            "penyebab": "SOP kebersihan area (kamar, toilet, restoran, lingkungan) belum dijalankan dengan konsisten",
+            "rekomendasi": "Terapkan inspeksi kebersihan berkala menggunakan checklist digital dan cross-check oleh supervisor",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Peralatan fisik dan fasilitas (AC, WiFi, kolam, parkir, kelistrikan) belum memadai secara kuantitas maupun kualitas",
+            "rekomendasi": "Audit dan lengkapi sarana fisik (termasuk stop kontak, amenities, & titik WiFi) sesuai standar modern",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Kekurangan jumlah staf kebersihan atau tingginya beban kerja, terutama saat resort sedang ramai",
+            "rekomendasi": "Sesuaikan rasio petugas kebersihan terhadap luasan area dan tingkat hunian",
+        },
+    ],
+    "Empathy": [
+        {
+            "faktor": "Man",
+            "penyebab": "Staf belum proaktif dalam memberikan perhatian personal dan memahami kebutuhan khusus tamu",
+            "rekomendasi": "Berikan pelatihan hospitality fokus pada active listening dan empati dalam menghadapi tamu",
+        },
+        {
+            "faktor": "Method",
+            "penyebab": "Tidak ada sistem pencatatan preferensi atau keluhan tamu yang diteruskan antar shift",
+            "rekomendasi": "Implementasikan sistem handover (operan) yang mencatat kebutuhan khusus dan preferensi tiap tamu",
+        },
+    ],
+    "Responsiveness": [
+        {
+            "faktor": "Method",
+            "penyebab": "Belum ada penetapan Service Level Agreement (SLA) waktu tunggu dan respons keluhan tamu",
+            "rekomendasi": "Tetapkan standar waktu maksimal penyajian makanan dan penanganan keluhan kamar",
+        },
+        {
+            "faktor": "Man",
+            "penyebab": "Keterbatasan jumlah personel saat jam sibuk (rush hour) mengakibatkan layanan menjadi lambat",
+            "rekomendasi": "Atur ulang jadwal shift staf agar lebih banyak personel bersiaga pada jam-jam sibuk",
+        },
+        {
+            "faktor": "Machine/Tool",
+            "penyebab": "Sistem komunikasi antar departemen (FO ke Housekeeping/F&B) kurang efisien",
+            "rekomendasi": "Gunakan sistem komunikasi digital yang mempercepat alur koordinasi penyelesaian permintaan tamu",
+        },
+    ],
 }
 
 # ============================================================
@@ -667,6 +801,149 @@ def page_dashboard_monitoring():
                 ],
             )
             st.plotly_chart(fig_donut, use_container_width=True)
+
+    # ----------------------------------------------------------------
+    # ANALISIS DSS BERBASIS DIMENSI SERVPERF (FITUR BARU)
+    # ----------------------------------------------------------------
+    with st.container(border=True):
+        st.markdown('<p class="section-header">🔬 Analisis DSS Berbasis Dimensi SERVPERF</p>',
+                    unsafe_allow_html=True)
+        st.caption(
+            "Analisis penyebab & rekomendasi berdasarkan skor skala per dimensi, "
+            "dipetakan ke kategori keluhan yang relevan dengan setiap dimensi."
+        )
+
+        # Hitung rata-rata skor per dimensi
+        dim_scores = {
+            "Tangibles": df_filtered["q3_tangibles"].mean() if total_ulasan > 0 else 0,
+            "Reliability": df_filtered["q1_reliability"].mean() if total_ulasan > 0 else 0,
+            "Responsiveness": df_filtered["q5_responsiveness"].mean() if total_ulasan > 0 else 0,
+            "Assurance": df_filtered["q2_assurance"].mean() if total_ulasan > 0 else 0,
+            "Empathy": df_filtered["q4_empathy"].mean() if total_ulasan > 0 else 0,
+        }
+
+        if total_ulasan > 0:
+            # Urutkan dimensi dari skor terendah ke tertinggi
+            sorted_dims = sorted(dim_scores.items(), key=lambda x: x[1])
+            lowest_dim = sorted_dims[0][0]
+
+            # Selectbox — semua dimensi, default ke dimensi terendah
+            dim_options = [f"{DIMENSION_LABEL_MAP[d]} ({d}) — Skor: {s:.2f}" for d, s in sorted_dims]
+            dim_keys = [d for d, s in sorted_dims]
+
+            selected_dim_option = st.selectbox(
+                "Pilih Dimensi untuk Analisis:",
+                dim_options,
+                index=0,  # Default ke dimensi terendah
+                key="dim_dss_selectbox",
+            )
+            selected_dim_idx = dim_options.index(selected_dim_option)
+            selected_dim = dim_keys[selected_dim_idx]
+            selected_score = dim_scores[selected_dim]
+            selected_label = DIMENSION_LABEL_MAP[selected_dim]
+
+            # Badge: terendah atau bukan
+            is_lowest = (selected_dim == lowest_dim)
+            dim_badge_text = "📉 DIMENSI SKOR TERENDAH" if is_lowest else "📊 ANALISIS DIMENSI"
+            dim_badge_class = "dss-dim-badge-low" if is_lowest else "dss-dim-badge-normal"
+
+            # --- Cari kategori ABSA terkait yang DITEMUKAN di data ---
+            absa_categories_for_dim = DIMENSION_ABSA_MAP.get(selected_dim, [])
+
+            # Hitung frekuensi ABSA dari ulasan negatif terfilter
+            df_neg_dim = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+            ulasan_neg_dim = df_neg_dim["teks_ulasan"].dropna().tolist()
+
+            found_absa_in_dim = []  # Kategori ABSA yang ditemukan DAN relevan dgn dimensi ini
+            if ulasan_neg_dim:
+                all_findings = extract_negative_findings(ulasan_neg_dim, top_n=25)
+                for finding in all_findings:
+                    if finding["frasa"] in absa_categories_for_dim:
+                        found_absa_in_dim.append(finding)
+
+            # --- Build Fishbone Table (dari knowledge base per dimensi) ---
+            dim_kb = DIMENSION_DSS_KB.get(selected_dim, [])
+
+            # Fishbone dari knowledge base dimensi
+            dim_table_html = (
+                "<table style='width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;'>"
+                "<thead>"
+                "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
+                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Faktor (6M)</th>"
+                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Kemungkinan Penyebab</th>"
+                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Rekomendasi Tindakan</th>"
+                "</tr>"
+                "</thead>"
+                "<tbody>"
+            )
+            for entry in dim_kb:
+                dim_table_html += (
+                    f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
+                    f"<td style='padding:8px 4px; color:#38bdf8; font-weight:500; vertical-align:top;'>{entry['faktor']}</td>"
+                    f"<td style='padding:8px 4px; color:#e2e8f0; vertical-align:top;'>{entry['penyebab']}</td>"
+                    f"<td style='padding:8px 4px; color:#34d399; vertical-align:top;'>{entry['rekomendasi']}</td>"
+                    f"</tr>"
+                )
+            dim_table_html += "</tbody></table>"
+
+            # --- Build ABSA temuan terkait (jika ada) ---
+            absa_list_html = ""
+            if found_absa_in_dim:
+                absa_list_html = (
+                    "<div style='margin-top:14px;'>"
+                    "<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
+                    "text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;'>"
+                    "📋 Temuan Keluhan Spesifik (ABSA) Terkait Dimensi Ini:</div>"
+                    "<table style='width:100%; border-collapse:collapse; font-size:13px;'>"
+                    "<thead>"
+                    "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
+                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>No</th>"
+                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Kategori Keluhan</th>"
+                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Frekuensi</th>"
+                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Proporsi</th>"
+                    "</tr>"
+                    "</thead>"
+                    "<tbody>"
+                )
+                for idx, f in enumerate(found_absa_in_dim, 1):
+                    absa_list_html += (
+                        f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
+                        f"<td style='padding:6px 4px; color:#94a3b8;'>{idx}</td>"
+                        f"<td style='padding:6px 4px; color:#e2e8f0;'>{f['frasa']}</td>"
+                        f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600;'>{f['frekuensi']}x</td>"
+                        f"<td style='padding:6px 4px; color:#94a3b8;'>{f['persentase']}%</td>"
+                        f"</tr>"
+                    )
+                absa_list_html += "</tbody></table></div>"
+            else:
+                absa_list_html = (
+                    "<div style='margin-top:14px; padding:12px 16px; "
+                    "background:rgba(56,189,248,0.06); border-radius:10px; "
+                    "border:1px solid rgba(56,189,248,0.1);'>"
+                    "<span style='color:#7dd3fc; font-size:0.85rem;'>ℹ️ "
+                    "Tidak ditemukan keluhan spesifik dari teks ulasan untuk dimensi ini. "
+                    "Skor rendah kemungkinan berasal dari penilaian skala Likert saja — "
+                    "rekomendasi umum di atas tetap berlaku sebagai panduan perbaikan.</span>"
+                    "</div>"
+                )
+
+            # --- Render Card ---
+            dim_card_html = (
+                f"<div class='dss-dim-analysis-card'>"
+                f"<span class='{dim_badge_class}'>{dim_badge_text}</span>"
+                f"<div class='dss-dim-analysis-name'>📐 {selected_label} ({selected_dim})</div>"
+                f"<div class='dss-dim-analysis-score'>Skor Rata-rata: <strong>{selected_score:.2f}</strong> / 5.00</div>"
+                f"<div class='dss-separator' style='border-color:rgba(56,189,248,0.15);'></div>"
+                f"<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
+                f"text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; margin-top:10px;'>"
+                f"🔍 Analisis Fishbone 6M — Penyebab & Rekomendasi (Level Dimensi):</div>"
+                f"{dim_table_html}"
+                f"{absa_list_html}"
+                f"</div>"
+            )
+            st.markdown(dim_card_html, unsafe_allow_html=True)
+        else:
+            st.info("📭 Belum ada data untuk analisis dimensi.")
 
     # ----------------------------------------------------------------
     # BARIS BARU: Donut Reservasi + Rekomendasi DSS (FITUR 3 & 4)
