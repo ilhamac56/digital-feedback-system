@@ -664,3 +664,105 @@ def extract_negative_findings(ulasan_negatif: list[str], top_n: int = 10) -> lis
 
 
 
+
+
+# ============================================================
+# FUNGSI EKSTRAKSI FRASA TEMUAN POSITIF (APRESIASI) — ABSA POSITIF
+# ============================================================
+
+ABSA_POSITIVE_CATEGORIES = [
+    {
+        "name": "Kenyamanan dan fasilitas kamar sangat baik",
+        "nouns": ["kamar", "kasur", "tempat tidur", "bed", "ruangan", "suasana", "fasilitas", "ac", "tv", "wifi", "air panas", "koneksi", "internet"],
+        "positives": ["nyaman", "empuk", "enak", "bagus", "bersih", "wangi", "luas", "sejuk", "dingin", "tenang", "lancar", "kencang", "berfungsi", "lengkap", "memadai", "mantap", "puas", "nyala"]
+    },
+    {
+        "name": "Kualitas pelayanan staf sangat memuaskan",
+        "nouns": ["staf", "staff", "pelayanan", "resepsionis", "karyawan", "petugas", "service", "layanan"],
+        "positives": ["ramah", "baik", "sopan", "cepat", "membantu", "tanggap", "responsif", "profesional", "sangat baik", "memuaskan", "jempolan", "bagus", "sigap"]
+    },
+    {
+        "name": "Makanan enak dan bervariasi",
+        "nouns": ["makanan", "sarapan", "menu", "rasa", "breakfast", "buffet", "resto", "restoran", "makan"],
+        "positives": ["enak", "lezat", "bervariasi", "banyak", "mantap", "nikmat", "sedap", "beragam", "lumayan", "pas"]
+    },
+    {
+        "name": "Kebersihan dan keindahan lingkungan terjaga",
+        "nouns": ["lingkungan", "taman", "kolam", "resort", "area", "kamar mandi", "toilet", "pemandangan", "view"],
+        "positives": ["bersih", "terawat", "rapi", "indah", "bagus", "nyaman", "asri", "sejuk", "wangi", "kinclong"]
+    }
+]
+
+def _extract_pos_categories_from_fragment(fragment: str) -> list[str]:
+    import re
+    clean = fragment.lower()
+    clean = re.sub(r'nya\b', '', clean)
+    clean = re.sub(r'[^a-z\s]', '', clean)
+    tokens = clean.split()
+    if not tokens:
+        return []
+
+    token_phrases = tokens.copy()
+    for i in range(len(tokens) - 1):
+        token_phrases.append(f"{tokens[i]} {tokens[i+1]}")
+    for i in range(len(tokens) - 2):
+        token_phrases.append(f"{tokens[i]} {tokens[i+1]} {tokens[i+2]}")
+
+    results = set()
+
+    for category in ABSA_POSITIVE_CATEGORIES:
+        has_noun = any(noun in token_phrases for noun in category["nouns"])
+        has_pos = any(pos in token_phrases for pos in category["positives"])
+        if has_noun and has_pos:
+            results.add(category["name"])
+
+    if not results:
+        for category in ABSA_POSITIVE_CATEGORIES:
+            has_pos = any(pos in token_phrases for pos in category["positives"])
+            if has_pos:
+                if any(pos in ["ramah", "sopan", "sigap", "tanggap"] for pos in token_phrases):
+                    return ["Kualitas pelayanan staf sangat memuaskan"]
+                if any(pos in ["enak", "lezat", "nikmat", "sedap"] for pos in token_phrases):
+                    return ["Makanan enak dan bervariasi"]
+                if any(pos in ["asri", "indah"] for pos in token_phrases):
+                    return ["Kebersihan dan keindahan lingkungan terjaga"]
+                if any(pos in ["empuk"] for pos in token_phrases):
+                    return ["Kenyamanan dan fasilitas kamar sangat baik"]
+
+    return list(results)
+
+def extract_positive_findings(ulasan_positif: list[str], top_n: int = 10) -> list[dict]:
+    from collections import Counter
+    category_counter = Counter()
+    category_reviews: dict[str, list[str]] = {}
+
+    for teks in ulasan_positif:
+        fragments = _split_into_fragments(teks)
+        seen_in_review = set()
+
+        for fragment in fragments:
+            categories = _extract_pos_categories_from_fragment(fragment)
+            for category in categories:
+                if category not in seen_in_review:
+                    category_counter[category] += 1
+                    seen_in_review.add(category)
+
+                if category not in category_reviews:
+                    category_reviews[category] = []
+                if teks not in category_reviews[category]:
+                    category_reviews[category].append(teks)
+
+    total_findings = sum(category_counter.values())
+    if total_findings == 0:
+        return []
+
+    results = []
+    for kategori, freq in category_counter.most_common(top_n):
+        results.append({
+            "frasa": kategori,
+            "frekuensi": freq,
+            "persentase": round(freq / total_findings * 100, 1),
+            "ulasan": category_reviews.get(kategori, []),
+        })
+
+    return results

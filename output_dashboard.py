@@ -18,7 +18,7 @@ import html
 from datetime import timedelta, datetime, timezone
 
 from core_utils import load_all_feedback
-from process_nlp import extract_negative_findings
+from process_nlp import extract_negative_findings, extract_positive_findings
 
 # Timezone WIB (UTC+7) — agar filter tanggal sesuai waktu lokal Indonesia
 _WIB = timezone(timedelta(hours=7))
@@ -76,6 +76,31 @@ DIMENSION_ABSA_MAP = {
     "Responsiveness": [
         "Waktu penyajian makanan lama",
         "Kualitas pelayanan staf kurang",
+    ],
+}
+
+# ============================================================
+# MAPPING DIMENSI → KATEGORI ABSA POSITIF YANG RELEVAN
+# ============================================================
+DIMENSION_ABSA_POS_MAP = {
+    "Reliability": [
+        "Kenyamanan dan fasilitas kamar sangat baik",
+        "Kualitas pelayanan staf sangat memuaskan"
+    ],
+    "Assurance": [
+        "Kualitas pelayanan staf sangat memuaskan",
+        "Makanan enak dan bervariasi"
+    ],
+    "Tangibles": [
+        "Kenyamanan dan fasilitas kamar sangat baik",
+        "Kebersihan dan keindahan lingkungan terjaga",
+        "Makanan enak dan bervariasi"
+    ],
+    "Empathy": [
+        "Kualitas pelayanan staf sangat memuaskan"
+    ],
+    "Responsiveness": [
+        "Kualitas pelayanan staf sangat memuaskan"
     ],
 }
 
@@ -1007,7 +1032,59 @@ def page_dashboard_monitoring():
                 ulasan_pos_dim = df_pos_dim["teks_ulasan"].dropna().tolist()
 
                 if ulasan_pos_dim:
-                    list_li = "".join([f"<li style='margin-bottom:8px;'>{html.escape(u)}</li>" for u in ulasan_pos_dim])
+                    # Ekstrak temuan positif dari ulasan menggunakan ABSA
+                    absa_pos_categories = DIMENSION_ABSA_POS_MAP.get(selected_dim, [])
+                    all_pos_findings = extract_positive_findings(ulasan_pos_dim, top_n=25)
+                    found_absa_pos = []
+                    
+                    for finding in all_pos_findings:
+                        if finding["frasa"] in absa_pos_categories:
+                            found_absa_pos.append(finding)
+
+                    if found_absa_pos:
+                        pos_absa_html = (
+                            "<table style='width:100%; border-collapse:collapse; font-size:13px; margin-top:8px;'>"
+                            "<thead>"
+                            "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
+                            "<th style='padding:6px 4px; color:#34d399; font-weight:600;'>Kategori Apresiasi</th>"
+                            "<th style='padding:6px 4px; color:#34d399; font-weight:600;'>Frekuensi</th>"
+                            "<th style='padding:6px 4px; color:#34d399; font-weight:600;'>Proporsi</th>"
+                            "</tr>"
+                            "</thead>"
+                            "<tbody>"
+                        )
+                        for idx, f in enumerate(found_absa_pos, 1):
+                            ulasan_asli_html = ""
+                            if "ulasan" in f and f["ulasan"]:
+                                list_li = "".join([f"<li style='margin-bottom:4px; padding-left:4px;'>{html.escape(u)}</li>" for u in f["ulasan"]])
+                                ulasan_asli_html = (
+                                    f"<details style='margin-top:6px;'>"
+                                    f"<summary style='font-size:0.75rem; color:#34d399; cursor:pointer;'>Lihat Ulasan Asli</summary>"
+                                    f"<ul style='font-size:0.75rem; color:#cbd5e1; margin-top:4px; padding-left:16px; font-style:italic; list-style-type:disc;'>"
+                                    f"{list_li}"
+                                    f"</ul>"
+                                    f"</details>"
+                                )
+
+                            pos_absa_html += (
+                                f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
+                                f"<td style='padding:6px 4px; color:#e2e8f0; vertical-align:top;'>"
+                                f"<strong>{f['frasa']}</strong>"
+                                f"{ulasan_asli_html}"
+                                f"</td>"
+                                f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600; vertical-align:top;'>{f['frekuensi']}x</td>"
+                                f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{f['persentase']}%</td>"
+                                f"</tr>"
+                            )
+                        pos_absa_html += "</tbody></table>"
+                    else:
+                        list_li = "".join([f"<li style='margin-bottom:8px;'>{html.escape(u)}</li>" for u in ulasan_pos_dim])
+                        pos_absa_html = (
+                            f"<ul style='font-size:0.85rem; color:#e2e8f0; padding-left:16px; font-style:italic; list-style-type:disc;'>"
+                            f"{list_li}"
+                            f"</ul>"
+                        )
+
                     pos_html = (
                         f"<div class='dss-dim-analysis-card' style='border-left-color:#34d399;'>"
                         f"<span class='dss-dim-badge-normal' style='background:rgba(52,211,153,0.1); color:#34d399;'>🌟 APRESIASI TAMU</span>"
@@ -1016,10 +1093,8 @@ def page_dashboard_monitoring():
                         f"<div class='dss-separator' style='border-color:rgba(52,211,153,0.15);'></div>"
                         f"<div style='font-size:0.78rem; font-weight:700; color:#34d399; "
                         f"text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:10px;'>"
-                        f"✨ Ulasan Positif Terkait Indikator Ini ({len(ulasan_pos_dim)} ulasan):</div>"
-                        f"<ul style='font-size:0.85rem; color:#e2e8f0; padding-left:16px; font-style:italic; list-style-type:disc;'>"
-                        f"{list_li}"
-                        f"</ul>"
+                        f"✨ Temuan Positif Terkait Indikator Ini ({len(ulasan_pos_dim)} ulasan terdeteksi):</div>"
+                        f"{pos_absa_html}"
                         f"</div>"
                     )
                     st.markdown(pos_html, unsafe_allow_html=True)
