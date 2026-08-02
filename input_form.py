@@ -100,25 +100,7 @@ def page_guest_form():
                 key="jenis_reservasi",
             )
 
-            st.markdown("---")
 
-            # Star Rating — radio horizontal
-            st.markdown("##### ⭐ Rating Keseluruhan")
-            st.caption("Berikan penilaian keseluruhan pengalaman Anda (1 = Sangat Buruk, 5 = Sangat Baik)")
-            rating = st.radio(
-                "Rating Bintang",
-                options=[1, 2, 3, 4, 5],
-                index=2,
-                horizontal=True,
-                label_visibility="collapsed",
-                key="rating_radio",
-            )
-            # Tampilkan bintang visual
-            stars_html = "".join(
-                ['<span class="star-filled">★</span>' if i < rating else '<span class="star-empty">★</span>'
-                 for i in range(5)]
-            )
-            st.markdown(f'<div class="star-rating-display">{stars_html}</div>', unsafe_allow_html=True)
 
             st.markdown("---")
 
@@ -188,7 +170,7 @@ def page_guest_form():
                 return
 
             # Proses NLP menggunakan fungsi modular
-            dimensi, sentimen = analyze_feedback(ulasan, rating)
+            dimensi, sentimen = analyze_feedback(ulasan, 0)
 
             # Siapkan data
             # Mapping jenis reservasi ke nilai ringkas untuk database
@@ -200,7 +182,7 @@ def page_guest_form():
             data = {
                 "tanggal": tanggal_menginap.isoformat(),
                 "nama_tamu": nama.strip(),
-                "rating_bintang": rating,
+                "rating_bintang": 0,
                 "q1_reliability": likert_values["q1_reliability"],
                 "q2_assurance": likert_values["q2_assurance"],
                 "q3_tangibles": likert_values["q3_tangibles"],
@@ -221,9 +203,8 @@ def page_guest_form():
                 </div>
                 """, unsafe_allow_html=True)
 
-                st.metric("⭐ Rating", f"{rating}/5")
                 st.metric("📊 Sentimen", sentimen)
-                st.metric("🏷️ Dimensi", dimensi if len(dimensi) < 40 else f"{len(dimensi.split(','))} dimensi")
+                st.metric("🏷️ Indikator", dimensi if len(dimensi) < 40 else f"{len(dimensi.split(','))} indikator")
 
                 st.balloons()
 

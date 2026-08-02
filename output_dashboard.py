@@ -603,14 +603,22 @@ def page_dashboard_monitoring():
         sentimen_options = ["Semua"] + sorted(df["sentimen_akhir"].dropna().unique().tolist())
         filter_sentimen = st.selectbox("Sentimen", sentimen_options, key="filter_sentimen")
 
-        # Filter Dimensi
+        # Filter Indikator
         all_dimensions = set()
         for dims in df["dimensi_terdeteksi"].dropna():
             for d in dims.split(", "):
                 if d.strip() and d.strip() != "Tidak Terdeteksi":
                     all_dimensions.add(d.strip())
-        dimensi_options = ["Semua"] + sorted(all_dimensions)
-        filter_dimensi = st.selectbox("Dimensi", dimensi_options, key="filter_dimensi")
+        
+        # Menerjemahkan opsi ke indikator
+        indikator_options_map = {DIMENSION_LABEL_MAP.get(d, d): d for d in all_dimensions}
+        indikator_options_display = ["Semua"] + sorted(indikator_options_map.keys())
+        filter_dimensi_display = st.selectbox("Indikator", indikator_options_display, key="filter_dimensi")
+        
+        if filter_dimensi_display != "Semua":
+            filter_dimensi = indikator_options_map[filter_dimensi_display]
+        else:
+            filter_dimensi = "Semua"
 
         # Filter Jenis Reservasi (FITUR 3)
         filter_reservasi = st.selectbox(
@@ -655,14 +663,13 @@ def page_dashboard_monitoring():
         (df_filtered["sentimen_akhir"] == "Negatif").sum() / total_ulasan * 100
         if total_ulasan > 0 else 0
     )
-    avg_rating = df_filtered["rating_bintang"].mean() if total_ulasan > 0 else 0
     avg_servperf = (
         df_filtered[["q1_reliability", "q2_assurance", "q3_tangibles",
             "q4_empathy", "q5_responsiveness"]].mean().mean()
         if total_ulasan > 0 else 0
     )
 
-    k1, k2, k3, k4 = st.columns(4)
+    k1, k2, k4 = st.columns(3)
 
     with k1:
         st.markdown(f"""
@@ -682,21 +689,12 @@ def page_dashboard_monitoring():
         </div>
         """, unsafe_allow_html=True)
 
-    with k3:
-        st.markdown(f"""
-        <div class="kpi-card kpi-amber">
-            <div class="kpi-icon">⭐</div>
-            <div class="kpi-value">{avg_rating:.2f}</div>
-            <div class="kpi-label">Rata-rata Rating</div>
-        </div>
-        """, unsafe_allow_html=True)
-
     with k4:
         st.markdown(f"""
         <div class="kpi-card kpi-violet">
             <div class="kpi-icon">📊</div>
             <div class="kpi-value">{avg_servperf:.2f}</div>
-            <div class="kpi-label">Rata-rata SERVPERF</div>
+            <div class="kpi-label">Rata-rata Indikator</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -708,9 +706,9 @@ def page_dashboard_monitoring():
     with st.container(border=True):
         chart_col1, chart_col2, chart_col3 = st.columns([2.4, 1.3, 1.3], gap="medium")
 
-        # --- Bar Chart: Rata-rata Skor Dimensi (FITUR 2 — label manajerial) ---
+        # --- Bar Chart: Rata-rata Skor Indikator (FITUR 2 — label manajerial) ---
         with chart_col1:
-            st.markdown('<p class="section-header">📊 Rata-rata Skor per Dimensi SERVPERF</p>',
+            st.markdown('<p class="section-header">📊 Rata-rata Skor per Indikator</p>',
                         unsafe_allow_html=True)
 
             # Variabel backend tetap q1_reliability dst, label diganti
@@ -884,116 +882,149 @@ def page_dashboard_monitoring():
             dim_badge_text = "📉 DIMENSI SKOR TERENDAH" if is_lowest else "📊 ANALISIS DIMENSI"
             dim_badge_class = "dss-dim-badge-low" if is_lowest else "dss-dim-badge-normal"
 
-            # --- Cari kategori ABSA terkait yang DITEMUKAN di data ---
-            absa_categories_for_dim = DIMENSION_ABSA_MAP.get(selected_dim, [])
-
-            # Hitung frekuensi ABSA dari ulasan negatif terfilter
-            df_neg_dim = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
-            ulasan_neg_dim = df_neg_dim["teks_ulasan"].dropna().tolist()
-
-            found_absa_in_dim = []  # Kategori ABSA yang ditemukan DAN relevan dgn dimensi ini
-            if ulasan_neg_dim:
-                all_findings = extract_negative_findings(ulasan_neg_dim, top_n=25)
-                for finding in all_findings:
-                    if finding["frasa"] in absa_categories_for_dim:
-                        found_absa_in_dim.append(finding)
-
-            # --- Build Fishbone Table (dari knowledge base per dimensi) ---
-            dim_kb = DIMENSION_DSS_KB.get(selected_dim, [])
-
-            # Fishbone dari knowledge base dimensi
-            dim_table_html = (
-                "<table style='width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;'>"
-                "<thead>"
-                "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
-                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Faktor (6M)</th>"
-                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Kemungkinan Penyebab</th>"
-                "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Rekomendasi Tindakan</th>"
-                "</tr>"
-                "</thead>"
-                "<tbody>"
+            selected_sentimen_dss = st.radio(
+                "Filter Sentimen Ulasan untuk Indikator Ini:",
+                ["Negatif (Keluhan & Root Cause)", "Positif (Apresiasi)"],
+                horizontal=True
             )
-            for entry in dim_kb:
-                dim_table_html += (
-                    f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
-                    f"<td style='padding:8px 4px; color:#38bdf8; font-weight:500; vertical-align:top;'>{entry['faktor']}</td>"
-                    f"<td style='padding:8px 4px; color:#e2e8f0; vertical-align:top;'>{entry['penyebab']}</td>"
-                    f"<td style='padding:8px 4px; color:#34d399; vertical-align:top;'>{entry['rekomendasi']}</td>"
-                    f"</tr>"
-                )
-            dim_table_html += "</tbody></table>"
 
-            # --- Build ABSA temuan terkait (jika ada) ---
-            absa_list_html = ""
-            if found_absa_in_dim:
-                absa_list_html = (
-                    "<div style='margin-top:14px;'>"
-                    "<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
-                    "text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;'>"
-                    "📋 Temuan Keluhan Spesifik (ABSA) Terkait Dimensi Ini:</div>"
-                    "<table style='width:100%; border-collapse:collapse; font-size:13px;'>"
+            if selected_sentimen_dss.startswith("Negatif"):
+                # --- Cari kategori ABSA terkait yang DITEMUKAN di data ---
+                absa_categories_for_dim = DIMENSION_ABSA_MAP.get(selected_dim, [])
+    
+                # Hitung frekuensi ABSA dari ulasan negatif terfilter
+                df_neg_dim = df_filtered[df_filtered["sentimen_akhir"] == "Negatif"]
+                ulasan_neg_dim = df_neg_dim["teks_ulasan"].dropna().tolist()
+    
+                found_absa_in_dim = []  # Kategori ABSA yang ditemukan DAN relevan dgn dimensi ini
+                if ulasan_neg_dim:
+                    all_findings = extract_negative_findings(ulasan_neg_dim, top_n=25)
+                    for finding in all_findings:
+                        if finding["frasa"] in absa_categories_for_dim:
+                            found_absa_in_dim.append(finding)
+    
+                # --- Build Fishbone Table (dari knowledge base per dimensi) ---
+                dim_kb = DIMENSION_DSS_KB.get(selected_dim, [])
+    
+                # Fishbone dari knowledge base dimensi
+                dim_table_html = (
+                    "<table style='width:100%; border-collapse:collapse; margin-top:10px; font-size:13px;'>"
                     "<thead>"
                     "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
-                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>No</th>"
-                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Kategori Keluhan</th>"
-                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Frekuensi</th>"
-                    "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Proporsi</th>"
+                    "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Faktor (6M)</th>"
+                    "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Kemungkinan Penyebab</th>"
                     "</tr>"
                     "</thead>"
                     "<tbody>"
                 )
-                for idx, f in enumerate(found_absa_in_dim, 1):
-                    ulasan_asli_html = ""
-                    if "ulasan" in f and f["ulasan"]:
-                        list_li = "".join([f"<li style='margin-bottom:4px; padding-left:4px;'>{html.escape(u)}</li>" for u in f["ulasan"]])
-                        ulasan_asli_html = (
-                            f"<details style='margin-top:6px;'>"
-                            f"<summary style='font-size:0.75rem; color:#38bdf8; cursor:pointer;'>Lihat Ulasan Asli</summary>"
-                            f"<ul style='font-size:0.75rem; color:#cbd5e1; margin-top:4px; padding-left:16px; font-style:italic; list-style-type:disc;'>"
-                            f"{list_li}"
-                            f"</ul>"
-                            f"</details>"
-                        )
-
-                    absa_list_html += (
+                for entry in dim_kb:
+                    dim_table_html += (
                         f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
-                        f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{idx}</td>"
-                        f"<td style='padding:6px 4px; color:#e2e8f0; vertical-align:top;'>"
-                        f"<strong>{f['frasa']}</strong>"
-                        f"{ulasan_asli_html}"
-                        f"</td>"
-                        f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600; vertical-align:top;'>{f['frekuensi']}x</td>"
-                        f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{f['persentase']}%</td>"
+                        f"<td style='padding:8px 4px; color:#38bdf8; font-weight:500; vertical-align:top;'>{entry['faktor']}</td>"
+                        f"<td style='padding:8px 4px; color:#e2e8f0; vertical-align:top;'>{entry['penyebab']}</td>"
                         f"</tr>"
                     )
-                absa_list_html += "</tbody></table></div>"
-            else:
-                absa_list_html = (
-                    "<div style='margin-top:14px; padding:12px 16px; "
-                    "background:rgba(56,189,248,0.06); border-radius:10px; "
-                    "border:1px solid rgba(56,189,248,0.1);'>"
-                    "<span style='color:#7dd3fc; font-size:0.85rem;'>ℹ️ "
-                    "Tidak ditemukan keluhan spesifik dari teks ulasan untuk dimensi ini. "
-                    "Skor rendah kemungkinan berasal dari penilaian skala Likert saja — "
-                    "rekomendasi umum di atas tetap berlaku sebagai panduan perbaikan.</span>"
-                    "</div>"
+                dim_table_html += "</tbody></table>"
+    
+                # --- Build ABSA temuan terkait (jika ada) ---
+                absa_list_html = ""
+                if found_absa_in_dim:
+                    absa_list_html = (
+                        "<div style='margin-top:14px;'>"
+                        "<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
+                        "text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;'>"
+                        "📋 Temuan Keluhan Spesifik (ABSA) Terkait Indikator Ini:</div>"
+                        "<table style='width:100%; border-collapse:collapse; font-size:13px;'>"
+                        "<thead>"
+                        "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
+                        "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>No</th>"
+                        "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Kategori Keluhan</th>"
+                        "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Frekuensi</th>"
+                        "<th style='padding:6px 4px; color:#94a3b8; font-weight:600;'>Proporsi</th>"
+                        "</tr>"
+                        "</thead>"
+                        "<tbody>"
+                    )
+                    for idx, f in enumerate(found_absa_in_dim, 1):
+                        ulasan_asli_html = ""
+                        if "ulasan" in f and f["ulasan"]:
+                            list_li = "".join([f"<li style='margin-bottom:4px; padding-left:4px;'>{html.escape(u)}</li>" for u in f["ulasan"]])
+                            ulasan_asli_html = (
+                                f"<details style='margin-top:6px;'>"
+                                f"<summary style='font-size:0.75rem; color:#38bdf8; cursor:pointer;'>Lihat Ulasan Asli</summary>"
+                                f"<ul style='font-size:0.75rem; color:#cbd5e1; margin-top:4px; padding-left:16px; font-style:italic; list-style-type:disc;'>"
+                                f"{list_li}"
+                                f"</ul>"
+                                f"</details>"
+                            )
+    
+                        absa_list_html += (
+                            f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
+                            f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{idx}</td>"
+                            f"<td style='padding:6px 4px; color:#e2e8f0; vertical-align:top;'>"
+                            f"<strong>{f['frasa']}</strong>"
+                            f"{ulasan_asli_html}"
+                            f"</td>"
+                            f"<td style='padding:6px 4px; color:#fbbf24; font-weight:600; vertical-align:top;'>{f['frekuensi']}x</td>"
+                            f"<td style='padding:6px 4px; color:#94a3b8; vertical-align:top;'>{f['persentase']}%</td>"
+                            f"</tr>"
+                        )
+                    absa_list_html += "</tbody></table></div>"
+                else:
+                    absa_list_html = (
+                        "<div style='margin-top:14px; padding:12px 16px; "
+                        "background:rgba(56,189,248,0.06); border-radius:10px; "
+                        "border:1px solid rgba(56,189,248,0.1);'>"
+                        "<span style='color:#7dd3fc; font-size:0.85rem;'>ℹ️ "
+                        "Tidak ditemukan keluhan spesifik dari teks ulasan untuk indikator ini. "
+                        "Skor rendah kemungkinan berasal dari penilaian skala Likert saja — "
+                        "alternatif penyebab umum di atas tetap berlaku sebagai panduan.</span>"
+                        "</div>"
+                    )
+    
+                # --- Render Card ---
+                dim_card_html = (
+                    f"<div class='dss-dim-analysis-card'>"
+                    f"<span class='{dim_badge_class}'>{dim_badge_text}</span>"
+                    f"<div class='dss-dim-analysis-name'>📐 {selected_label}</div>"
+                    f"<div class='dss-dim-analysis-score'>Skor Rata-rata: <strong>{selected_score:.2f}</strong> / 5.00</div>"
+                    f"<div class='dss-separator' style='border-color:rgba(56,189,248,0.15);'></div>"
+                    f"<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
+                    f"text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; margin-top:10px;'>"
+                    f"🔍 Analisis Fishbone 6M — Alternatif Penyebab (Level Indikator):</div>"
+                    f"{dim_table_html}"
+                    f"{absa_list_html}"
+                    f"</div>"
                 )
+                st.markdown(dim_card_html, unsafe_allow_html=True)
 
-            # --- Render Card ---
-            dim_card_html = (
-                f"<div class='dss-dim-analysis-card'>"
-                f"<span class='{dim_badge_class}'>{dim_badge_text}</span>"
-                f"<div class='dss-dim-analysis-name'>📐 {selected_label} ({selected_dim})</div>"
-                f"<div class='dss-dim-analysis-score'>Skor Rata-rata: <strong>{selected_score:.2f}</strong> / 5.00</div>"
-                f"<div class='dss-separator' style='border-color:rgba(56,189,248,0.15);'></div>"
-                f"<div style='font-size:0.78rem; font-weight:700; color:#38bdf8; "
-                f"text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; margin-top:10px;'>"
-                f"🔍 Analisis Fishbone 6M — Penyebab & Rekomendasi (Level Dimensi):</div>"
-                f"{dim_table_html}"
-                f"{absa_list_html}"
-                f"</div>"
-            )
-            st.markdown(dim_card_html, unsafe_allow_html=True)
+            else:
+                # Tampilkan Ulasan Positif
+                df_pos_dim = df_filtered[
+                    (df_filtered["sentimen_akhir"] == "Positif") &
+                    (df_filtered["dimensi_terdeteksi"].str.contains(selected_dim, na=False))
+                ]
+                ulasan_pos_dim = df_pos_dim["teks_ulasan"].dropna().tolist()
+
+                if ulasan_pos_dim:
+                    list_li = "".join([f"<li style='margin-bottom:8px;'>{html.escape(u)}</li>" for u in ulasan_pos_dim])
+                    pos_html = (
+                        f"<div class='dss-dim-analysis-card' style='border-left-color:#34d399;'>"
+                        f"<span class='dss-dim-badge-normal' style='background:rgba(52,211,153,0.1); color:#34d399;'>🌟 APRESIASI TAMU</span>"
+                        f"<div class='dss-dim-analysis-name'>📐 {selected_label}</div>"
+                        f"<div class='dss-dim-analysis-score'>Skor Rata-rata: <strong>{selected_score:.2f}</strong> / 5.00</div>"
+                        f"<div class='dss-separator' style='border-color:rgba(52,211,153,0.15);'></div>"
+                        f"<div style='font-size:0.78rem; font-weight:700; color:#34d399; "
+                        f"text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; margin-top:10px;'>"
+                        f"✨ Ulasan Positif Terkait Indikator Ini ({len(ulasan_pos_dim)} ulasan):</div>"
+                        f"<ul style='font-size:0.85rem; color:#e2e8f0; padding-left:16px; font-style:italic; list-style-type:disc;'>"
+                        f"{list_li}"
+                        f"</ul>"
+                        f"</div>"
+                    )
+                    st.markdown(pos_html, unsafe_allow_html=True)
+                else:
+                    st.info("📭 Belum ada teks ulasan bersentimen Positif yang secara spesifik menyebutkan indikator ini.")
         else:
             st.info("📭 Belum ada data untuk analisis dimensi.")
 
@@ -1125,7 +1156,6 @@ def page_dashboard_monitoring():
                         "<tr style='border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;'>"
                         "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Faktor (6M)</th>"
                         "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Kemungkinan Penyebab</th>"
-                        "<th style='padding:8px 4px; color:#94a3b8; font-weight:600;'>Rekomendasi Tindakan</th>"
                         "</tr>"
                         "</thead>"
                         "<tbody>"
@@ -1135,7 +1165,6 @@ def page_dashboard_monitoring():
                             f"<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>"
                             f"<td style='padding:8px 4px; color:#38bdf8; font-weight:500; vertical-align:top;'>{entry['faktor']}</td>"
                             f"<td style='padding:8px 4px; color:#e2e8f0; vertical-align:top;'>{entry['penyebab']}</td>"
-                            f"<td style='padding:8px 4px; color:#34d399; vertical-align:top;'>{entry['rekomendasi']}</td>"
                             f"</tr>"
                         )
                     table_html += "</tbody></table>"
@@ -1148,7 +1177,7 @@ def page_dashboard_monitoring():
                         f"<div class='dss-dim-name'>📌 {top_kategori}</div>"
                         f"<div class='dss-score'>Jumlah Keluhan: <strong>{top_freq}</strong> keluhan</div>"
                         f"<div class='dss-separator'></div>"
-                        f"<div class='dss-label'>🔍 Analisis Fishbone & Rekomendasi Tindakan (DSS):</div>"
+                        f"<div class='dss-label'>🔍 Analisis Fishbone (Alternatif Penyebab):</div>"
                         f"{table_html}"
                         f"</div>"
                     )
@@ -1195,16 +1224,26 @@ def page_dashboard_monitoring():
             "nama_tamu": "Nama Tamu",
             "jenis_reservasi": "Jenis Reservasi",
             "rating_bintang": "Rating Bintang",
-            "q1_reliability": "Q1 Reliability",
-            "q2_assurance": "Q2 Assurance",
-            "q3_tangibles": "Q3 Tangibles",
-            "q4_empathy": "Q4 Empathy",
-            "q5_responsiveness": "Q5 Responsiveness",
-            "dimensi_terdeteksi": "Dimensi Terdeteksi",
+            "q1_reliability": "Q1 Kenyamanan",
+            "q2_assurance": "Q2 Kesopanan",
+            "q3_tangibles": "Q3 Kebersihan & Fisik",
+            "q4_empathy": "Q4 Kepedulian",
+            "q5_responsiveness": "Q5 Kecepatan",
+            "dimensi_terdeteksi": "Indikator Terdeteksi",
             "sentimen_akhir": "Sentimen",
             "teks_ulasan": "Teks Ulasan",
         }
         df_display = df_filtered[list(display_cols.keys())].rename(columns=display_cols)
+        
+        # Translate dimensi in column
+        if "Indikator Terdeteksi" in df_display.columns:
+            def translate_dims(dim_str):
+                if not isinstance(dim_str, str) or not dim_str:
+                    return dim_str
+                dims = [d.strip() for d in dim_str.split(",")]
+                return ", ".join([DIMENSION_LABEL_MAP.get(d, d) for d in dims])
+            df_display["Indikator Terdeteksi"] = df_display["Indikator Terdeteksi"].apply(translate_dims)
+
 
         st.dataframe(
             df_display,
@@ -1214,11 +1253,11 @@ def page_dashboard_monitoring():
             column_config={
                 "Tanggal": st.column_config.DateColumn(format="DD MMM YYYY"),
                 "Rating Bintang": st.column_config.NumberColumn(format="%d ⭐"),
-                "Q1 Reliability": st.column_config.NumberColumn(format="%d"),
-                "Q2 Assurance": st.column_config.NumberColumn(format="%d"),
-                "Q3 Tangibles": st.column_config.NumberColumn(format="%d"),
-                "Q4 Empathy": st.column_config.NumberColumn(format="%d"),
-                "Q5 Responsiveness": st.column_config.NumberColumn(format="%d"),
+                "Q1 Kenyamanan": st.column_config.NumberColumn(format="%d"),
+                "Q2 Kesopanan": st.column_config.NumberColumn(format="%d"),
+                "Q3 Kebersihan & Fisik": st.column_config.NumberColumn(format="%d"),
+                "Q4 Kepedulian": st.column_config.NumberColumn(format="%d"),
+                "Q5 Kecepatan": st.column_config.NumberColumn(format="%d"),
                 "Sentimen": st.column_config.TextColumn(width="small"),
                 "Jenis Reservasi": st.column_config.TextColumn(width="medium"),
             },
